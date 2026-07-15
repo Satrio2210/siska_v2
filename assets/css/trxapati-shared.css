@@ -1,0 +1,244 @@
+/* ============================================
+   TRXAPATI Shared Design System
+   Digunakan oleh: TRXAPATI01, TRXAPATI02, TRXAPATI07
+   ============================================ */
+
+/* Design Tokens */
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+}
+
+.content-modern {
+  margin: 20px 20px;
+}
+
+/* LAYOUT */
+body {
+  background-color: #D1D5DB;
+}
+
+.card-modern {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.card-exam {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.card-exam textarea,
+.card-exam select {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+  box-sizing: border-box;
+}
+
+.card-exam textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 14px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+.form-control {
+  border: 1px solid #D1D5DB;
+  color: #1F2937;
+  font-size: 14px;
+  transition: .2s;
+  height: 38px;
+  font-weight: 500;
+  padding: 0 14px;
+  border-radius: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-control[readonly] {
+  background: #f0f0f0;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #059669;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
+
+.form-control:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-grid-2.pati {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr;
+  gap: 16px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+textarea.form-control {
+  height: 60px;
+  padding-top: 12px;
+  resize: none;
+  width: 100%;
+}
+
+/* BUTTON */
+.btn-modern {
+  border: none;
+  height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.btn-save {
+  background: #059669;
+  color: white;
+  width: 100%;
+}
+
+.btn-reset {
+  background: #f59e0b;
+  color: white;
+  width: 100%;
+}
+
+.btn-refresh {
+  background: #0ea5ec;
+  color: white;
+  width: 100%;
+}
+
+.btn-delete {
+  background: #ff0000;
+  color: white;
+  width: 100%;
+}
+
+/* SEARCH */
+.search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  z-index: 999;
+  width: 100%;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+  overflow: auto;
+  max-height: 300px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  animation: dropdownFade .15s ease;
+}
+
+.table-wrapper {
+  overflow: auto;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+}
+
+.input-group-text {
+  font-size: 14px;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+@media(max-width:1100px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

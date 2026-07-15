@@ -1,0 +1,226 @@
+﻿#screen, .modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.table-wrapper {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: white;
+}
+
+#screen thead, .modern-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+#screen thead tr, .modern-table thead tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+#screen th, .modern-table th {
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  border: none;
+  background: #10b981;
+  color: white;
+}
+
+#screen tbody, .modern-table tbody {
+  display: block;
+  max-height: 380px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  scrollbar-gutter: stable;
+}
+
+#screen tbody tr, .modern-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+  transition: .2s ease;
+  background: white;
+}
+
+#screen tbody tr:nth-child(even), .modern-table tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+#screen tbody tr:hover, .modern-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+#screen td, .modern-table td {
+  padding: 14px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #000;
+  border-bottom: 1px solid #edf2f7;
+  text-align: center;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+#screen th:nth-child(1), .modern-table th:nth-child(1),
+#screen td:nth-child(1), .modern-table td:nth-child(1) {
+  width: 90px;
+}
+
+#screen th:nth-child(2), .modern-table th:nth-child(2),
+#screen td:nth-child(2), .modern-table td:nth-child(2) {
+  width: 70px;
+}
+
+#screen th:nth-child(3), .modern-table th:nth-child(3),
+#screen td:nth-child(3), .modern-table td:nth-child(3) {
+  width: 90px;
+}
+
+#screen th:nth-child(4), .modern-table th:nth-child(4),
+#screen td:nth-child(4), .modern-table td:nth-child(4) {
+  width: 150px;
+}
+
+#screen th:nth-child(5), .modern-table th:nth-child(5),
+#screen td:nth-child(5), .modern-table td:nth-child(5) {
+  width: 90px;
+}
+
+#screen th:nth-child(6), .modern-table th:nth-child(6),
+#screen td:nth-child(6), .modern-table td:nth-child(6) {
+  width: 100px;
+}
+
+#screen th:nth-child(7), .modern-table th:nth-child(7),
+#screen td:nth-child(7), .modern-table td:nth-child(7) {
+  width: 150px;
+  min-width: 150px;
+}
+
+#screen td:nth-child(7), .modern-table td:nth-child(7) {
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-lunas {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-belum {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pay-umum {
+  background: #dcfce7;
+  color: #15803d;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pay-bpjs {
+  background: #dbeafe;
+  color: #1d4ed8;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.action-group {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  width: 100%;
+}
+
+.action-group .button-view,
+.action-group .button-panggil,
+.action-group a.pure-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.button-view {
+  background: #10b981;
+  color: white;
+}
+
+.button-view:hover {
+  background: #059669;
+}
+
+.button-panggil {
+  background: #3b82f6;
+  color: white;
+}
+
+.button-panggil:hover {
+  background: #2563eb;
+}
+
+.button-disabled {
+  background: #d1d5db !important;
+  color: #9ca3af !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  box-shadow: none !important;
+}
+
+#screen tbody::-webkit-scrollbar, .modern-table tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+#screen tbody::-webkit-scrollbar-thumb, .modern-table tbody::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: auto;
+  }
+
+  #screen, .modern-table {
+    min-width: 900px;
+  }
+}
