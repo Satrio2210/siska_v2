@@ -735,6 +735,22 @@ function buatajaxrekammedis() {
   return null;
 }
 
+function setRekamMedisOneRowHeight() {
+  var wrap = document.querySelector("#tblrekammedis .rekam-medis-table tbody");
+  if (!wrap) return;
+  var firstRow = wrap.querySelector("tr");
+  if (!firstRow) {
+    wrap.style.maxHeight = "";
+    wrap.classList.remove("rm-one-row-visible");
+    return;
+  }
+  var h = firstRow.getBoundingClientRect().height;
+  if (h > 0) {
+    wrap.style.maxHeight = Math.ceil(h) + "px";
+    wrap.classList.add("rm-one-row-visible");
+  }
+}
+
 function stateChangedrekammedis() {
   var data;
   if (rekamku.readyState == 4 && rekamku.status == 200) {
@@ -742,6 +758,11 @@ function stateChangedrekammedis() {
     if (data.length > 3) {
       document.getElementById("tblrekammedis").innerHTML = data;
       document.getElementById("tblrekammedis").style.visibility = "";
+      setTimeout(setRekamMedisOneRowHeight, 0);
+      if (!window._rekamMedisResizeBound) {
+        window._rekamMedisResizeBound = true;
+        window.addEventListener("resize", setRekamMedisOneRowHeight);
+      }
     }
     else {
       document.getElementById("tblrekammedis").innerHTML = "";

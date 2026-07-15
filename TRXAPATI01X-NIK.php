@@ -17,7 +17,7 @@ if ($nik === '' || strlen($nik) !== 16) {
   - PATI_PIDN  : kolom NIK (atau yang lu pakai)
   - PATI_NAME  : kolom nama pasien
 */
-$sql = "SELECT PATI_MAIN_NAME, PATI_MAIN_BIRT
+$sql = "SELECT PATI_MAST_CODE, PATI_MAIN_NAME, PATI_MAIN_BIRT
         FROM patimast
         WHERE PATI_MAIN_PIDN = :nik
         LIMIT 1";
@@ -29,6 +29,7 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($row) {
   echo json_encode([
     'exists' => true,
+    'mast_code' => $row['PATI_MAST_CODE'] ?? '',
     'name' => $row['PATI_MAIN_NAME'] ?? '',
     'tgllahir' => $row['PATI_MAIN_BIRT'] ?? ''
   ]);

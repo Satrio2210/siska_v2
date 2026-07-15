@@ -21,16 +21,14 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="assets/css/layouts/header.css">
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
     <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-    <link rel="stylesheet" href="assets/css/trxapati-07.css">
-      <link rel="stylesheet" href="assets/css/modern-table.css">`n</head>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="text/javascript" src="js/jquery.js"></script>
-  <script src="js/sweetalert.min.js"></script>
-  <script>
-    $(document).ready(function () { setInterval(timestamp, 1000); });
-    function timestamp() { $.ajax({ url: 'inc/timestamp.php', success: function (data) { $('#timestamp').html(data); }, }); }
-  </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script>
+      $(document).ready(function () { setInterval(timestamp, 1000); });
+      function timestamp() { $.ajax({ url: 'inc/timestamp.php', success: function (data) { $('#timestamp').html(data); }, }); }
+    </script>
 
   <body onLoad="periksaakses('PASS_REGI_ENTR');">
     <div id="wrapper">
@@ -44,10 +42,11 @@ if (isset($_SESSION['username'])) {
           <form name="frmtrxaregi" method="post" action="">
             <div class="content-modern">
               <div class="card-modern" id="cariDaftar">
-                <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D; Cari &amp;
-                  Daftar Pasien</div>
-                <input type="text" name="txtsearch" id="txtsearch" class="form-control search-control"
-                  placeholder="Ketik nama untuk mencari pasien..." autocomplete="off"
+                <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D; Daftar Pasien
+                </div>
+                <input type="text" name="txtsearch" id="txtsearch" class="form-control"
+                  style="margin-bottom: 10px; width: 250px;" placeholder="Ketik nama untuk mencari pasien..."
+                  autocomplete="off"
                   onkeyup="if (value.length > 0) { ambilscreen(this.value); } else { ambilscreen(''); }"
                   onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtsearch').value = ''; document.getElementById('txtsearch').focus(); }">
 

@@ -8,16 +8,17 @@
   grid-template-columns: 2fr 1fr;
   gap: 16px;
   align-items: start;
-} 
+}
 
 .right-grid {
   display: grid;
 }
 
-.action-group {
-  display: flex;
-  gap: 12px;
-  margin-top: 14px;
+.action-group.pati {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .queue-box {
@@ -35,4 +36,3 @@
   color: #64748b;
   font-size: 14px;
 }
-

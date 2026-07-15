@@ -11,6 +11,7 @@ if (ISSET($_SESSION['username']))
 
       $mastcode = $_POST['txtmastcode'];
       $mainpidn = $_POST['txtmainpidn'];
+      $mastcodeAsli = isset($_POST['hidmastcode_asli']) ? $_POST['hidmastcode_asli'] : '';
 
       if(isset($_POST['hidmaintitl']) && ($_POST['hidmaintitl'] != ''))  {$maintitl = $_POST['hidmaintitl'];}//ok
       if(isset($_POST['txtmainname']) && ($_POST['txtmainname'] != ''))  {$mainname = addslashes($_POST['txtmainname']);}//ok
@@ -44,7 +45,9 @@ if (ISSET($_SESSION['username']))
       $timeinput = date("G:i:s");
       $userid = $_SESSION['username'];
 
-      $periksamastcode = "SELECT COUNT(*) FROM patimast WHERE PATI_MAST_CODE='$mastcode'";
+      $whereKey = !empty($mastcodeAsli) ? $mastcodeAsli : $mastcode;
+
+      $periksamastcode = "SELECT COUNT(*) FROM patimast WHERE PATI_MAST_CODE='$whereKey'";
       $periksamastcode_di_query=$db->query($periksamastcode) or die ("Cek Fail");
       $ketersediaan = $periksamastcode_di_query->fetchColumn();
       //Cek adanya user id yang di masukkan di database jika tidak ada dilanjutkan dengan membuat record kode pasien baru
@@ -95,7 +98,7 @@ if (ISSET($_SESSION['username']))
                                        PATI_MAIN_EDUC='$maineduc',  PATI_MAIN_PHNE='$mainphne', PATI_MAIN_MAIL='$mainmail', 
                                       PATI_MAIN_PRNT='$mainprnt', 
                                       PATI_UPDT_DATE='$dateinput', PATI_UPDT_TIME='$timeinput',PATI_UPDT_USER='$userid'    
-                  WHERE PATI_MAST_CODE='$mastcode'";
+                  WHERE PATI_MAST_CODE='$whereKey'";
 
                 // Prepare Request  
         $query_update = $db->prepare($update);

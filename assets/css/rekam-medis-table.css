@@ -1,0 +1,162 @@
+/* Riwayat medis — header tetap, scroll hanya isi tbody */
+
+.rekam-medis-wrap {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.rekam-medis-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+  margin: 0;
+}
+
+/* Header menempel di atas wrapper, tidak ikut scroll */
+.rekam-medis-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.rekam-medis-table thead th {
+  padding: 12px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.35;
+  color: #fff;
+  background: #10b981;
+  border: none;
+  border-bottom: 1px solid #059669;
+}
+
+.rekam-medis-table thead th:first-child {
+  border-radius: 11px 0 0 0;
+}
+
+.rekam-medis-table thead th:last-child {
+  border-radius: 0 11px 0 0;
+}
+
+/* Tinggi area isi = 1 baris (di-set JS); scroll untuk baris berikutnya */
+.rekam-medis-table tbody {
+  display: block;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+  scrollbar-gutter: stable;
+}
+
+.rekam-medis-table tbody.rm-one-row-visible {
+  overflow-y: auto;
+}
+
+.rekam-medis-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.rekam-medis-table tbody td {
+  padding: 12px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #111827;
+  text-align: left;
+  vertical-align: top;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  line-height: 1.5;
+  word-wrap: break-word;
+  background: #fff;
+}
+
+.rekam-medis-table tbody tr:nth-child(even) td {
+  background: #f9fafb;
+}
+
+.rekam-medis-table tbody tr:hover td {
+  background: #ecfdf5;
+}
+
+.rekam-medis-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.rekam-medis-table th:nth-child(1),
+.rekam-medis-table td:nth-child(1) {
+  width: 16%;
+}
+
+.rekam-medis-table th:nth-child(2),
+.rekam-medis-table td:nth-child(2) {
+  width: 22%;
+}
+
+.rekam-medis-table th:nth-child(3),
+.rekam-medis-table td:nth-child(3) {
+  width: 34%;
+}
+
+.rekam-medis-table th:nth-child(4),
+.rekam-medis-table td:nth-child(4) {
+  width: 28%;
+}
+
+.rekam-medis-table td.rm-col-dokter {
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 600;
+}
+
+.rekam-medis-table .label-bold {
+  font-weight: 700;
+  color: #111827;
+}
+
+.rekam-medis-table .inner-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.rekam-medis-table .inner-table td {
+  padding: 1px 0;
+  border: none !important;
+  background: transparent !important;
+  font-size: 12px;
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+.rekam-medis-table .inner-table td:nth-child(1) {
+  width: 58px;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.rekam-medis-table .inner-table td:nth-child(2) {
+  width: 8px;
+  padding: 0 4px;
+}
+
+.rekam-medis-table tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rekam-medis-table tbody::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.rekam-medis-table tbody::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}

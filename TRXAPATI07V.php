@@ -3,67 +3,71 @@ include "conf/config.php";
 ?>
 
 <style>
-    body {
-        background: #f3f4f6;
+    .table-container {
+        overflow: auto;
+        border-radius: 16px;
+        max-height: 420px;
+        border: 1px solid #e2e8f0;
     }
 
     #screen {
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        font-size: 13px;
-        background: #fff;
     }
 
-    #screen thead th {
-        padding: 10px 10px 8px;
-        text-align: left;
-        font-size: 13px;
-        font-weight: 700;
-        color: #ffffff;
-        border-bottom: 1px solid #d1d5db;
+    #screen thead {
         background: #10b981;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    #screen th {
+        padding: 10px 6px;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+        vertical-align: middle;
+        border: none;
+        letter-spacing: 0.3px;
     }
 
     #screen td {
-        padding: 7px 10px;
-        color: #374151;
-        vertical-align: top;
+        padding: 8px 6px;
+        font-size: 12px;
+        /* color: #374151; */
+        text-align: center;
+        vertical-align: middle;
         border-bottom: 1px solid #e5e7eb;
+        overflow-wrap: break-word;
         word-break: break-word;
-    }
-
-    #screen tr:nth-child(even) {
-        background: #f9fafb;
-    }
-
-    #screen tr:hover {
-        background: #f3f4f6;
     }
 
     #screen th:nth-child(1),
     #screen td:nth-child(1) {
-        width: 72px;
+        width: 60px;
     }
 
     #screen th:nth-child(2),
     #screen td:nth-child(2) {
-        width: 210px;
+        width: 200px;
     }
 
     #screen th:nth-child(3),
     #screen td:nth-child(3) {
-        width: 95px;
+        width: 85px;
     }
 
     #screen th:nth-child(4),
     #screen td:nth-child(4) {
-        width: 88px;
+        width: 150px;
     }
 
     #screen th:nth-child(5),
     #screen td:nth-child(5) {
-        width: 155px;
+        width: 90px;
     }
 
     #screen th:nth-child(6),
@@ -76,45 +80,36 @@ include "conf/config.php";
         width: 155px;
     }
 
-    #screen th:nth-child(8),
-    #screen td:nth-child(8) {
-        width: 95px;
+    #screen tr {
+        transition: .2s;
     }
 
-    #screen th:nth-child(9),
-    #screen td:nth-child(9) {
-        width: 110px;
+    #screen tbody tr:hover {
+        background: #d0e3f7;
     }
 
-    .button-view.pure-button,
-    .button-view {
-        background: #e5e7eb;
-        color: #374151;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        padding: 6px 12px;
+    .badge {
+        padding: 4px 8px;
+        border-radius: 999px;
         font-size: 12px;
-        font-weight: 600;
-        box-shadow: none;
+        font-weight: 700;
+        display: inline-block;
+        white-space: nowrap;
     }
 
-    .button-view:hover {
-        background: #d1d5db;
-        color: #111827;
+    .badge-primary {
+        background: #fef3c7;
+        color: #92400e;
     }
 
-    .table-wrap {
-        overflow: auto;
-        border-radius: 16px;
-        max-height: 420px;
-        border: 1px solid #e2e8f0;
+    .badge-secondary {
+        background: #dcfce7;
+        color: #166534;
     }
 </style>
-<link rel="stylesheet" href="assets/css/modern-table.css">
 
-
-<div class="table-wrap">
-    <table id="screen" class="modern-table">
+<div class="table-container">
+    <table id="screen">
         <thead>
             <tr>
                 <th>ANTRIAN</th>
@@ -170,8 +165,8 @@ include "conf/config.php";
             while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
                 echo '<tr>';
                 $regicode = $k['TRXA_REGI_CODE'];
-                echo '<td style="width: 100px">' . $k['TRXA_REGI_LIST'] . '</td>';
-                echo '<td style="width: 200px; text-align: left;">' . $k['PATI_NAME'] . '</td>';
+                echo '<td>' . $k['TRXA_REGI_LIST'] . '</td>';
+                echo '<td>' . $k['PATI_NAME'] . '</td>';
                 // echo '<td style="width: 100px">' . $k['TRXA_PATI_CODE'] . '</td>';
             
                 $xregipaym = $k['TRXA_REGI_PAYM'];
@@ -189,45 +184,30 @@ include "conf/config.php";
                     $regipaym = 'Fail get Payment';
                 }
 
-                echo '<td style="width: 100px">' . $regipaym . '</td>';
-                echo '<td style="width: 200px; text-align: left;">' . $k['DOCT_NAME'] . '</td>';
-                echo '<td style="width: 100px">' . $k['POLI_NAME'] . '</td>';
-                // echo '<td style="width: 200px">' . $k['ENTR_USER'] . '</td>';
+                echo '<td>' . $regipaym . '</td>';
+                echo '<td>' . $k['DOCT_NAME'] . '</td>';
+                echo '<td>' . $k['POLI_NAME'] . '</td>';
+                // echo '>R'] . '</td>';
                 $sudah_periksa = $k['SUDAH_PERIKSA'];
                 $registat = $k['TRXA_REGI_STAT'];
-                // if ($registat == 'W') 
-//   { 
-//     echo '<td style="width: 100px; background-color: #fbf705;"><b>Antri</b></td>';
-//   }
-// else if ($registat == 'C') 
-//   { 
-//     echo '<td style="width: 100px; background-color: #64cdcd;"><b>Periksa</b></td>';
-//   }
-// else if ($registat == 'P') 
-//   { 
-//     echo '<td style="width: 100px; background-color: #87fd65;"><b>Bayar</b></td>';
-//   }
-// else 
-//   { 
-//     echo '<td style="width: 100px;">No Status</b></td>';
-//   }
-            
+
+                echo '<td>';
                 if ($registat == 'W') {
                     // Kalo subquery nemu datanya di trxaexam (artinya sudah diklik submit/simpan)
                     if ($sudah_periksa > 0) {
-                        echo '<td style="width: 100px; background-color: #059669; color: white;">Siap Diperiksa</td>';
+                        echo '<span class="badge badge-secondary">Siap Diperiksa</span>';
                     }
                     // Kalo belum ada data pemeriksaan awal di trxaexam
                     else {
-                        echo '<td style="width: 100px; background-color: #ffc107; color: black;">Menunggu Skrining</td>';
+                        echo '<span class="badge badge-primary">Menunggu Skrining</span>';
                     }
                 } else {
-                    echo '<td style="width: 100px;">Bukan Antrian</td>';
+                    echo '<span>Bukan Antrian</span>';
                 }
+                echo '</td>';
 
-
-                echo '<td style="width: 200px">';
-                echo '<a class="button-view pure-button" onclick="viewcode(\'' . $regicode . '\');">Periksa</a>';
+                echo '<td>';
+                echo '<button type="button" class="btn-modern btn-save" style="width: 100px;" onclick="viewcode(\'' . $regicode . '\');">Periksa</button>';
                 echo '</td>';
                 echo '</tr>';
             }
@@ -235,10 +215,3 @@ include "conf/config.php";
         </tbody>
     </table>
 </div>
-
-
-
-
-
-
-

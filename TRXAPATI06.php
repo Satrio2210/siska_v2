@@ -24,24 +24,12 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="assets/css/layouts/header.css">
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
     <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-
-    <style type="text/css">
-      img {
-        width: 100px;
-        height: 100px;
-        position: relative;
-        top: 0px;
-        left: 0px;
-      }
-
-      .button-print {
-        background: rgb(223, 117, 20);
-        /* this is an orange */
-      }
-    </style>
   </head>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="js/jquery.js"></script>
+  <script src="js/sweetalert.min.js"></script>
+
   <script>
     $(document).ready(function () {
       setInterval(timestamp, 1000);
@@ -62,7 +50,8 @@ if (isset($_SESSION['username'])) {
                 <div class="card-title">&#x1F3F7; Daftar Harga</div>
                 <label for="txtmedicode" class="form-label">Cari Harga</label>
                 <input type="text" class="form-control" name="txtmedicode" id="txtmedicode" maxlength="20"
-                  style="width: 200px;" onkeyup="if (value.length > 0) { ambilviewprice(this.value); };" onkeydown="if (event.keyCode == 13 && value.length > 13) 
+                  style="width: 200px; margin-bottom:10px;"
+                  onkeyup="if (value.length > 0) { ambilviewprice(this.value); };" onkeydown="if (event.keyCode == 13 && value.length > 13) 
                         { 
                         document.getElementById('txtmedicode').value = '';
                         document.getElementById('txtmedicode').focus()
@@ -70,18 +59,17 @@ if (isset($_SESSION['username'])) {
                 <div id="tblviewprice"></div>
               </div>
           </form>
-
         </div>
-        <div class="footerdate">
-          <span class="labelTime Time"><b>Date :</b> <?php $tgl = date('d-m-Y');
-          echo $tgl; ?></span>
-        </div>
-        <div class="footertime">
-          <span class="labelTime Time" id="timestamp"></span>
-        </div>
-
-
       </div>
+    </div>
+    <div class="footerdate">
+      <span class="labelTime Time"><b>Date :</b>
+        <?php $tgl = date('d-m-Y');
+        echo $tgl; ?>
+      </span>
+    </div>
+    <div class="footertime">
+      <span class="labelTime Time" id="timestamp"></span>
     </div>
     <script src="js/TRXAPATI06.js"></script>
     <script src="js/ui.js"></script>

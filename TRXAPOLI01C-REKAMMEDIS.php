@@ -1,18 +1,17 @@
-﻿<?php
+<?php
 include "conf/config.php";
 ?>
 
+<link rel="stylesheet" href="assets/css/rekam-medis-table.css">
 
-<link rel="stylesheet" href="assets/css/modern-table.css">
-
-<div class="table-container">
-  <table id="screen" class="modern-table">
+<div class="rekam-medis-wrap">
+  <table class="rekam-medis-table">
     <thead>
       <tr>
-        <th style="width: 20%;">Dokter<br>Pemeriksa</th>
-        <th style="width: 25%;">TTV<br>Antropometri</th>
-        <th style="width: 30%;">Hasil<br>Pemeriksaan</th>
-        <th style="width: 25%;">Tindak Lanjut</th>
+        <th>Dokter<br>Pemeriksa</th>
+        <th>TTV<br>Antropometri</th>
+        <th>Hasil<br>Pemeriksaan</th>
+        <th>Tindak Lanjut</th>
       </tr>
     </thead>
     <tbody>
@@ -103,7 +102,7 @@ include "conf/config.php";
         echo '<tr>';
 
         // KOLOM 1: Dokter Pemeriksa
-        echo '<td style="text-align: center; vertical-align: middle;">';
+        echo '<td class="rm-col-dokter">';
         echo $outdoctname . '<br>';
         echo 'pada<br>';
         echo $outregidate;
@@ -178,8 +177,3 @@ include "conf/config.php";
     </tbody>
   </table>
 </div>
-
-
-
-
-

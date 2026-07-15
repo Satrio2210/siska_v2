@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <?php include "conf/config.php";
 //memulai session
 session_start();
@@ -211,7 +211,8 @@ if (isset($_SESSION['username'])) {
       }
     </style>
 
-      <link rel="stylesheet" href="assets/css/modern-table.css">`n</head>
+      <link rel="stylesheet" href="assets/css/modern-table.css">
+</head>
   <script type="text/javascript" src="js/jquery.js"></script>
   <script src="js/sanie.js"></script>
   <script src="js/sweetalert.min.js"></script>

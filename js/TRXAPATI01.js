@@ -212,18 +212,29 @@ function stateChangedNIK() {
     }
 
   if (res.exists) {
-    // isi kolom nama pasien (id input nama lu: txtmainname) :contentReference[oaicite:2]{index=2}
     var nm = document.getElementById('txtmainname');
     if (nm) {
-      nm.removeAttribute('disabled'); // biar kelihatan bisa diedit
+      nm.removeAttribute('disabled');
       nm.value = res.name || '';
     }
 
-    swal({
-      title: 'NIK SUDAH TERDAFAR!!',
-      text: 'NIK sudah terdaftar dengan Nama ' + (res.name || 'Tidak diketahui') + ' dengan Tanggal Lahir ' + (res.tgllahir || 'Tidak diketahui'),
-      icon: 'warning',
-    });
+    var currentMast = document.getElementById('txtmastcode');
+    var hidAsli = document.getElementById('hidmastcode_asli');
+    var currentAsli = hidAsli ? hidAsli.value : '';
+
+    if (res.mast_code && currentAsli && res.mast_code !== currentAsli) {
+      swal({
+        title: 'NIK MILIK PASIEN LAIN!',
+        text: 'NIK ini terdaftar untuk pasien lain (' + (res.name || '') + '). Pasien yang sedang Anda edit akan tetap disimpan dengan NIK baru ini.',
+        icon: 'warning',
+      });
+    } else {
+      swal({
+        title: 'NIK SUDAH TERDAFTAR!!',
+        text: 'NIK sudah terdaftar dengan Nama ' + (res.name || 'Tidak diketahui') + ' dengan Tanggal Lahir ' + (res.tgllahir || 'Tidak diketahui'),
+        icon: 'warning',
+      });
+    }
 
     document.getElementById('txtmainpidn').focus();
   }
@@ -331,6 +342,9 @@ function stateChangedpaticode() {
 function isipaticode(outmastcode, outmainpidn, outmaintitl, outmainname, outmaingend, outmainbirt, outmainblod, outmainaddr, outmainward, outmaindist, outmaincity, outmainprov, outmainreli, outmainctzn, outmainstat, outmainprof, outmaineduc, outmainphne, outmainmail, outmainprnt) {
   try {
     document.getElementById("txtmastcode").value = outmastcode;
+
+    var hid = document.getElementById('hidmastcode_asli');
+    if (hid) hid.value = outmastcode;
 
     document.getElementById('txtmainpidn').value = outmainpidn;
     loadedNIK = outmainpidn;

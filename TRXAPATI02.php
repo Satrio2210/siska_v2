@@ -28,7 +28,7 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
     <link rel="stylesheet" href="assets/css/trxapati-shared.css">
     <link rel="stylesheet" href="assets/css/trxapati-02.css">
-      <link rel="stylesheet" href="assets/css/modern-table.css">`n</head>
+  </head>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="js/jquery.js"></script>
@@ -299,24 +299,16 @@ if (isset($_SESSION['username'])) {
 
                     </div>
 
-
-
                   </div>
 
-                  <div class="action-group">
-
+                  <div class="action-group pati">
                     <button type="button" class="btn-modern btn-save" onclick="simpanPendaftaran()">
                       Simpan
                     </button>
 
-                    <!-- <button type="reset" class="btn-modern btn-reset">
-                      Reset
-                    </button> -->
-
                     <button type="button" onclick="location.reload();" class="btn-modern btn-refresh">
                       Refresh
                     </button>
-
                   </div>
 
                 </div>
@@ -341,7 +333,7 @@ if (isset($_SESSION['username'])) {
                     <div class="queue-estimation">
                       Estimasi Dilayani Â± 15 Menit
                     </div>
-                    <div class="action-group">
+                    <div class="action-group pati">
                       <button id="btnPrintAntrian" class="btn-modern btn-save" style="width:100%;margin-top:10px;"
                         onclick="printAntrian();">
                         Cetak
