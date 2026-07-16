@@ -90,28 +90,6 @@ if (isset($_SESSION['username'])) {
         margin-top: 10px;
       }
 
-      #tbllistdiag {
-        width: 100%;
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        margin-top: 8px;
-        max-height: 300px;
-        overflow-y: auto;
-      }
-
-      #tbldiagnosa {
-        width: 100%;
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        overflow: hidden;
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
-
       /* === SPLIT LAYOUT === */
       .split-layout {
         display: grid;
@@ -157,19 +135,6 @@ if (isset($_SESSION['username'])) {
         background: #059669;
       }
 
-      /* === TABLE OVERRIDES === */
-      #tbldiagnosa,
-      #tblscreen {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        width: 100%;
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-        margin-top: 10px;
-      }
-
       /* === RESPONSIVE === */
       @media(max-width:992px) {
         .split-layout {
@@ -211,8 +176,7 @@ if (isset($_SESSION['username'])) {
       }
     </style>
 
-      <link rel="stylesheet" href="assets/css/modern-table.css">
-</head>
+  </head>
   <script type="text/javascript" src="js/jquery.js"></script>
   <script src="js/sanie.js"></script>
   <script src="js/sweetalert.min.js"></script>
@@ -332,7 +296,7 @@ if (isset($_SESSION['username'])) {
 
                     <textarea id="txtexamcomp" name="txtexamcomp" rows="3" class="form-control" readonly="true"
                       style="resize: vertical;">
-                                                                                                                                                                                                                                                                        </textarea>
+                                                                                                                                                                                                                                                                                                                    </textarea>
                   </div>
                 </div>
 
@@ -762,24 +726,10 @@ if (isset($_SESSION['username'])) {
 
                     </div>
 
-                    <div id="tbllistdiag" style="
-                          width: 100%;
-                          background-color: white;
-                          display: none;
-                          margin-top: 10px;
-                          border-radius: 12px;
-                          overflow-y: auto;
-                          max-height: 250px;
-                      ">
+                    <div id="tbllistdiag">
                     </div>
 
-                    <div id="tbldiagnosa" style="
-                          width: 100%;
-                          background-color: white;
-                          display: none;
-                          margin-top: 10px;
-                          border-radius: 12px;
-                      ">
+                    <div id="tbldiagnosa">
                     </div>
 
 

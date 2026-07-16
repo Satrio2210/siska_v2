@@ -119,7 +119,6 @@ include "conf/config.php";
                 <th>POLI</th>
                 <th>STATUS</th>
                 <th>Action</th>
-
             </tr>
         </thead>
         <tbody>

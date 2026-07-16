@@ -51,10 +51,9 @@
             <ul class="nav-submenu">
                 <li><a href="TRXAPOLI00.php" class="nav-link-custom submenu-link"><i
                             class="bi bi-caret-right"></i>Pemeriksaan</a></li>
-                <li><a href="TRXAMEDI01.php" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Harga
+                <li><a href="#" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Harga
                         Tindakan</a></li>
-                <li><a href="DIAGMAST01.php" class="nav-link-custom submenu-link"><i
-                            class="bi bi-caret-right"></i>Diagnosa</a></li>
+                <li><a href="#" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Diagnosa</a></li>
             </ul>
         </div>
 
@@ -69,7 +68,7 @@
                             class="bi bi-caret-right"></i>Pemeriksaan</a></li>
                 <li><a href="TRXALABO05.php" class="nav-link-custom submenu-link"><i
                             class="bi bi-caret-right"></i>Hasil</a></li>
-                <li><a href="LABOMAST01.php" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Harga
+                <li><a href="#" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Harga
                         Pemeriksaan</a></li>
             </ul>
         </div>
