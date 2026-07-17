@@ -2,11 +2,10 @@
 include "conf/config.php";
 ?>
 
-`n<link rel="stylesheet" href="assets/css/modern-table.css">
-<table id="screen" class="modern-table">
+<table id="screen">
   <thead>
     <tr>
-      <th style="width: 500px;">TINDAKAN</th>
+      <th style="width: 500px;">LAYANAN</th>
     </tr>
   </thead>
   <tbody>
@@ -59,10 +58,3 @@ include "conf/config.php";
     ?>
   </tbody>
 </table>
-
-
-
-
-
-
-

@@ -1,499 +1,416 @@
-  // periksa akses
-    var aksesku;
-  function periksaakses(fieldid)
-  {
-    aksesku = buatajaxakses();
-    var url="ACCESS.php";
-    aksesku.onreadystatechange=stateChangedAkses;
-    var params = "q="+fieldid;
-    //alert('Parameter adalah '+fieldid);
-    aksesku.open("POST",url,true);
-    aksesku.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    aksesku.setRequestHeader("Content-length", params.length);
-    aksesku.setRequestHeader("Connection", "close");
-    aksesku.send(params);
+var aksesku;
+function periksaakses(fieldid) {
+  aksesku = buatajax();
+  var url = "ACCESS.php";
+  aksesku.onreadystatechange = stateChangedAkses;
+  var params = "q=" + fieldid;
+  aksesku.open("POST", url, true);
+  aksesku.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  aksesku.send(params);
+}
 
-  }
-
-  function buatajaxakses()
-  {
-    if (window.XMLHttpRequest)
-    {
-    return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject)
-    {
-    return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
-  }
-
-  function stateChangedAkses()
-  {
-  var data;
-  if (aksesku.readyState==4)
-    {
-
-    xdata=aksesku.responseText;
-    data=xdata.trim();
-    
-    if(data.length>1)
-      {
-
-        document.getElementById('txtmastcode').setAttribute('disabled','true');
-        document.getElementById('txtlaborslt').setAttribute('disabled','true');
-
-        document.getElementById('txtlabovalu').setAttribute('disabled','true');
-        document.getElementById('txtlabonote').setAttribute('disabled','true');
-
-        ambilscreen('',document.getElementById('hidlabodoct').value);
-
-      }
-      else
-      {
-        document.getElementById('txtmastcode').setAttribute('disabled','true');
-        document.getElementById('txtlaborslt').setAttribute('disabled','true');
-
-        document.getElementById('txtlabovalu').setAttribute('disabled','true');
-        document.getElementById('txtlabonote').setAttribute('disabled','true');
-
-
-      }
-    }
-  }
-// end periksa akses  
-
-// ambil data rujukan pemeriksaan Laborat
-
-var rujukanku;
-function ambilrujukan(kata,gender,tindakan)
-{
-  if(kata.length > 5)
-  {
-    document.getElementById("tbllabomast").innerHTML = "";
-    document.getElementById("tbllabomast").style.visibility = "hidden";
-  }
-  else
-  {
-  rujukanku = buatajaxrujukan();
-
-  var url="TRXALABO05C-LABOMAST.php";
-  rujukanku.onreadystatechange=stateChangedrujukan;
-  var params = "q="+kata+"|"+gender+"|"+tindakan;
-  //alert(params);
-  rujukanku.open("POST",url,true);
-  rujukanku.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  rujukanku.setRequestHeader("Content-length", params.length);
-  rujukanku.setRequestHeader("Connection", "close");
-  rujukanku.send(params);
-  }
-} 
-
-function buatajaxrujukan()
-{
-  if (window.XMLHttpRequest)
-  {
-  return new XMLHttpRequest();
-  }
-  if (window.ActiveXObject)
-  {
-  return new ActiveXObject("Microsoft.XMLHTTP");
-  }
+function buatajax() {
+  if (window.XMLHttpRequest) return new XMLHttpRequest();
+  if (window.ActiveXObject) return new ActiveXObject("Microsoft.XMLHTTP");
   return null;
 }
 
-function stateChangedrujukan()
-{
-  var data;
-  if (rujukanku.readyState==4 && rujukanku.status==200)
-  {
-  data=rujukanku.responseText;
-    if(data.length>3)
-    {   
-    document.getElementById("tbllabomast").innerHTML = data;
-    document.getElementById("tbllabomast").style.visibility = "";
-    }
-    else  
-    {
-    document.getElementById("tbllabomast").innerHTML = "";
-    document.getElementById("tbllabomast").style.visibility = "hidden";
+function stateChangedAkses() {
+  if (aksesku.readyState == 4) {
+    var data = aksesku.responseText.trim();
+    if (data.length > 1) {
+      ambilscreen('', document.getElementById('hidlabodoct').value);
     }
   }
 }
 
-function isirujukan(outmastcode,outsizename,outunitname,outvalumin,outvalumax,outvalustrg)
-{
-  try 
-  {
+function viewcode(regicode, paticode) {
+  try {
+    var ajaxview = buatajax();
+    ajaxview.onreadystatechange = function () {
+      if (ajaxview.readyState == 4) {
+        var data = ajaxview.responseText;
+        if (data.length > 1) {
+          var res = data.split("|");
+          document.getElementById("txtlaboregi").value = res[1];
+          document.getElementById("txtpaticode").value = res[2];
+          document.getElementById("txtmainname").value = res[3];
+          document.getElementById("txtmaingend").value = res[5];
+          document.getElementById("hidmaingend").value = res[4];
 
-  document.getElementById("hidmastcode").value = outmastcode;
-  document.getElementById("txtmastcode").value = outsizename;
-  
-  if (outvalumin == '<')
-  {
-  var valuminmax = outvalumin+" "+outvalumax;  
-  }
-  else if (outvalumin == '>')
-  {
-  var valuminmax = outvalumin+" "+outvalumax;  
-  }
-  else if ((outvalumin == '') && (outvalumax == ''))
-  {
-  var valuminmax = outvalustrg;  
-  } 
-  else 
-  {
-  var valuminmax = outvalumin+" - "+outvalumax;  
-  }
-  
+          if (res[6] == 'Tn.') document.getElementById("hidmaintitl").value = 'M';
+          else if (res[6] == 'Ny.' || res[6] == 'Nn.') document.getElementById("hidmaintitl").value = 'F';
+          else if (res[6] == 'An.') document.getElementById("hidmaintitl").value = 'C';
 
-  document.getElementById("txtlabovalu").value = valuminmax;
+          document.getElementById("txtmainage").value = res[7];
+          document.getElementById("txtbirtdate").value = res[8];
+          document.getElementById("txtmainaddr").value = res[9];
+          document.getElementById("txtregipaym").value = res[10];
 
-  document.getElementById("txtlabounit").value = outunitname;
-
-  document.getElementById("txtlaborslt").focus();
-  
-  document.getElementById("tbllabomast").style.visibility = "hidden";
-  document.getElementById("tbllabomast").innerHTML = "";
-
-  } 
-  catch(err){ alert(err.message); }
-}
-
-// selesai ambil data rujukan
-
-// input hasil pemeriksaan
-// inlaboregi,inlabodoct,inmastcode,inlaborslt,inlabonote
-  var ajaxinput;
-  function input(laboregi,labodoct,mastcode,laborslt,labonote)
-  {
-    ajaxinput = buatajaxinput();
-    var url="TRXALABO05E.php";
-    ajaxinput.onreadystatechange=stateChangedInput;
-    var params = "q="+laboregi+"|"+labodoct+"|"+mastcode+"|"+laborslt+"|"+labonote;
-    //alert(params);
-    ajaxinput.open("POST",url,true);
-    ajaxinput.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    //ajaxinput.setRequestHeader("Content-length", params.length);
-    //ajaxinput.setRequestHeader("Connection", "close");
-    ajaxinput.send(params);
-  }
-
-  function buatajaxinput()
-  {
-    if (window.XMLHttpRequest)
-    {
-    return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject)
-    {
-    return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
-  }
-
-  function stateChangedInput()
-  {
-  if (ajaxinput.readyState==4)
-    {
-        //document.getElementById('txtlaboregi').value = '';
-        //document.getElementById('txtpaticode').value = '';
-
-        var labodoct = document.getElementById('hidlabodoct').value;
-        var laboregi = document.getElementById('txtlaboregi').value;
-        //document.getElementById('txtmainname').value = '';
-        //document.getElementById('txtmaingend').value = '';
-        //document.getElementById('hidmaingend').value = '';
-
-        //document.getElementById('txtmainage').value = '';
-        //document.getElementById('txtbirtdate').value = '';
-
-        //document.getElementById('txtmainaddr').value = '';
-        //document.getElementById('txtregipaym').value = '';
-
-        document.getElementById('txtmastcode').value = '';
-        //document.getElementById('txtmastcode').setAttribute('disabled','true');
-        document.getElementById('hidmastcode').value = '';
-
-        document.getElementById('txtlaborslt').value = '';
-        //document.getElementById('txtlaborslt').setAttribute('disabled','true');
-
-        document.getElementById('txtlabovalu').value = '';
-        //document.getElementById('txtlabovalu').setAttribute('disabled','true');
-
-        document.getElementById('txtlabounit').value = '';
-
-        document.getElementById('txtlabonote').value = '';
-		//document.getElementById('txtlabonote').setAttribute('disabled','true');
-
-		document.getElementById('txtmastcode').focus();
-
-        ambilscreen('',labodoct);
-        ambilhasil(laboregi);
-        //}
-    }
-  }
-  // Selesai Input Data Wall ke Tabel trxalabo
-
-// Tampilkan Data Order   yang telah di pilih pada tabel untuk di ubah pada form 
-var ajaxview
-function viewcode(regicode,paticode)
-{
-  try 
-  {
-    ajaxview = buatajaxview();
-    var url="TRXALABO05C.php";
-    ajaxview.onreadystatechange=stateChangedView;
-    var params = "q="+regicode+"|"+paticode;
-    //alert(params);
-    ajaxview.open("POST",url,true);
+          ambilhasil(res[1]);
+          loadPemeriksaan(res[1]);
+        }
+      }
+    };
+    ajaxview.open("POST", "TRXALABO05C.php", true);
     ajaxview.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    ajaxview.setRequestHeader("Content-length", params.length);
-    ajaxview.setRequestHeader("Connection", "close");
-    ajaxview.send(params);
-
-  } 
-  catch(err){ alert(err.message); }
+    ajaxview.send("q=" + encodeURIComponent(regicode + "|" + paticode));
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
-  function buatajaxview()
-  {
-    if (window.XMLHttpRequest)
-    {
-    return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject)
-    {
-    return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
-  }
+function loadPemeriksaan(regicode) {
+  var sel = document.getElementById("txtpemeriksaan");
+  sel.innerHTML = '<option value="">Memuat...</option>';
+  document.getElementById("hidmedicode").value = "";
+  document.getElementById("hidtempcode").value = "";
+  clearLabItems("Memuat pemeriksaan...");
 
-  function stateChangedView()
-  {
-  var data;
-  if (ajaxview.readyState==4)
-    {
-      data=ajaxview.responseText;
-      if(data.length>1)
-      {
-        //alert(data);
-//      1         2       3         4         5       6         7        8         9         10       
-//|$regicode|$paticode|$mainname|$maingend|$gender|$maintitl|$fullage|$mainbirt|$mainaddr|$regipaym|
-      var res = data.split("|"); 
-      document.getElementById("txtlaboregi").value = res[1];
-
-      ambilhasil(res[1]);
-
-      document.getElementById("txtpaticode").value = res[2];
-
-      document.getElementById("txtmainname").value = res[3];
-
-      document.getElementById("txtmaingend").value = res[5];
-      document.getElementById("hidmaingend").value = res[4];
-
-      if (res[6] == 'Tn.')
-      {
-      document.getElementById("hidmaintitl").value = 'M';  
+  $.ajax({
+    url: "TRXALABO05C-PEMERIKSAAN.php",
+    type: "POST",
+    dataType: "json",
+    data: { regicode: regicode },
+    success: function (res) {
+      sel.innerHTML = '<option value="">-- Pilih pemeriksaan --</option>';
+      if (!res || res.status !== "ok" || !res.data || res.data.length === 0) {
+        sel.innerHTML = '<option value="">Tidak ada order lab di trxatret</option>';
+        clearLabItems("Tidak ada order lab. Anda bisa tambah item manual.");
+        return;
       }
-      else if (res[6] == 'Ny.')
-      {
-      document.getElementById("hidmaintitl").value = 'F';  
-      } 
-      else if (res[6] == 'Nn.')
-      {
-      document.getElementById("hidmaintitl").value = 'F';  
-      } 
-      else if (res[6] == 'An.')
-      {
-      document.getElementById("hidmaintitl").value = 'C';  
-      } 
-            
-
-      document.getElementById("txtmainage").value = res[7];
-
-      document.getElementById("txtbirtdate").value = res[8];
-
-      document.getElementById("txtmainaddr").value = res[9];
-
-      document.getElementById("txtregipaym").value = res[10];
-
-      document.getElementById("txtmastcode").removeAttribute('disabled');
-      //document.getElementById("txtmastcode").value = res[11];
-
-      document.getElementById("txtlaborslt").removeAttribute('disabled');
-      //document.getElementById("txtlaborslt").value = res[12];
-
-      document.getElementById("txtlabovalu").removeAttribute('disabled');
-      //document.getElementById("txtlabovalu").value = res[13];
-
-      //document.getElementById("txtlabounit").value = res[14];
-
-      document.getElementById("txtlabonote").removeAttribute('disabled');
-      //document.getElementById("txtlabonote").value = res[15];
-
-      document.getElementById("txtmastcode").focus();
-
-      }      
-        //}
+      for (var i = 0; i < res.data.length; i++) {
+        var d = res.data[i];
+        var opt = document.createElement("option");
+        opt.value = d.medi_code;
+        opt.text = (d.medi_name || d.medi_code) + (d.temp_code ? "" : " (tanpa template)");
+        opt.setAttribute("data-temp", d.temp_code || "");
+        opt.setAttribute("data-name", d.medi_name || d.medi_code);
+        sel.appendChild(opt);
+      }
+      if (res.data.length === 1) {
+        sel.selectedIndex = 1;
+        onPemeriksaanChange(sel);
+      }
+    },
+    error: function () {
+      sel.innerHTML = '<option value="">Gagal load pemeriksaan</option>';
+      clearLabItems("Gagal memuat daftar pemeriksaan");
     }
+  });
+}
+
+function onPemeriksaanChange(sel) {
+  var opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) {
+    document.getElementById("hidmedicode").value = "";
+    document.getElementById("hidtempcode").value = "";
+    clearLabItems("Pilih pemeriksaan untuk memuat item lab");
+    return;
+  }
+  var medicode = opt.value;
+  var tempcode = opt.getAttribute("data-temp") || "";
+  document.getElementById("hidmedicode").value = medicode;
+  document.getElementById("hidtempcode").value = tempcode;
+  getLabTemplate(medicode, tempcode);
+}
+
+function getLabTemplate(medicode, tempcode) {
+  clearLabItems("Memuat template...");
+  var laboregi = document.getElementById("txtlaboregi")
+    ? document.getElementById("txtlaboregi").value
+    : "";
+  $.ajax({
+    url: "TRXALABO05C-TEMPLATE.php",
+    type: "POST",
+    dataType: "json",
+    data: {
+      kode_pemeriksaan: medicode || "",
+      temp_code: tempcode || "",
+      laboregi: laboregi || ""
+    },
+    success: function (res) {
+      if (res && res.template && res.template.temp_code) {
+        document.getElementById("hidtempcode").value = res.template.temp_code;
+      }
+      if (res && res.items && res.items.length > 0) {
+        renderLabItems(res.items);
+      } else {
+        clearLabItems("Template kosong. Klik Tambah Item untuk input manual.");
+      }
+    },
+    error: function () {
+      clearLabItems("Gagal memuat template");
+    }
+  });
+}
+
+function clearLabItems(msg) {
+  var tbody = document.getElementById("lab-items-container");
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">' + (msg || "") + "</td></tr>";
+}
+
+function escapeHtml(str) {
+  if (str == null) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderLabItems(items) {
+  var tbody = document.getElementById("lab-items-container");
+  tbody.innerHTML = "";
+  var no = 0;
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    var isHeader = (it.item_is_header === "Y" || it.item_is_header === "y");
+    no++;
+    var tr = document.createElement("tr");
+    if (isHeader) tr.className = "row-header";
+
+    var rujukan = it.item_rujukan || "";
+    var satuan = it.item_satuan || "";
+    var name = it.item_name || "";
+    var dtlId = it.dtl_id || "";
+
+    if (isHeader) {
+      tr.innerHTML =
+        '<td>' + no + "</td>" +
+        '<td colspan="4"><strong>' + escapeHtml(name) + "</strong>" +
+        '<input type="hidden" name="item_name[]" value="' + escapeHtml(name) + '">' +
+        '<input type="hidden" name="item_hasil[]" value="">' +
+        '<input type="hidden" name="item_rujukan[]" value="">' +
+        '<input type="hidden" name="item_satuan[]" value="">' +
+        '<input type="hidden" name="item_dtl_id[]" value="' + escapeHtml(dtlId) + '">' +
+        '<input type="hidden" name="item_is_header[]" value="Y">' +
+        "</td>" +
+        '<td><button type="button" class="btn-icon-del" title="Hapus" onclick="hapusBaris(this)"><i class="bi bi-trash"></i></button></td>';
+    } else {
+      tr.innerHTML =
+        '<td class="col-no">' + no + "</td>" +
+        '<td><input class="form-control" type="text" name="item_name[]" value="' + escapeHtml(name) + '" readonly>' +
+        '<input type="hidden" name="item_dtl_id[]" value="' + escapeHtml(dtlId) + '">' +
+        '<input type="hidden" name="item_is_header[]" value="N"></td>' +
+        '<td><input class="form-control" type="text" name="item_hasil[]" value="" maxlength="50" placeholder="Hasil"></td>' +
+        '<td><div class="item-rujukan">' + escapeHtml(rujukan) + "</div>" +
+        '<input type="hidden" name="item_rujukan[]" value="' + escapeHtml(rujukan) + '"></td>' +
+        '<td><input class="form-control" type="text" name="item_satuan[]" value="' + escapeHtml(satuan) + '" readonly></td>' +
+        '<td><button type="button" class="btn-icon-del" title="Hapus" onclick="hapusBaris(this)"><i class="bi bi-trash"></i></button></td>';
+    }
+    tbody.appendChild(tr);
+  }
+  renumberRows();
+}
+
+function tambahBarisManual() {
+  var tbody = document.getElementById("lab-items-container");
+  if (tbody.querySelector("td[colspan]")) {
+    tbody.innerHTML = "";
+  }
+  var tr = document.createElement("tr");
+  tr.innerHTML =
+    '<td class="col-no"></td>' +
+    '<td><input class="form-control" type="text" name="item_name[]" value="" placeholder="Nama item" maxlength="100">' +
+    '<input type="hidden" name="item_dtl_id[]" value="">' +
+    '<input type="hidden" name="item_is_header[]" value="N"></td>' +
+    '<td><input class="form-control" type="text" name="item_hasil[]" value="" maxlength="50" placeholder="Hasil"></td>' +
+    '<td><input class="form-control" type="text" name="item_rujukan[]" value="" placeholder="Nilai rujukan"></td>' +
+    '<td><input class="form-control" type="text" name="item_satuan[]" value="" placeholder="Satuan"></td>' +
+    '<td><button type="button" class="btn-icon-del" title="Hapus" onclick="hapusBaris(this)"><i class="bi bi-trash"></i></button></td>';
+  tbody.appendChild(tr);
+  renumberRows();
+  var inp = tr.querySelector('input[name="item_name[]"]');
+  if (inp) inp.focus();
+}
+
+function hapusBaris(btn) {
+  var tr = btn.closest("tr");
+  if (tr) tr.parentNode.removeChild(tr);
+  var tbody = document.getElementById("lab-items-container");
+  if (!tbody.querySelector("tr")) {
+    clearLabItems("Tidak ada item. Klik Tambah Item atau pilih pemeriksaan.");
+  } else {
+    renumberRows();
+  }
+}
+
+function renumberRows() {
+  var rows = document.querySelectorAll("#lab-items-container tr");
+  var n = 0;
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].querySelector("td[colspan='6']")) continue;
+    n++;
+    var cell = rows[i].querySelector(".col-no") || rows[i].cells[0];
+    if (cell) cell.textContent = n;
+  }
+}
+
+function submitHasilLab() {
+  var laboregi = document.getElementById("txtlaboregi").value;
+  var labodoct = document.getElementById("hidlabodoct").value;
+  var medicode = document.getElementById("hidmedicode").value;
+  var tempcode = document.getElementById("hidtempcode").value;
+  var noteEl = document.getElementById("txtlabonote");
+  var labonote = noteEl ? noteEl.value : "";
+
+  if (!laboregi) {
+    swal({ title: "Nomor Pemeriksaan Kosong", text: "Anda belum memilih Pasien", icon: "warning" });
+    return;
+  }
+  if (!labodoct) {
+    swal({ title: "Petugas kosong", text: "Nama petugas medis kosong", icon: "warning" });
+    return;
   }
 
+  var names = document.querySelectorAll('#lab-items-container input[name="item_name[]"]');
+  var hasils = document.querySelectorAll('#lab-items-container input[name="item_hasil[]"]');
+  var headers = document.querySelectorAll('#lab-items-container input[name="item_is_header[]"]');
+  var filled = 0;
+  for (var i = 0; i < names.length; i++) {
+    var isH = headers[i] && headers[i].value === "Y";
+    if (!isH && names[i].value.trim() !== "" && hasils[i] && hasils[i].value.trim() !== "") {
+      filled++;
+    }
+  }
+  if (filled === 0) {
+    swal({ title: "Hasil kosong", text: "Isi minimal 1 item hasil pemeriksaan", icon: "warning" });
+    return;
+  }
 
+  var payload = {
+    laboregi: laboregi,
+    labodoct: labodoct,
+    medicode: medicode,
+    tempcode: tempcode,
+    labonote: labonote,
+    "item_name[]": [],
+    "item_hasil[]": [],
+    "item_rujukan[]": [],
+    "item_satuan[]": [],
+    "item_dtl_id[]": [],
+    "item_is_header[]": []
+  };
 
+  var rows = document.querySelectorAll("#lab-items-container tr");
+  for (var r = 0; r < rows.length; r++) {
+    var row = rows[r];
+    if (row.querySelector("td[colspan='6']")) continue;
+    var n = row.querySelector('input[name="item_name[]"]');
+    var h = row.querySelector('input[name="item_hasil[]"]');
+    var j = row.querySelector('input[name="item_rujukan[]"]');
+    var s = row.querySelector('input[name="item_satuan[]"]');
+    var d = row.querySelector('input[name="item_dtl_id[]"]');
+    var ih = row.querySelector('input[name="item_is_header[]"]');
+    if (!n) continue;
+    payload["item_name[]"].push(n.value);
+    payload["item_hasil[]"].push(h ? h.value : "");
+    payload["item_rujukan[]"].push(j ? j.value : "");
+    payload["item_satuan[]"].push(s ? s.value : "");
+    payload["item_dtl_id[]"].push(d ? d.value : "");
+    payload["item_is_header[]"].push(ih ? ih.value : "N");
+  }
 
-// Tampilkan data yang diinput dalam datable
+  $.ajax({
+    url: "TRXALABO05E.php",
+    type: "POST",
+    dataType: "json",
+    data: payload,
+    traditional: true,
+    success: function (res) {
+      if (res && res.status === "ok") {
+        swal({ title: "Berhasil", text: res.message || "Tersimpan", icon: "success" });
+        ambilhasil(laboregi);
+      } else {
+        swal({ title: "Gagal", text: (res && res.message) || "Gagal simpan", icon: "error" });
+      }
+    },
+    error: function (xhr) {
+      swal({ title: "Error", text: "Gagal kirim data: " + (xhr.responseText || xhr.status), icon: "error" });
+    }
+  });
+}
+
+function printHasilLab() {
+  var outlaboregi = document.getElementById("txtlaboregi").value;
+  if (!outlaboregi) {
+    swal({
+      title: "Data Hasil belum di pilih",
+      text: "Anda belum memilih Data Hasil Pemeriksaan Laboratorium",
+      icon: "warning"
+    });
+    return;
+  }
+  window.open("TRXALABO05P.php?laboregi=" + encodeURIComponent(outlaboregi), "_blank");
+}
+
 var drz;
-function ambilscreen(kata,nakes)
-{
-  if(nakes.length > 5)
-  {
-  document.getElementById("tblscreen").style.visibility = "hidden";
+function ambilscreen(kata, nakes) {
+  if (nakes.length > 5) {
+    var el = document.getElementById("tblscreen");
+    if (el) el.style.visibility = "hidden";
+    return;
   }
-  else
-  {
-  drz = buatajaxscreen();
-  var url="TRXALABO05V.php";
-  drz.onreadystatechange=stateChangedscreen;
-  var params = "q="+kata+"|"+nakes;
-  drz.open("POST",url,true);
-  //beberapa http header harus kita set kalau menggunakan POST
+  drz = buatajax();
+  drz.onreadystatechange = function () {
+    if (drz.readyState == 4 && drz.status == 200) {
+      var el = document.getElementById("tblscreen");
+      if (!el) return;
+      var datapost = drz.responseText;
+      if (datapost.length > 0) {
+        el.innerHTML = datapost;
+        el.style.visibility = "";
+      } else {
+        el.innerHTML = "";
+        el.style.visibility = "hidden";
+      }
+    }
+  };
+  drz.open("POST", "TRXALABO05V.php", true);
   drz.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  drz.setRequestHeader("Content-length", params.length);
-  drz.setRequestHeader("Connection", "close");
-  drz.send(params);
-  }
-} 
-
-  function buatajaxscreen()
-  {
-    if (window.XMLHttpRequest)
-    {
-    return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject)
-    {
-    return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
-  }
-
-function stateChangedscreen()
-{
-  var datapost;
-  if (drz.readyState==4 && drz.status==200)
-  {
-  datapost=drz.responseText;
-    if(datapost.length>0)
-    {
-    document.getElementById("tblscreen").innerHTML = datapost;
-    document.getElementById("tblscreen").style.visibility = "";
-    }
-    else  
-    {
-    document.getElementById("tblscreen").innerHTML = "";
-    document.getElementById("tblscreen").style.visibility = "hidden";
-    }
-  }
+  drz.send("q=" + encodeURIComponent((kata || "") + "|" + nakes));
 }
 
-
-// tabel Hasil Pemeriksaan Laboratorium
 var resultku;
-
-function ambilhasil(regicode)
-{
-  if(regicode.length > 14)
-  {
-  document.getElementById("tblviewresult").style.visibility = "hidden";
+function ambilhasil(regicode) {
+  if (!regicode || regicode.length > 14) {
+    var el = document.getElementById("tblviewresult");
+    if (el) {
+      el.innerHTML = "";
+      el.style.visibility = "hidden";
+    }
+    return;
   }
-  else
-  {
-  resultku = buatajaxhasil();
-  var url="TRXALABO05C-LABORESULT.php";
-  resultku.onreadystatechange=stateChangedhasil;
-  var params = "q="+regicode;
-  resultku.open("POST",url,true);
+  resultku = buatajax();
+  resultku.onreadystatechange = function () {
+    if (resultku.readyState == 4 && resultku.status == 200) {
+      var el = document.getElementById("tblviewresult");
+      if (!el) return;
+      var data = resultku.responseText;
+      if (data.length > 3) {
+        el.innerHTML = data;
+        el.style.visibility = "";
+      } else {
+        el.innerHTML = "";
+        el.style.visibility = "hidden";
+      }
+    }
+  };
+  resultku.open("POST", "TRXALABO05C-LABORESULT.php", true);
   resultku.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  resultku.setRequestHeader("Content-length", params.length);
-  resultku.setRequestHeader("Connection", "close");
-  resultku.send(params);
-  }
-} 
-
-function buatajaxhasil()
-{
-  if (window.XMLHttpRequest)
-  {
-  return new XMLHttpRequest();
-  }
-  if (window.ActiveXObject)
-  {
-  return new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  return null;
+  resultku.send("q=" + encodeURIComponent(regicode));
 }
 
-function stateChangedhasil()
-{
-  var data;
-  if (resultku.readyState==4 && resultku.status==200)
-  {
-  data=resultku.responseText;
-    if(data.length>3)
-    {   
-    document.getElementById("tblviewresult").innerHTML = data;
-    document.getElementById("tblviewresult").style.visibility = "";
+var ajaxhapus;
+function hapuscode(regicode, hasilid) {
+  ajaxhapus = buatajax();
+  ajaxhapus.onreadystatechange = function () {
+    if (ajaxhapus.readyState == 4) {
+      ambilhasil(document.getElementById("txtlaboregi").value);
     }
-    else  
-    {
-    document.getElementById("tblviewresult").innerHTML = "";
-    document.getElementById("tblviewresult").style.visibility = "hidden";
-    }
-  }
+  };
+  ajaxhapus.open("POST", "TRXALABO05D.php", true);
+  ajaxhapus.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  ajaxhapus.send("q=" + encodeURIComponent(regicode + "|" + hasilid));
 }
-
-// ambil list hasil labs
-
-// Hapus 
-  var ajaxhapus;
-  function hapuscode(regicode,mastcode)
-  {
-    ajaxhapus = buatajaxhapus();
-    //var url="TBLIUNIT01D.php";
-    var url="TRXALABO05D.php";
-    ajaxhapus.onreadystatechange=stateChangedhapus;
-    var params = "q="+regicode+"|"+mastcode;
-    //alert(params);
-    ajaxhapus.open("POST",url,true);
-    ajaxhapus.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    ajaxhapus.setRequestHeader("Content-length", params.length);
-    ajaxhapus.setRequestHeader("Connection", "close");
-    ajaxhapus.send(params);
-  }
-
-  function buatajaxhapus()
-  {
-    if (window.XMLHttpRequest)
-    {
-    return new XMLHttpRequest();
-    }
-    if (window.ActiveXObject)
-    {
-    return new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    return null;
-  }
-
-  function stateChangedhapus()
-  {
-  var data;
-  if (ajaxhapus.readyState==4)
-    {
-        var inregicode = document.getElementById('txtlaboregi').value;
-        //alert(inregicode);
-        ambilhasil(inregicode);
-        //document.getElementById('txtlistdiag').focus();
-    }
-  }
-// Selesai hapus Data 

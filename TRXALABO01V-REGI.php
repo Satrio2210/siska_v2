@@ -104,17 +104,23 @@ include "inc/sanie.php";
 
   #screen th:nth-child(5),
   #screen td:nth-child(5) {
-    width: 120px;
+    width: 180px;
+    text-align: left;
   }
 
   #screen th:nth-child(6),
   #screen td:nth-child(6) {
-    width: 150px;
+    width: 120px;
   }
 
   #screen th:nth-child(7),
   #screen td:nth-child(7) {
-    width: 130px;
+    width: 150px;
+  }
+
+  #screen th:nth-child(8),
+  #screen td:nth-child(8) {
+    width: 160px;
   }
 
   /* STATUS BADGE */
@@ -163,6 +169,23 @@ include "inc/sanie.php";
     background: #059669;
   }
 
+  .button-hasil {
+    border: none;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+    text-decoration: none;
+    background: #3b82f6;
+    color: white;
+  }
+
+  .button-hasil:hover {
+    background: #2563eb;
+  }
+
   /* SCROLLBAR */
   #screen tbody::-webkit-scrollbar {
     width: 8px;
@@ -181,7 +204,7 @@ include "inc/sanie.php";
     }
 
     #screen {
-      min-width: 840px;
+      min-width: 1020px;
     }
 
   }
@@ -196,6 +219,7 @@ include "inc/sanie.php";
         <th>Antri</th>
         <th>Nama Pasien</th>
         <th>Poli</th>
+        <th>Keterangan</th>
         <th>Payment</th>
         <th>Status</th>
         <th>Action</th>
@@ -211,7 +235,8 @@ include "inc/sanie.php";
                 (SELECT PATI_MAIN_BIRT FROM patimast WHERE PATI_MAST_CODE=TRXA_PATI_CODE) AS MAIN_AGE,
                 (SELECT PATI_MAIN_GEND FROM patimast WHERE PATI_MAST_CODE=TRXA_PATI_CODE) AS MAIN_GEND,
                 (SELECT COUNT(*) FROM trxatret WHERE TRXA_TRET_CODE=TRXA_REGI_CODE AND TRXA_VIEW_STAT='Y') AS TOTA_TRET,
-                TRXA_REGI_PAYM, TRXA_REGI_POLI, TRXA_REGI_LIST, TRXA_ENTR_DATE
+                TRXA_REGI_PAYM, TRXA_REGI_POLI, TRXA_REGI_LIST, TRXA_ENTR_DATE,
+                TRXA_REGI_RUJUK_TYPE, TRXA_REGI_RUJUK_NOTE
                 FROM trxaregi
                 WHERE TRXA_REGI_DOCT = '$dokter' AND TRXA_REGI_STAT IN('W','C')
                 AND TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 5 DAY)
@@ -282,6 +307,18 @@ include "inc/sanie.php";
         echo '<td>' . $noantri_full . '</td>';
         echo '<td>' . htmlspecialchars($outmainname, ENT_QUOTES, 'UTF-8') . '</td>';
         echo '<td>' . $regipoli . '</td>';
+
+        $rujukType = isset($k['TRXA_REGI_RUJUK_TYPE']) ? trim($k['TRXA_REGI_RUJUK_TYPE']) : '';
+        $rujukNote = isset($k['TRXA_REGI_RUJUK_NOTE']) ? trim($k['TRXA_REGI_RUJUK_NOTE']) : '';
+        if ($rujukType === 'LB' && $rujukNote !== '') {
+          $keterangan = 'Rujuk Internal - ' . $rujukNote . '';
+        } elseif ($rujukType === 'LB') {
+          $keterangan = 'Rujuk Internal';
+        } else {
+          $keterangan = 'Datang Sendiri';
+        }
+        echo '<td style="text-align:left;">' . htmlspecialchars($keterangan, ENT_QUOTES, 'UTF-8') . '</td>';
+
         echo '<td>' . $outregipaym . '</td>';
 
         if ($outtotaltret > 0) {
@@ -293,6 +330,8 @@ include "inc/sanie.php";
         echo '<td><div class="action-group">';
         echo '<a class="button-periksa" href="TRXALABO01.php?regicode=' . urlencode($outtretcode)
           . '&paticode=' . urlencode($outpaticode) . '">Periksa</a>';
+        echo '<a class="button-hasil" href="TRXALABO05.php?regicode=' . urlencode($outtretcode)
+          . '&paticode=' . urlencode($outpaticode) . '">Hasil</a>';
         echo '</div></td>';
 
         echo '</tr>';
@@ -301,11 +340,3 @@ include "inc/sanie.php";
     </tbody>
   </table>
 </div>
-
-
-
-
-
-
-
-
