@@ -30,7 +30,7 @@
             </a>
             <ul class="nav-submenu">
                 <li><a href="TRXAPATI01.php" class="nav-link-custom submenu-link">
-                        <i class="bi bi-caret-right"></i>Daftar Pasien</a></li>
+                        <i class="bi bi-caret-right"></i>Pasien Baru</a></li>
                 <li><a href="TRXAPATI02.php" class="nav-link-custom submenu-link"><i
                             class="bi bi-caret-right"></i>Pasien Berobat</a></li>
                 <li><a href="TRXAPATI07.php" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>TTV &
@@ -84,8 +84,7 @@
                             class="bi bi-caret-right"></i>Pembayaran</a></li>
                 <li><a href="TRXASALE02.php" class="nav-link-custom submenu-link"><i
                             class="bi bi-caret-right"></i>Kwitansi</a></li>
-                <li><a href="TRXASALE03.php" class="nav-link-custom submenu-link"><i
-                            class="bi bi-caret-right"></i>Report</a></li>
+                <li><a href="#" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Report</a></li>
             </ul>
         </div>
 

@@ -11,8 +11,7 @@ $grand_total = 0;
 $discount = 0; // Jika ada variabel diskon dari DB, bisa dimasukkan ke sini
 
 // 1. Refactor: Data Pasien menggunakan LEFT JOIN
-$query_regi = "
-    SELECT 
+$query_regi = "SELECT 
         r.TRXA_PATI_CODE, 
         r.TRXA_REGI_STAT, 
         CONCAT(p.PATI_MAIN_TITL, ' ', p.PATI_MAIN_NAME) AS PATI_NAME,
@@ -38,19 +37,101 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
 } else {
   $registat = 'Antri';
 }
-
 ?>
 
+<style>
+  .invoice-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: Inter, Arial, sans-serif;
+    font-size: 13px;
+    color: #1f2937;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+  }
 
-<link rel="stylesheet" href="assets/css/modern-table.css">
+  .invoice-table thead th {
+    background: #007aff;
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 1px solid #d1d5db;
+    letter-spacing: 0.2px;
+  }
+
+  .invoice-table .section-header {
+    background: #007aff !important;
+    color: #fff !important;
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    border-bottom: 1px solid #d1d5db;
+    letter-spacing: 0.2px;
+  }
+
+  .invoice-table tbody tr td {
+    border-bottom: 1px solid #d1d5db;
+  }
+
+  .invoice-table tbody tr.item-row td {
+    background: #fff;
+    padding: 8px 12px;
+    border-bottom: 1px solid #d1d5db;
+    vertical-align: middle;
+  }
+
+  .invoice-table tbody tr.item-row:nth-child(even) td {
+    background: #f2f2f2;
+  }
+
+  .invoice-table tbody tr.item-row:hover td {
+    background: #eaf3ff;
+  }
+
+  .invoice-table .text-left {
+    text-align: left;
+  }
+
+  .invoice-table .text-center {
+    text-align: center;
+  }
+
+  .invoice-table .text-right {
+    text-align: right;
+  }
+
+  .invoice-table .font-bold {
+    font-weight: 700;
+  }
+
+  .invoice-table tr.total-row td {
+    background: #f8fafc;
+    padding: 8px 12px;
+    border-top: none;
+    border-bottom: 1px solid #d1d5db;
+    color: #111827;
+  }
+
+  .invoice-table tr.total-row.total-final td {
+    background: #eaf3ff;
+    color: #007aff;
+    font-size: 14px;
+    border-bottom: none;
+  }
+</style>
 
 <table class="invoice-table">
   <thead>
     <tr>
-      <th class="text-left" style="width: 40%;">Keterangan</th>
-      <th class="text-center" style="width: 15%;">Jumlah</th>
-      <th class="text-right" style="width: 20%;">Biaya</th>
-      <th class="text-right" style="width: 25%;">Sub Total</th>
+      <th>Keterangan</th>
+      <th>Jumlah</th>
+      <th>Biaya</th>
+      <th>Sub Total</th>
     </tr>
   </thead>
   <tbody>
@@ -83,10 +164,10 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
       $grand_total += $row_tret['SUB_TOTAL']; // Tambah ke Grand Total
     
       echo '<tr class="item-row">';
-      echo '<td class="text-left">' . $row_tret['MEDI_NAME'] . '</td>';
-      echo '<td class="text-center">' . $row_tret['TRXA_TRET_QUTY'] . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($row_tret['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($row_tret['SUB_TOTAL'], 0, '', '.') . '</td>';
+      echo '<td>' . $row_tret['MEDI_NAME'] . '</td>';
+      echo '<td>' . $row_tret['TRXA_TRET_QUTY'] . '</td>';
+      echo '<td>Rp. ' . number_format($row_tret['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
+      echo '<td>Rp. ' . number_format($row_tret['SUB_TOTAL'], 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>
@@ -117,10 +198,10 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
     $grand_total += $total_admin; // Tambah ke Grand Total
     
     echo '<tr class="item-row">';
-    echo '<td class="text-left">Biaya Admin</td>';
-    echo '<td class="text-center">1</td>';
-    echo '<td class="text-right">Rp. ' . number_format($total_admin, 0, '', '.') . '</td>';
-    echo '<td class="text-right">Rp. ' . number_format($total_admin, 0, '', '.') . '</td>';
+    echo '<td>Biaya Admin</td>';
+    echo '<td>1</td>';
+    echo '<td>Rp. ' . number_format($total_admin, 0, '', '.') . '</td>';
+    echo '<td>Rp. ' . number_format($total_admin, 0, '', '.') . '</td>';
     echo '</tr>';
     ?>
 
@@ -151,10 +232,10 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
       $grand_total += $row_action['SUB_TOTAL']; // Tambah ke Grand Total
     
       echo '<tr class="item-row">';
-      echo '<td class="text-left">' . $row_action['MEDI_NAME'] . '</td>';
-      echo '<td class="text-center">' . $row_action['TRXA_TRET_QUTY'] . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($row_action['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($row_action['SUB_TOTAL'], 0, '', '.') . '</td>';
+      echo '<td>' . $row_action['MEDI_NAME'] . '</td>';
+      echo '<td>' . $row_action['TRXA_TRET_QUTY'] . '</td>';
+      echo '<td>Rp. ' . number_format($row_action['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
+      echo '<td>Rp. ' . number_format($row_action['SUB_TOTAL'], 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>
@@ -192,10 +273,10 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
       $grand_total += $totapric; // Tambah ke Grand Total
     
       echo '<tr class="item-row">';
-      echo '<td class="text-left">' . $row_csbl['STOCK_NAME'] . '</td>';
-      echo '<td class="text-center">' . $qty_csbl . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($stockpric_bulat, 0, '', '.') . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($totapric, 0, '', '.') . '</td>';
+      echo '<td>' . $row_csbl['STOCK_NAME'] . '</td>';
+      echo '<td>' . $qty_csbl . '</td>';
+      echo '<td>Rp. ' . number_format($stockpric_bulat, 0, '', '.') . '</td>';
+      echo '<td>Rp. ' . number_format($totapric, 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>
@@ -302,35 +383,33 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
       $grand_total += $item['total_price']; // Tambah ke Grand Total
     
       echo '<tr class="item-row">';
-      echo '<td class="text-left">' . htmlspecialchars($item['name']) . '</td>';
-      echo '<td class="text-center">' . htmlspecialchars($item['qty']) . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($item['stock_pric'], 0, '', '.') . '</td>';
-      echo '<td class="text-right">Rp. ' . number_format($item['total_price'], 0, '', '.') . '</td>';
+      echo '<td>' . htmlspecialchars($item['name']) . '</td>';
+      echo '<td>' . htmlspecialchars($item['qty']) . '</td>';
+      echo '<td>Rp. ' . number_format($item['stock_pric'], 0, '', '.') . '</td>';
+      echo '<td>Rp. ' . number_format($item['total_price'], 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>
 
     <!-- ================= BAGIAN FOOTER (TOTAL) ================= -->
-    <tr>
-      <td colspan="3" class="text-right font-bold" style="border-bottom: none;">Sub Total:</td>
-      <td class="text-right font-bold" style="border-bottom: none;">Rp.
+    <tr class="total-row">
+      <td colspan="3" class="text-right font-bold">Sub Total:</td>
+      <td class="text-right font-bold">Rp.
         <?php echo number_format($grand_total, 0, '', '.'); ?>
       </td>
     </tr>
-    <tr>
-      <td colspan="3" class="text-right font-bold" style="border-top: none; border-bottom: none;">Discount:</td>
-      <td class="text-right font-bold" style="border-top: none; border-bottom: none;">Rp.
+    <tr class="total-row">
+      <td colspan="3" class="text-right font-bold">Discount:</td>
+      <td class="text-right font-bold">Rp.
         <?php echo number_format($discount, 0, '', '.'); ?>
       </td>
     </tr>
-    <tr>
-      <td colspan="3" class="text-right font-bold" style="border-top: none;">Total:</td>
-      <td class="text-right font-bold" style="border-top: none;">Rp.
+    <tr class="total-row total-final">
+      <td colspan="3" class="text-right font-bold">Total:</td>
+      <td class="text-right font-bold">Rp.
         <?php echo number_format($grand_total - $discount, 0, '', '.'); ?>
       </td>
     </tr>
 
   </tbody>
 </table>
-
-
