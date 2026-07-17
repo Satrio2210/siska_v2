@@ -109,7 +109,7 @@ include "inc/sanie.php";
         }
 
         // Sudah bayar = ada row di trxasale ATAU status registrasi = P (BPJS CLOSE tanpa trxasale)
-        $sudah_bayar = ((int)$k['SUDAH_BAYAR'] > 0 || $k['TRXA_REGI_STAT'] === 'P');
+        $sudah_bayar = ((int) $k['SUDAH_BAYAR'] > 0 || $k['TRXA_REGI_STAT'] === 'P');
         if ($sudah_bayar) {
           echo '<td><span class="status-badge status-lunas">Sudah Bayar</span></td>';
         } else {
@@ -144,8 +144,6 @@ include "inc/sanie.php";
         echo '</div></td>';
         echo '</tr>';
       }
-
-
 
       ?>
     </tbody>
