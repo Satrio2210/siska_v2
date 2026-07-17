@@ -36,6 +36,7 @@ include "inc/sanie.php";
             t.TRXA_REGI_POLI, 
             pl.TBLA_POLI_NAME AS REGI_POLI,
             t.TRXA_ENTR_DATE,
+            t.TRXA_REGI_STAT,
             (SELECT COUNT(*) FROM trxasale WHERE TRXA_REGI_CODE = t.TRXA_REGI_CODE AND TRXA_VIEW_STAT = 'Y') AS SUDAH_BAYAR,
             (SELECT TRXA_SALE_CODE FROM trxasale WHERE TRXA_REGI_CODE = t.TRXA_REGI_CODE AND TRXA_VIEW_STAT = 'Y' ORDER BY TRXA_SALE_CODE DESC LIMIT 1) AS SALES_CODE
         FROM trxaregi t
@@ -107,14 +108,13 @@ include "inc/sanie.php";
           echo '<td>' . $regipaym . '</td>';
         }
 
-        $sudah_bayar = $k['SUDAH_BAYAR'];
-        if ($sudah_bayar > 0) {
+        // Sudah bayar = ada row di trxasale ATAU status registrasi = P (BPJS CLOSE tanpa trxasale)
+        $sudah_bayar = ((int)$k['SUDAH_BAYAR'] > 0 || $k['TRXA_REGI_STAT'] === 'P');
+        if ($sudah_bayar) {
           echo '<td><span class="status-badge status-lunas">Sudah Bayar</span></td>';
         } else {
           echo '<td><span class="status-badge status-belum">Belum Bayar</span></td>';
         }
-
-
 
         echo '<td><div class="action-group">';
 
@@ -125,11 +125,16 @@ include "inc/sanie.php";
           data-poli="' . $namapoli . '"
           data-channel="SALE">Panggil</a>';
 
-        if ($sudah_bayar > 0) {
-          // LOGIKA JIKA SUDAH BAYAR: Periksa (Disabled), Panggil, Print (Aktif)
+        if ($sudah_bayar) {
+          // LOGIKA JIKA SUDAH BAYAR: Periksa (Disabled), Panggil, Print (Aktif jika ada sales)
           echo '<a type="button" class="button-view pure-button button-disabled">Periksa</a>';
           echo $btn_panggil;
-          echo '<a type="button" class="button-view pure-button" onclick="location.href=\'TRXASALE02P.php?regicode=' . $regicode . '&salecode=' . $salescode . '\';">Print</a>';
+          if (!empty($salescode)) {
+            echo '<a type="button" class="button-view pure-button" onclick="location.href=\'TRXASALE02P.php?regicode=' . $regicode . '&salecode=' . $salescode . '\';">Print</a>';
+          } else {
+            // BPJS CLOSE: tidak ada kwitansi nominal, print disabled
+            echo '<a type="button" class="button-view pure-button button-disabled">Print</a>';
+          }
         } else {
           // LOGIKA JIKA BELUM BAYAR: Periksa (Aktif), Panggil, Print (Disabled)
           echo '<a type="button" class="button-view pure-button" onclick="location.href=\'TRXASALE01.php?regicode=' . $regicode . '&paticode=' . $paticode . '\';">Periksa</a>';

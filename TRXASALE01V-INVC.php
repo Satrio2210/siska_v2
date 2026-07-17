@@ -161,13 +161,14 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
 
     $qtret = $db->query($query_tret) or die("Gagal Ambil data tindakan!!");
     while ($row_tret = $qtret->fetch(PDO::FETCH_ASSOC)) {
-      $grand_total += $row_tret['SUB_TOTAL']; // Tambah ke Grand Total
+      // BPJS: layanan tetap ditampilkan (tagihan tambahan)
+      $grand_total += $row_tret['SUB_TOTAL'];
     
       echo '<tr class="item-row">';
-      echo '<td>' . $row_tret['MEDI_NAME'] . '</td>';
-      echo '<td>' . $row_tret['TRXA_TRET_QUTY'] . '</td>';
-      echo '<td>Rp. ' . number_format($row_tret['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
-      echo '<td>Rp. ' . number_format($row_tret['SUB_TOTAL'], 0, '', '.') . '</td>';
+      echo '<td class="text-left">' . $row_tret['MEDI_NAME'] . '</td>';
+      echo '<td class="text-center">' . $row_tret['TRXA_TRET_QUTY'] . '</td>';
+      echo '<td class="text-right">Rp. ' . number_format($row_tret['TRXA_MEDI_RATE'], 0, '', '.') . '</td>';
+      echo '<td class="text-right">Rp. ' . number_format($row_tret['SUB_TOTAL'], 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>
@@ -270,13 +271,19 @@ if ($row_regi['TRXA_REGI_STAT'] == 'C') {
       $tott = $stockpric_bulat * $qty_csbl;
       $totapric = pembulatan($tott);
 
-      $grand_total += $totapric; // Tambah ke Grand Total
+      // BPJS: BHP tidak ditagih
+      if ($tipe_pembayaran == 'B') {
+        $stockpric_bulat = 0;
+        $totapric = 0;
+      }
+
+      $grand_total += $totapric;
     
       echo '<tr class="item-row">';
-      echo '<td>' . $row_csbl['STOCK_NAME'] . '</td>';
-      echo '<td>' . $qty_csbl . '</td>';
-      echo '<td>Rp. ' . number_format($stockpric_bulat, 0, '', '.') . '</td>';
-      echo '<td>Rp. ' . number_format($totapric, 0, '', '.') . '</td>';
+      echo '<td class="text-left">' . $row_csbl['STOCK_NAME'] . '</td>';
+      echo '<td class="text-center">' . $qty_csbl . '</td>';
+      echo '<td class="text-right">Rp. ' . number_format($stockpric_bulat, 0, '', '.') . '</td>';
+      echo '<td class="text-right">Rp. ' . number_format($totapric, 0, '', '.') . '</td>';
       echo '</tr>';
     }
     ?>

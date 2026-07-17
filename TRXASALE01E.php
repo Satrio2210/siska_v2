@@ -12,8 +12,12 @@ $paymtota = str_replace(".","",$xpaymtota);
 $paymamnt = str_replace(".","",$xpaymamnt);
 $paymdisc = str_replace(".","",$xpaymdisc);
 
-if ($regipaym == 'U') { $paymmode = $xpaymmode; }
-else { $paymmode = 'UNP'; }
+// BPJS dengan tagihan tambahan layanan/tindakan: bayar seperti umum (mode bayar dari form)
+if ($regipaym == 'U' || ($regipaym == 'B' && (float)str_replace(".","",$xpaymtota) > 0)) {
+    $paymmode = $xpaymmode;
+} else {
+    $paymmode = 'UNP';
+}
 
 
 $viewstat = 'Y';

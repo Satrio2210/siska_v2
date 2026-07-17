@@ -67,10 +67,18 @@ if (isset($_GET['regicode'])) {
 		$admission_date = $row_header['ADMISSION_DATE'];
 		$discharge_date = $row_header['DISCHARGE_DATE'];
 
+		$is_bpjs = ($row_header['PATIENT_TYPE'] == 'B');
+		// BPJS + ada nominal bayar di trxasale → cetak sebagai Umum, hide obat/BHP
+		$q_paid = $db->prepare("SELECT COALESCE(SUM(TRXA_PAYM_AMNT),0) FROM trxasale
+		                        WHERE TRXA_REGI_CODE = :regi AND TRXA_VIEW_STAT = 'Y'");
+		$q_paid->execute(array(':regi' => $regicode));
+		$paid_amnt = (float)$q_paid->fetchColumn();
+		$bpjs_extra_invoice = ($is_bpjs && $paid_amnt > 0);
+
 		if ($row_header['PATIENT_TYPE'] == 'U') {
 			$patient_type = 'Umum';
 		} else if ($row_header['PATIENT_TYPE'] == 'B') {
-			$patient_type = 'BPJS';
+			$patient_type = $bpjs_extra_invoice ? 'Umum' : 'BPJS';
 		} else if ($row_header['PATIENT_TYPE'] == 'A') {
 			$patient_type = 'Asuransi';
 		} else if ($row_header['PATIENT_TYPE'] == 'P') {
@@ -148,7 +156,7 @@ if (isset($_GET['regicode'])) {
 		$pdf->Cell(25, 6, 'Disc.', 'LTBR', 0, 'R');
 		$pdf->Cell(25, 6, 'Patient', 'LTBR', 1, 'R');
 
-		// Periksa Drugs
+		// Periksa Drugs — BPJS tagihan tambahan: obat tidak ditampilkan
 		$sql_cekprsc = "SELECT COUNT(*) FROM trxaprsc 
              WHERE TRXA_PRSC_CODE = :regicode 
              AND TRXA_PRSC_STAT = 'P'";
@@ -164,6 +172,10 @@ if (isset($_GET['regicode'])) {
 
 		} catch (PDOException $e) {
 			error_log("Database Error (Periksa Obat): " . $e->getMessage());
+			$ketersediaanprsc = 0;
+		}
+
+		if ($bpjs_extra_invoice) {
 			$ketersediaanprsc = 0;
 		}
 
@@ -389,11 +401,15 @@ if (isset($_GET['regicode'])) {
 				foreach ($actions as $row_action) {
 					$action_name = $row_action['MEDI_NAME'];
 					$action_qty = $row_action['TRXA_TRET_QUTY'];
-					$action_amount = $row_action['SUB_TOTAL'];
+					$action_amount = (float)$row_action['SUB_TOTAL'];
+					// BPJS extra: item nilai 0 tidak dicetak
+					if ($bpjs_extra_invoice && $action_amount < 1) {
+						continue;
+					}
 					$view_action_amount = number_format($action_amount, 0, '', '.');
 
 					$no++;
-					$sub_total += $action_amount; // Lebih singkat dari $sub_total = $sub_total + $action_amount;
+					$sub_total += $action_amount;
 
 					$pdf->Cell(8, 5, $no, 'LR', 0, 'C');
 					$pdf->Cell(50, 5, $action_name, 'L', 0, 'L');
@@ -411,41 +427,8 @@ if (isset($_GET['regicode'])) {
 			}
 		}
 
-		// Periksa Services
-		$sql_services_count = "SELECT COUNT(*) 
-			FROM trxatret t
-			INNER JOIN tblfmedi m ON m.TBLF_MEDI_CODE = t.TRXA_MEDI_CODE
-			WHERE m.TBLF_MEDI_TYPE = 'J'
-			AND t.TRXA_TRET_CODE = :regicode 
-			AND t.TRXA_VIEW_STAT = 'Y'
-		";
-
-		try {
-			$stmt_services = $db->prepare($sql_services_count);
-
-			$stmt_services->execute([
-				':regicode' => $regicode
-			]);
-
-			$ketersediaanservices = $stmt_services->fetchColumn();
-
-		} catch (PDOException $e) {
-			error_log("Database Error (Periksa Services): " . $e->getMessage());
-			$ketersediaanservices = 0;
-		}
-
-		if ($ketersediaanservices > 0) {
-
-			$pdf->Cell(8, 5, ' ', 'LR', 0, 'C');
-			$pdf->Cell(50, 5, 'SERVICES', 'L', 0, 'L');
-			$pdf->Cell(30, 5, '  ', 'R', 0, 'L');
-			$pdf->Cell(10, 5, ' ', 'LR', 0, 'R');
-			$pdf->Cell(15, 5, ' ', 'LR', 0, 'L');
-			$pdf->Cell(25, 5, ' ', 'LR', 0, 'R');
-			$pdf->Cell(25, 5, ' ', 'LR', 0, 'R');
-			$pdf->Cell(25, 5, ' ', 'LR', 1, 'R');
-
-			$sql_tret = "SELECT 
+		// Periksa Services — BPJS extra: hanya item amount > 0 (skip Konsul BPJS = 0)
+		$sql_tret = "SELECT 
 					t.TRXA_TRET_CODE, 
 					t.TRXA_MEDI_CODE, 
 					m.TBLF_MEDI_NAME AS MEDI_NAME, 
@@ -461,18 +444,36 @@ if (isset($_GET['regicode'])) {
 				AND t.TRXA_VIEW_STAT = 'Y'
 			";
 
-			try {
-				$stmt_tret = $db->prepare($sql_tret);
-				$stmt_tret->execute([
-					':regicode' => $regicode
-				]);
+		try {
+			$stmt_tret = $db->prepare($sql_tret);
+			$stmt_tret->execute([
+				':regicode' => $regicode
+			]);
 
-				$services = $stmt_tret->fetchAll(PDO::FETCH_ASSOC);
+			$services = $stmt_tret->fetchAll(PDO::FETCH_ASSOC);
+			$services_print = array();
+			foreach ($services as $row_tret) {
+				$tret_amount = (float)$row_tret['SUB_TOTAL'];
+				if ($bpjs_extra_invoice && $tret_amount < 1) {
+					continue;
+				}
+				$services_print[] = $row_tret;
+			}
 
-				foreach ($services as $row_tret) {
+			if (count($services_print) > 0) {
+				$pdf->Cell(8, 5, ' ', 'LR', 0, 'C');
+				$pdf->Cell(50, 5, 'SERVICES', 'L', 0, 'L');
+				$pdf->Cell(30, 5, '  ', 'R', 0, 'L');
+				$pdf->Cell(10, 5, ' ', 'LR', 0, 'R');
+				$pdf->Cell(15, 5, ' ', 'LR', 0, 'L');
+				$pdf->Cell(25, 5, ' ', 'LR', 0, 'R');
+				$pdf->Cell(25, 5, ' ', 'LR', 0, 'R');
+				$pdf->Cell(25, 5, ' ', 'LR', 1, 'R');
+
+				foreach ($services_print as $row_tret) {
 					$tret_name = $row_tret['MEDI_NAME'];
 					$tret_qty = $row_tret['TRXA_TRET_QUTY'];
-					$tret_amount = $row_tret['SUB_TOTAL'];
+					$tret_amount = (float)$row_tret['SUB_TOTAL'];
 					$view_tret_amount = number_format($tret_amount, 0, '', '.');
 
 					$no++;
@@ -487,14 +488,14 @@ if (isset($_GET['regicode'])) {
 					$pdf->Cell(25, 5, '0', 'LR', 0, 'R');
 					$pdf->Cell(25, 5, $view_tret_amount, 'LR', 1, 'R');
 				}
-
-			} catch (PDOException $e) {
-				error_log("Database Error (Cetak PDF Jasa Pelayanan): " . $e->getMessage());
-				$pdf->Cell(188, 5, 'Gagal memuat rincian jasa. Silakan hubungi admin.', 1, 1, 'C');
 			}
+
+		} catch (PDOException $e) {
+			error_log("Database Error (Cetak PDF Jasa Pelayanan): " . $e->getMessage());
+			$pdf->Cell(188, 5, 'Gagal memuat rincian jasa. Silakan hubungi admin.', 1, 1, 'C');
 		}
 
-		// periksa BHP
+		// periksa BHP — BPJS tagihan tambahan: BHP tidak ditampilkan
 		$sql_csbl_count = "SELECT COUNT(*) FROM trxacsbl 
                    WHERE TRXA_CSBL_CODE = :regicode 
                    AND TRXA_CSBL_STAT = 'P'";
@@ -509,6 +510,10 @@ if (isset($_GET['regicode'])) {
 
 		} catch (PDOException $e) {
 			error_log("Database Error (Periksa BHP): " . $e->getMessage());
+			$ketersediaancsbl = 0;
+		}
+
+		if ($bpjs_extra_invoice) {
 			$ketersediaancsbl = 0;
 		}
 
@@ -592,6 +597,10 @@ if (isset($_GET['regicode'])) {
 		$pdf->Cell(25, 6, '', 0, 0, 'R');
 		$pdf->Cell(25, 6, '', 0, 0, 'R');
 
+		// Admin charge: BPJS tagihan tambahan = 0
+		if ($bpjs_extra_invoice || $is_bpjs) {
+			$total_admin = 0;
+		} else {
 		// Periksa apakah ada obat racikan
 		$sql_racikan_count = "SELECT COUNT(*) 
 			FROM trxaprsc 
@@ -657,6 +666,7 @@ if (isset($_GET['regicode'])) {
 		} else {
 			$total_admin = $fee_admin + $fee_resep + $fee_racikan;
 		}
+		} // end non-BPJS admin
 
 		$view_fee_admin = number_format($total_admin, 0, '', '.');
 

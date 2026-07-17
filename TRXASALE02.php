@@ -25,9 +25,8 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="assets/css/layouts/header.css">
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
     <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-    
-      <link rel="stylesheet" href="assets/css/modern-table.css">
-</head>
+
+  </head>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="js/jquery.js"></script>
   <script type="text/javascript" src="js/sanie.js"></script>
@@ -91,4 +90,3 @@ if (isset($_SESSION['username'])) {
   header("Location: " . "signin.php");
 }
 ?>
-

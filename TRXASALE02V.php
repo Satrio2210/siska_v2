@@ -4,20 +4,108 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 error_reporting(E_ALL & ~E_NOTICE);
 include "conf/config.php";
 ?>
-<div class="table-wrapper">
-  <table id="screen" class="modern-table">
+
+<style>
+  .table-container {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+
+  #tblsaleprt {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #tblsaleprt tbody {
+    display: block;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+
+  #tblsaleprt thead,
+  #tblsaleprt tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  #tblsaleprt thead {
+    background: #10b981;
+    color: white;
+    /* position: sticky;
+    top: 0;
+    z-index: 10; */
+    /* height: 30px; */
+  }
+
+  #tblsaleprt th {
+    padding: 10px 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    letter-spacing: 0.3px;
+  }
+
+  #tblsaleprt td {
+    padding: 8px 6px;
+    font-size: 12px;
+    /* color: #374151; */
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  #tblsaleprt th:nth-child(1),
+  #tblsaleprt td:nth-child(1) {
+    width: 30%;
+  }
+
+  #tblsaleprt th:nth-child(2),
+  #tblsaleprt td:nth-child(2) {
+    width: 70%;
+  }
+
+  #tblsaleprt th:nth-child(3),
+  #tblsaleprt td:nth-child(3) {
+    width: 70%;
+  }
+
+  #tblsaleprt th:nth-child(4),
+  #tblsaleprt td:nth-child(4) {
+    width: 70%;
+  }
+
+  #tblsaleprt th:nth-child(5),
+  #tblsaleprt td:nth-child(5) {
+    width: 70%;
+  }
+
+  #tblsaleprt th:nth-child(6),
+  #tblsaleprt td:nth-child(6) {
+    width: 70%;
+  }
+
+  #tblsaleprt tbody tr:hover {
+    background: #d0e3f7;
+  }
+</style>
+
+<div class="table-container">
+  <table id="tblsaleprt">
     <thead>
       <tr>
-        <th style="width: 100px">Klinik</th>
-        <th style="width: 200px">Medis</th>
-        <th style="width: 100px">Tgl Bayar</th>
-        <th style="width: 150px">No. Pendaftaran</th>
-        <th style="width: 150px">No. Kwitansi</th>
-        <th style="width: 100px">No. RM</th>
-        <th style="width: 200px">Nama</th>
-        <th style="width: 100px">L/P</th>
-        <th style="width: 100px">Pembayaran</th>
-        <th style="width: 100px">Action</th>
+        <th>Tgl Bayar</th>
+        <th>Klinik</th>
+        <th>Medis</th>
+        <th>Nama</th>
+        <th>Pembayaran</th>
+        <th>Action</th>
       </tr>
     </thead>
 
@@ -64,41 +152,41 @@ include "conf/config.php";
         $salecode = $k['TRXA_SALE_CODE'];
         $regicode = $k['REGI_CODE'];
         $paticode = $k['TRXA_PATI_CODE'];
-        echo '<td style="width: 100px">' . $k['REGI_POLI'] . '</td>';
-        echo '<td style="width: 200px; text-align: left;">' . $k['REGI_DOCT'] . '</td>';
         $paiddate = date("d-m-Y", strtotime($k['TRXA_ENTR_DATE']));
-        echo '<td style="width: 100px">' . $paiddate . '</td>';
-        echo '<td style="width: 150px">' . $regicode . '</td>';
-        echo '<td style="width: 150px">' . $salecode . '</td>';
-        echo '<td style="width: 100px">' . $paticode . '</td>';
-        echo '<td style="width: 200px">' . $k['PATI_NAME'] . '</td>';
 
-        $maingend = $k['MAIN_GEND'];
-        if ($maingend == 'M') {
-          echo '<td style="width: 100px"> Laki-laki </td>';
-        } else if ($maingend == 'F') {
-          echo '<td style="width: 100px"> Perempuan </td>';
-        } else {
-          echo '<td style="width: 100px"> No gender </td>';
-        }
-
+        echo '<td>' . $paiddate . '</td>';
+        echo '<td>' . $k['REGI_POLI'] . '</td>';
+        echo '<td>' . $k['REGI_DOCT'] . '</td>';
+        echo '<td>' . $k['PATI_NAME'] . '</td>';
+        // echo '<td>' . $regicode . '</td>';
+        // echo '<td>' . $salecode . '</td>';
+        // echo '<td>' . $paticode . '</td>';
+        // $maingend = $k['MAIN_GEND'];
+        // if ($maingend == 'M') {
+        //   echo '<td> Laki-laki </td>';
+        // } else if ($maingend == 'F') {
+        //   echo '<td> Perempuan </td>';
+        // } else {
+        //   echo '<td> No gender </td>';
+        // }
+      
         $regipaym = $k['REGI_PAYM'];
         if ($regipaym == 'U') {
-          echo '<td style="width: 100px"> Umum </td>';
+          echo '<td> Umum </td>';
         } else if ($regipaym == 'B') {
-          echo '<td style="width: 100px"> BPJS </td>';
+          echo '<td> BPJS </td>';
         } else if ($regipaym == 'A') {
-          echo '<td style="width: 100px"> Asuransi </td>';
+          echo '<td> Asuransi </td>';
         } else if ($regipaym == 'P') {
-          echo '<td style="width: 100px"> Perusahaan </td>';
+          echo '<td> Perusahaan </td>';
         } else if ($regipaym == 'H') {
-          echo '<td style="width: 100px"> Halodoc </td>';
+          echo '<td> Halodoc </td>';
         }
 
-        echo '<td style="width: 100px">';
+        echo '<td>';
         ?>
-        <a class="button-print pure-button"
-          onClick="javascript: location.href ='TRXASALE02P.php?regicode=<?php echo $regicode; ?>&salecode=<?php echo $salecode; ?>'">Print</a>
+        <button type="button" class="btn-modern btn-refresh"
+          onClick="javascript: location.href ='TRXASALE02P.php?regicode=<?php echo $regicode; ?>&salecode=<?php echo $salecode; ?>'">Print</button>
 
         <?php
         echo '</td>';
@@ -110,6 +198,3 @@ include "conf/config.php";
     </tbody>
   </table>
 </div>
-
-
-

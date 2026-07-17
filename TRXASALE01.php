@@ -59,6 +59,7 @@ if (isset($_SESSION['username'])) {
                 <input type="hidden" name="hidregipoli" id="hidregipoli">
                 <input type="hidden" name="hidregipaym" id="hidregipaym">
                 <input type="hidden" name="hidpaymtota" id="hidpaymtota">
+                <input type="hidden" name="hidsalemode" id="hidsalemode" value="BAYAR">
                 <input type="hidden" name="txtpaymdisc" id="txtpaymdisc" value="0">
 
                 <div class="form-grid-5">
@@ -122,79 +123,8 @@ if (isset($_SESSION['username'])) {
 
                   <div class="form-group">
                     <label class="form-label">Action</label>
-                    <button type="button" class="btn-modern btn-save" style="height: 38px;" onclick="javascript:
-                        if (document.getElementById('txtpaymtota').value == '')
-                        {
-                          swal({
-                              title: 'Total yang harus di bayar Kosong' ,
-                              text: 'Anda belum memilih Pasien yang akan melakukan pembayaran',
-                              icon: 'warning',
-                              });
-                        }
-
-                        else if (document.getElementById('txtpaymtota').value <= 0)
-                        {
-                          swal({
-                              title: 'Telah di lakukan Pembayaran' ,
-                              text: 'Pasien telah melakukan pembayaran, konfirmasikan ke Admisi untuk di tutup',
-                              icon: 'warning',
-                              });
-                        }
-
-                      else if (isNaN(document.getElementById('txtpaymamnt').value)) 
-                        {
-                          swal({
-                              title: 'Salah Input Angka' ,
-                              text: 'Masukkan Nominal Angka , silahkan periksa lagi',
-                              icon: 'warning',
-                              });
-                        }
-
-                      else if (document.getElementById('txtpaymamnt').value <= 0)
-                        {
-                          swal({
-                              title: 'Pembayaran Nol ' ,
-                              text: 'Isi kembali Nominal pembayaran, silahkan periksa lagi',
-                              icon: 'warning',
-                              });
-                        }
-
-                      else if (document.getElementById('txtpaymamnt').value < document.getElementById('hidpaymtota').value)
-                        {
-                          swal({
-                              title: 'Pembayaran Kurang ' ,
-                              text: 'Isi kembali Nominal pembayaran, silahkan periksa lagi',
-                              icon: 'warning',
-                              });
-                        }
-
-                         else if (document.getElementById('txtpaymamnt').value == '')
-                        {
-                            swal({
-                                title: 'Nominal Pembayaran Kosong' ,
-                                text: 'Anda belum mengisi Nominal Pembayaran, silah periksa lagi',
-                                icon: 'warning',
-                                });
-                        }
-
-                         else
-                         {
-                             var inregicode = document.getElementById('hidregicode').value;
-                             var inpaticode = document.getElementById('hidpaticode').value;
-
-                             var inregidoct = document.getElementById('hidregidoct').value;
-                             var inregipoli = document.getElementById('hidregipoli').value;
-                             var inregipaym = document.getElementById('hidregipaym').value;
-
-                             var inpaymtota = document.getElementById('txtpaymtota').value; 
-                             var inpaymamnt = document.getElementById('txtpaymamnt').value;
-
-                             var inpaymdisc = document.getElementById('txtpaymdisc').value;
-                             var inpaymmode = document.getElementById('optpaymmode').value;
-
-                             input(inregicode,inpaticode,inregidoct,inregipoli,inregipaym,inpaymtota,inpaymamnt,inpaymdisc,inpaymmode);
-                         }
-                       ">Bayar!</button>
+                    <button type="button" class="btn-modern btn-save" id="btnSaleAction" style="height: 38px;"
+                      onclick="handleSaleAction();">Bayar!</button>
                   </div>
                 </div>
 
