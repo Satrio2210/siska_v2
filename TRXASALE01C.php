@@ -7,14 +7,16 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
     $rawdata = xss_clean($_POST['q']);
     list($regicode, $paticode) = explode("|", $rawdata);
 
-    $view = "SELECT 
-                t.TRXA_REGI_CODE, 
-                t.TRXA_PATI_CODE, 
-                t.TRXA_REGI_DATE, 
+    $view = "SELECT
+                t.TRXA_REGI_CODE,
+                t.TRXA_PATI_CODE,
+                t.TRXA_REGI_DATE,
                 t.TRXA_ENTR_DATE,
                 t.TRXA_REGI_PAYM,
                 t.TRXA_REGI_DOCT,
                 t.TRXA_REGI_POLI,
+                t.TRXA_REGI_FEE,
+                t.TRXA_REGI_STAT,
                 p.PATI_MAIN_NAME,
                 p.PATI_MAIN_GEND,
                 p.PATI_MAIN_BIRT,
@@ -24,12 +26,18 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
             LEFT JOIN patimast p ON p.PATI_MAST_CODE = t.TRXA_PATI_CODE
             LEFT JOIN passiden u ON u.PASS_USER_IDEN = t.TRXA_REGI_DOCT
             LEFT JOIN tblapoli pl ON pl.TBLA_POLI_CODE = t.TRXA_REGI_POLI
-            WHERE t.TRXA_REGI_CODE = '$regicode' 
-              AND t.TRXA_PATI_CODE = '$paticode' 
+            WHERE t.TRXA_REGI_CODE = :regi
+              AND t.TRXA_PATI_CODE = :pati
               AND t.TRXA_VIEW_STAT = 'Y'";
 
-    $qview = $db->query($view) or die("Gagal Ambil Data Admisi!!");
-    $rview = $qview->fetch(PDO::FETCH_ASSOC);
+    $stview = $db->prepare($view);
+    $stview->execute([':regi' => $regicode, ':pati' => $paticode]);
+    $rview = $stview->fetch(PDO::FETCH_ASSOC);
+
+    if (!$rview) {
+        echo "|0||||||0||0|||||||||";
+        exit;
+    }
 
     $regicode = "$rview[TRXA_REGI_CODE]";
     $paticode = "$rview[TRXA_PATI_CODE]";
@@ -68,72 +76,70 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
         $maingend_name = 'No gender';
     }
 
-    // Total layanan (J) + tindakan (O/N) yang masih belumbayar
-    $query_layanan = "SELECT COALESCE(SUM(a.TRXA_MEDI_RATE * a.TRXA_TRET_QUTY), 0) AS TOTA
-                      FROM trxatret a
-                      LEFT JOIN tblfmedi b ON a.TRXA_MEDI_CODE = b.TBLF_MEDI_CODE
-                      WHERE a.TRXA_TRET_CODE = '$regicode'
-                        AND b.TBLF_MEDI_TYPE = 'J'
-                        AND a.TRXA_TRET_STAT = 'I'
-                        AND a.TRXA_VIEW_STAT = 'Y'";
-    $total_layanan = (float)$db->query($query_layanan)->fetchColumn();
+    $stSum = $db->prepare("
+        SELECT
+            COALESCE(SUM(CASE WHEN b.TBLF_MEDI_TYPE = 'J'  THEN a.TRXA_MEDI_RATE * a.TRXA_TRET_QUTY ELSE 0 END), 0) AS TOTAL_LAYANAN,
+            COALESCE(SUM(CASE WHEN b.TBLF_MEDI_TYPE IN ('O','N') THEN a.TRXA_MEDI_RATE * a.TRXA_TRET_QUTY ELSE 0 END), 0) AS TOTAL_TINDAKAN,
+            COALESCE(SUM(a.TRXA_MEDI_RATE * a.TRXA_TRET_QUTY), 0) AS TOTAL_TRET
+        FROM trxatret a
+        LEFT JOIN tblfmedi b ON a.TRXA_MEDI_CODE = b.TBLF_MEDI_CODE
+        WHERE a.TRXA_TRET_CODE = :regi
+          AND a.TRXA_TRET_STAT = 'I'
+          AND a.TRXA_VIEW_STAT = 'Y'
+    ");
+    $stSum->execute([':regi' => $regicode]);
+    $rowSum = $stSum->fetch(PDO::FETCH_ASSOC);
 
-    $query_tindakan = "SELECT COALESCE(SUM(a.TRXA_MEDI_RATE * a.TRXA_TRET_QUTY), 0) AS TOTA
-                       FROM trxatret a
-                       LEFT JOIN tblfmedi b ON a.TRXA_MEDI_CODE = b.TBLF_MEDI_CODE
-                       WHERE a.TRXA_TRET_CODE = '$regicode'
-                         AND b.TBLF_MEDI_TYPE IN ('O','N')
-                         AND a.TRXA_TRET_STAT = 'I'
-                         AND a.TRXA_VIEW_STAT = 'Y'";
-    $total_tindakan = (float)$db->query($query_tindakan)->fetchColumn();
+    $total_layanan = (float) ($rowSum['TOTAL_LAYANAN'] ?? 0);
+    $total_tindakan = (float) ($rowSum['TOTAL_TINDAKAN'] ?? 0);
+    $total_tret = (float) ($rowSum['TOTAL_TRET'] ?? 0);
 
-    // Semua tret (untuk non-BPJS)
-    $query_tret = "SELECT COALESCE(SUM(TRXA_MEDI_RATE * TRXA_TRET_QUTY), 0) AS TOTA_TRET 
-                    FROM trxatret 
-                    WHERE TRXA_TRET_CODE = '$regicode'
-                    AND TRXA_TRET_STAT = 'I'
-                    AND TRXA_VIEW_STAT = 'Y'";
-    $total_tret = (float)$db->query($query_tret)->fetchColumn();
+    $stCsbl = $db->prepare("
+        SELECT COALESCE(SUM(TRXA_STOCK_PRIC * TRXA_STOCK_QUTY), 0) AS TOTA_CSBL
+        FROM trxacsbl
+        WHERE TRXA_CSBL_CODE = :regi
+          AND TRXA_CSBL_STAT = 'I'
+          AND TRXA_VIEW_STAT = 'Y'
+    ");
+    $stCsbl->execute([':regi' => $regicode]);
+    $total_csbl = (float) $stCsbl->fetchColumn();
 
-    $query_csbl = "SELECT COALESCE(SUM(TRXA_STOCK_PRIC * TRXA_STOCK_QUTY), 0) AS TOTA_CSBL 
-                   FROM trxacsbl 
-                   WHERE TRXA_CSBL_CODE = '$regicode'
-                   AND TRXA_CSBL_STAT = 'I'
-                   AND TRXA_VIEW_STAT = 'Y'";
-    $total_csbl = (float)$db->query($query_csbl)->fetchColumn();
-
-    $query_prsc = "SELECT TRXA_STOCK_PRIC, TRXA_STOCK_QUTY, TRXA_PRSC_CONC, TRXA_RACIK_ID,
-                  (SELECT TRXA_REGI_PAYM FROM trxaregi WHERE TRXA_REGI_CODE=TRXA_PRSC_CODE) AS PAYM_TYPE
-                   FROM trxaprsc 
-                   WHERE TRXA_PRSC_CODE = '$regicode'
-                   AND TRXA_PRSC_STAT = 'I'
-                   AND TRXA_VIEW_STAT = 'Y'";
-    $qprsc = $db->query($query_prsc) or die("Gagal Ambil data Resep");
+    $stPrsc = $db->prepare("
+        SELECT
+            a.TRXA_STOCK_PRIC,
+            a.TRXA_STOCK_QUTY,
+            a.TRXA_PRSC_CONC,
+            a.TRXA_RACIK_ID,
+            c.TRXA_REGI_PAYM AS PAYM_TYPE
+        FROM trxaprsc a
+        LEFT JOIN trxaregi c ON c.TRXA_REGI_CODE = a.TRXA_PRSC_CODE
+                              AND c.TRXA_VIEW_STAT = 'Y'
+        WHERE a.TRXA_PRSC_CODE = :regi
+          AND a.TRXA_PRSC_STAT = 'I'
+          AND a.TRXA_VIEW_STAT = 'Y'
+    ");
+    $stPrsc->execute([':regi' => $regicode]);
 
     $total_prsc = 0;
     $racik_totals = [];
     $paym_type = $regipaym;
+    $racik_ids = [];
 
-    while ($rprsc = $qprsc->fetch(PDO::FETCH_ASSOC)) {
-        if ($paym_type === null || $paym_type === '') {
+    while ($rprsc = $stPrsc->fetch(PDO::FETCH_ASSOC)) {
+        if (($paym_type === null || $paym_type === '') && !empty($rprsc['PAYM_TYPE'])) {
             $paym_type = $rprsc['PAYM_TYPE'];
         }
 
-        $stockpric_bulat = pembulatan((int) round($rprsc['TRXA_STOCK_PRIC']));
-        // BPJS: obat tidak dihitung
-        if ($regipaym === 'B' || $paym_type === 'B') {
-            $stockpric_bulat = 0;
-        }
+        $is_bpjs = ($regipaym === 'B' || ($paym_type !== null && $paym_type === 'B'));
+        $stockpric_bulat = $is_bpjs ? 0 : pembulatan((int) round($rprsc['TRXA_STOCK_PRIC']));
 
         $tott = $stockpric_bulat * $rprsc['TRXA_STOCK_QUTY'];
-        $totapric = pembulatan($tott);
-        if ($regipaym === 'B' || $paym_type === 'B') {
-            $totapric = 0;
-        }
+        $totapric = $is_bpjs ? 0 : pembulatan($tott);
 
         $is_racikan = ($rprsc['TRXA_PRSC_CONC'] === 'Y' && !empty($rprsc['TRXA_RACIK_ID']) && $rprsc['TRXA_RACIK_ID'] > 0);
         if ($is_racikan) {
             $rid = $rprsc['TRXA_RACIK_ID'];
+            $racik_ids[$rid] = true;
             if (!isset($racik_totals[$rid])) {
                 $racik_totals[$rid] = 0;
             }
@@ -143,42 +149,46 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
         }
     }
 
-    foreach ($racik_totals as $rid => $comp_total) {
-        if ($regipaym === 'B' || $paym_type === 'B') {
+    foreach (array_keys($racik_totals) as $rid) {
+        $is_bpjs = ($regipaym === 'B' || ($paym_type !== null && $paym_type === 'B'));
+        if ($is_bpjs) {
             $total_prsc += 0;
         } else {
-            $total_prsc += pembulatan($comp_total + 30000);
+            $total_prsc += pembulatan($racik_totals[$rid] + 30000);
         }
     }
 
-    // BPJS: BHP tidak dihitung
     if ($regipaym === 'B') {
         $total_csbl = 0;
     }
 
-    $query_outs = "SELECT COALESCE(SUM(TRXA_PAYM_AMNT), 0) AS TOTA_PAYM 
-                   FROM trxasale WHERE TRXA_REGI_CODE = '$regicode'
-                   AND TRXA_VIEW_STAT = 'Y'";
-    $total_outs = (float)$db->query($query_outs)->fetchColumn();
+    $stOuts = $db->prepare("
+        SELECT COALESCE(SUM(TRXA_PAYM_AMNT), 0)
+        FROM trxasale
+        WHERE TRXA_REGI_CODE = :regi
+          AND TRXA_VIEW_STAT = 'Y'
+    ");
+    $stOuts->execute([':regi' => $regicode]);
+    $total_outs = (float) $stOuts->fetchColumn();
 
-    $q_regi = "SELECT TRXA_REGI_FEE, TRXA_REGI_PAYM FROM trxaregi WHERE TRXA_REGI_CODE='$regicode' LIMIT 1";
-    $data_regi = $db->query($q_regi)->fetch(PDO::FETCH_ASSOC);
+    $fee_admin_aktif = ($rview['TRXA_REGI_FEE'] == 'Y');
+    $tipe_pembayaran = $rview['TRXA_REGI_PAYM'];
 
-    $fee_admin_aktif = ($data_regi && $data_regi['TRXA_REGI_FEE'] == 'Y') ? true : false;
-    $tipe_pembayaran = $data_regi ? $data_regi['TRXA_REGI_PAYM'] : '';
-
-    $periksaracikan = "SELECT COUNT(*) FROM trxaprsc WHERE TRXA_PRSC_CODE='$regicode' 
-                 AND TRXA_PRSC_CONC='Y'
-                 AND TRXA_PRSC_STAT='I'
-                 AND TRXA_VIEW_STAT='Y'";
-    $ketersediaan_racikan = $db->query($periksaracikan)->fetchColumn();
+    $stRacikCount = $db->prepare("
+        SELECT
+            SUM(CASE WHEN TRXA_PRSC_CONC = 'Y' THEN 1 ELSE 0 END) AS RACIKAN,
+            SUM(CASE WHEN TRXA_PRSC_STAT  = 'I' THEN 1 ELSE 0 END) AS RESEP
+        FROM trxaprsc
+        WHERE TRXA_PRSC_CODE = :regi
+          AND TRXA_VIEW_STAT = 'Y'
+          AND TRXA_PRSC_STAT = 'I'
+    ");
+    $stRacikCount->execute([':regi' => $regicode]);
+    $rowRC = $stRacikCount->fetch(PDO::FETCH_ASSOC);
+    $ketersediaan_racikan = (int) ($rowRC['RACIKAN'] ?? 0);
+    $ketersediaan_resep = (int) ($rowRC['RESEP'] ?? 0);
 
     if ($ketersediaan_racikan == 0) {
-        $periksaresep = "SELECT COUNT(*) FROM trxaprsc WHERE TRXA_PRSC_CODE='$regicode'
-                 AND TRXA_PRSC_STAT='I'
-                 AND TRXA_VIEW_STAT='Y'";
-        $ketersediaan_resep = $db->query($periksaresep)->fetchColumn();
-
         if ($ketersediaan_resep == 0) {
             $total_admin = (!$fee_admin_aktif) ? 0 : $fee_admin;
         } else {
@@ -192,11 +202,9 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
         $total_admin = 0;
     }
 
-    // BPJS: hanya layanan + tindakan (nilai > 0) yang boleh ditagih
     if ($regipaym === 'B') {
         $billable_extra = $total_layanan + $total_tindakan;
         $xpaymtota = $billable_extra - $total_outs;
-        // mode: CLOSE jika tidak ada tambahan berbayar, else BAYAR
         $sale_mode = ($billable_extra > 0) ? 'BAYAR' : 'CLOSE';
     } else {
         $subtotal1 = ($total_tret + $total_csbl);
@@ -214,7 +222,5 @@ if (isset($_POST['q']) && ($_POST['q'] != '')) {
     $paymtota = pembulatan($int);
     $viewpaymtota = number_format($paymtota, 0, '', '.');
 
-    // pipe: 1-14 existing + 15 sale_mode
     echo "|$regicode|$paticode|$regidoct|$regipoli|$regipaym|$paymtota|$viewpaymtota|$regidate|$patiname|$maingend_name|$mainbirt|$regidoctname|$regipoliname|$regipaym_name|$sale_mode|";
 }
-?>
