@@ -115,12 +115,8 @@
                 <i class="bi bi-chevron-down nav-group-chevron ms-auto"></i>
             </a>
             <ul class="nav-submenu">
-                <li><a href="MEDIRECO01.php" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Rawat
-                        Inap</a></li>
-                <li><a href="MEDIRECO02.php" class="nav-link-custom submenu-link"><i class="bi bi-caret-right"></i>Rawat
-                        Jalan</a></li>
-                <li><a href="MEDIRECO04.php" class="nav-link-custom submenu-link"><i
-                            class="bi bi-caret-right"></i>IGD</a></li>
+                <li><a href="MEDIRECO05.php" class="nav-link-custom submenu-link"><i
+                            class="bi bi-caret-right"></i>Daftar RM Pasien</a></li>
             </ul>
         </div>
 

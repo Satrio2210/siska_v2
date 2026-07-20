@@ -24,7 +24,6 @@ if (isset($_SESSION['username'])) {
         <link rel="stylesheet" href="assets/css/layouts/header.css">
         <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
         <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-        <link rel="stylesheet" href="assets/css/modern-table.css">
 
         <style type="text/css">
             #tblscreen {

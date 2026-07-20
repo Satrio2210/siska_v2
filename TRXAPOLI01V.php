@@ -215,7 +215,7 @@ include "inc/sanie.php";
   }
 </style>
 <div class="table-wrapper">
-  <table id="screen" class="modern-table">
+  <table id="screen">
     <thead>
       <tr>
         <th>Tgl Daftar</th>
