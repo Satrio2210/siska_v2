@@ -390,7 +390,7 @@ function stateChangedsigna()
   }
 }
 
-function isisigna(outsgnacode,outsgnaname)
+function isisigna(outsgnacode,outsgnaname,outsgnausag)
 
 {
   try 
@@ -398,9 +398,12 @@ function isisigna(outsgnacode,outsgnaname)
   document.getElementById("txtdrugsigna").value = outsgnaname;
   
   document.getElementById("hiddrugsigna").value = outsgnacode;
+
+  var usageEl = document.getElementById("txtdrugusage");
+  if (usageEl) {
+    usageEl.value = outsgnausag || outsgnaname || '';
+  }
    
- 
-  document.getElementById("txtdrugusage").focus();
   document.getElementById("tblsigna").style.visibility = "hidden";
   document.getElementById("tblsigna").innerHTML = "";
 

@@ -1,5 +1,4 @@
-﻿<link rel="stylesheet" href="assets/css/modern-table.css">
-<?php
+﻿<?php
 error_reporting(E_ALL ^ E_DEPRECATED);
 error_reporting(E_ALL & ~E_NOTICE);
 
@@ -54,119 +53,156 @@ $xdetail = "SELECT
             ";
 
 $qdetail = $db->query($xdetail) or die($db->errorInfo()[2]);
+?> <!-- Tutup tag PHP di sini, mulai HTML murni -->
 
-echo '
+<style>
+  .detail-header {
+    font-size: 13px;
+  }
+
+  .table-container {
+    overflow: auto;
+    border-radius: 16px;
+    max-height: 420px;
+    border: 1px solid #e2e8f0;
+    margin-top: 10px;
+  }
+
+  #tbldetail-farm-receipt {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  #tbldetail-farm-receipt th,
+  #tbldetail-farm-receipt td {
+    padding: 10px 20px;
+  }
+
+  #tbldetail-farm-receipt thead {
+    background: #10b981;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #tbldetail-farm-receipt th {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    letter-spacing: 0.3px;
+  }
+
+  #tbldetail-farm-receipt td {
+    font-size: 12px;
+    /* color: #374151; */
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  #tbldetail-farm-receipt th:nth-child(1),
+  #tbldetail-farm-receipt td:nth-child(1) {
+    width: 20%;
+  }
+
+  #tbldetail-farm-receipt th:nth-child(2),
+  #tbldetail-farm-receipt td:nth-child(2) {
+    width: 20%;
+  }
+
+  #tbldetail-farm-receipt th:nth-child(3),
+  #tbldetail-farm-receipt td:nth-child(3) {
+    width: 20%;
+  }
+
+  #tbldetail-farm-receipt th:nth-child(4),
+  #tbldetail-farm-receipt td:nth-child(4) {
+    width: 20%;
+  }
+
+  #tbldetail-farm-receipt th:nth-child(5),
+  #tbldetail-farm-receipt td:nth-child(5) {
+    width: 20%;
+  }
+</style>
 
 <div class="card-modern">
+  <div class="card-title">Detail Resep</div>
 
-  <div class="card-title">
-    DETAIL RESEP
-  </div>
+  <table class="detail-header">
+    <tr>
+      <td><b>No Antrian</b></td>
+      <td>: <?= htmlspecialchars($row['TRXA_REGI_LIST']) ?></td>
+    </tr>
+    <tr>
+      <td><b>Pasien</b></td>
+      <td>: <?= htmlspecialchars($row['PATI_MAIN_TITL'] . ' ' . $row['PATI_MAIN_NAME']) ?></td>
+    </tr>
+    <tr>
+      <td><b>Dokter</b></td>
+      <td>: <?= htmlspecialchars($row['PASS_USER_NAME']) ?></td>
+    </tr>
+    <tr>
+      <td><b>Pembayaran</b></td>
+      <td>: <?= ($row['TRXA_REGI_PAYM'] == 'B' ? 'BPJS' : 'UMUM') ?></td>
+    </tr>
+  </table>
 
-  <div class="card-body">
-
-    <table width="100%" class="detail-header">
-
-      <tr>
-        <td width="150"><b>No Antrian</b></td>
-        <td>: ' . $row['TRXA_REGI_LIST'] . '</td>
-      </tr>
-
-      <tr>
-        <td><b>Pasien</b></td>
-        <td>: ' . $row['PATI_MAIN_TITL'] . ' ' . $row['PATI_MAIN_NAME'] . '</td>
-      </tr>
-
-      <tr>
-        <td><b>Dokter</b></td>
-        <td>: ' . $row['PASS_USER_NAME'] . '</td>
-      </tr>
-
-      <tr>
-        <td><b>Pembayaran</b></td>
-        <td>: ' . ($row['TRXA_REGI_PAYM'] == 'B' ? 'BPJS' : 'UMUM') . '</td>
-      </tr>
-
-    </table>
-
-    <div style="height:15px"></div>
-
-    <table id="screen" class="modern-table">
-
+  <div class="table-container">
+    <table id="tbldetail-farm-receipt">
       <thead>
         <tr>
           <th>Obat</th>
           <th>Qty</th>
           <th>Batch</th>
           <th>Jenis</th>
-          <th width="150">Action</th>
+          <th>Action</th>
         </tr>
       </thead>
-
       <tbody>
-';
 
-while ($d = $qdetail->fetch(PDO::FETCH_ASSOC)) {
-    echo '<tr>';
+        <?php while ($d = $qdetail->fetch(PDO::FETCH_ASSOC)): ?>
+          <?php
+          $jenis = $d['JENIS'];
+          if ($d['TRXA_PRSC_CONC'] == 'Y' && !empty($d['RACIK_NAMA'])) {
+            $jenis .= ' (' . $d['RACIK_NAMA'] . ')';
+          }
+          ?>
 
-    echo '<td>'
-        . $d['INVE_PART_NAME'] . ' '
-        . $d['TBLI_SPEC_NAME']
-        . '</td>';
+          <tr>
+            <td><?= htmlspecialchars($d['INVE_PART_NAME'] . ' ' . $d['TBLI_SPEC_NAME']) ?></td>
+            <td><?= htmlspecialchars($d['TRXA_STOCK_QUTY'] . ' ' . $d['TBLI_UNIT_NAME']) ?></td>
+            <td><?= htmlspecialchars($d['BTCH']) ?></td>
+            <td><?= htmlspecialchars($jenis) ?></td>
+            <td>
+              <div class="form-grid"> <!-- Wrapper div untuk tombol -->
+                <button type="button" class="btn-modern btn-edit" style="height: 38px;"
+                  onclick="editobat('<?= htmlspecialchars($prsccode) ?>', '<?= htmlspecialchars($d['TRXA_STOCK_CODE']) ?>')">
+                  Edit
+                </button>
+                <button type="button" class="btn-modern btn-delete" style="height: 38px;"
+                  onclick="hapusobat('<?= htmlspecialchars($prsccode) ?>', '<?= htmlspecialchars($d['TRXA_STOCK_CODE']) ?>')">
+                  Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
 
-    echo '<td>'
-        . $d['TRXA_STOCK_QUTY'] . ' '
-        . $d['TBLI_UNIT_NAME']
-        . '</td>';
-
-    echo '<td>'
-        . $d['BTCH']
-        . '</td>';
-
-    $jenis = $d['JENIS'];
-    if ($d['TRXA_PRSC_CONC'] == 'Y' && !empty($d['RACIK_NAMA'])) {
-        $jenis .= ' (' . $d['RACIK_NAMA'] . ')';
-    }
-
-    echo '<td>'
-        . htmlspecialchars($jenis)
-        . '</td>';
-
-    echo '<td>';
-
-    echo '<button type="button" class="btn-edit" onclick="editobat(\'' . $prsccode . '\',\'' . $d['TRXA_STOCK_CODE'] . '\')">Edit</button>';
-
-    echo '<button type="button" class="btn-delete" onclick="hapusobat(\'' . $prsccode . '\',\'' . $d['TRXA_STOCK_CODE'] . '\')">Hapus</button>';
-
-    echo '</td>';
-
-    echo '</tr>';
-}
-echo '
+        <?php endwhile; ?>
 
       </tbody>
-
     </table>
-
-    <div style="margin-top:20px;text-align:right;">
-
-      <button
-        class="btn-siapkan"
-        type="button"
-        onclick="siapkansemua(\'' . $prsccode . '\')">
-
-        SIAPKAN SEMUA RESEP
-
-      </button>
-
-    </div>
-
   </div>
 
+  <div style="margin-top:20px; text-align:right; font-size: 14px;">
+    <button class="btn-modern btn-save" type="button" onclick="siapkansemua('<?= htmlspecialchars($prsccode) ?>')">
+      Siapkan Resep
+    </button>
+  </div>
 </div>
-
-';
-?>
-
-
-

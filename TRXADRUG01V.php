@@ -5,29 +5,107 @@ include "conf/config.php";
 include "inc/sanie.php";
 ?>
 
+<style>
+  .table-container {
+    overflow: auto;
+    border-radius: 16px;
+    max-height: 420px;
+    border: 1px solid #e2e8f0;
+    margin-top: 10px;
+  }
 
-<link rel="stylesheet" href="assets/css/modern-table.css">
-<div class="card-modern">
+  #tbllistpt-farm-receipt {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
 
-  <div class="card-body">
-    <div class="table-wrapper">
-      <table id="screen" class="modern-table">
-        <thead>
-          <tr>
-            <th>No. Antrian</th>
-            <th>Pasien</th>
-            <th>Dokter</th>
-            <th>Pembayaran</th>
-            <th>Jumlah Obat</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $kata = $_POST['q'];
-          $panjangkata = strlen($kata);
-          $xquery = "SELECT
+  #tbllistpt-farm-receipt th,
+  #tbllistpt-farm-receipt td {
+    padding: 10px 20px;
+  }
+
+  #tbllistpt-farm-receipt thead {
+    background: #10b981;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #tbllistpt-farm-receipt th {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: middle;
+    border: none;
+    letter-spacing: 0.3px;
+  }
+
+  #tbllistpt-farm-receipt td {
+    font-size: 12px;
+    /* color: #374151; */
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(1),
+  #tbllistpt-farm-receipt td:nth-child(1) {
+    width: 5%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(2),
+  #tbllistpt-farm-receipt td:nth-child(2) {
+    width: 15%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(3),
+  #tbllistpt-farm-receipt td:nth-child(3) {
+    width: 15%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(4),
+  #tbllistpt-farm-receipt td:nth-child(4) {
+    width: 10%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(5),
+  #tbllistpt-farm-receipt td:nth-child(5) {
+    width: 10%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(6),
+  #tbllistpt-farm-receipt td:nth-child(6) {
+    width: 10%;
+  }
+
+  #tbllistpt-farm-receipt th:nth-child(7),
+  #tbllistpt-farm-receipt td:nth-child(7) {
+    width: 20%;
+  }
+</style>
+
+<div class="table-container">
+  <table id="tbllistpt-farm-receipt">
+    <thead>
+      <tr>
+        <th>No. Antrian</th>
+        <th>Pasien</th>
+        <th>Dokter</th>
+        <th>Pembayaran</th>
+        <th>Jumlah Obat</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $kata = $_POST['q'];
+      $panjangkata = strlen($kata);
+      $xquery = "SELECT
               p.TRXA_PRSC_CODE,
               r.TRXA_REGI_LIST,
               pm.PATI_MAIN_TITL,
@@ -56,15 +134,15 @@ include "inc/sanie.php";
               AND p.TRXA_ENTR_DATE > DATE_SUB(CURDATE(),INTERVAL 4 DAY)
               ";
 
-          if ($kata != '') {
-            $xquery .= "
+      if ($kata != '') {
+        $xquery .= "
       AND (
           pm.PATI_MAIN_NAME LIKE '$kata%'
           OR r.TRXA_REGI_LIST LIKE '$kata%'
       )
       ";
-          }
-          $xquery .= "
+      }
+      $xquery .= "
               GROUP BY 
               p.TRXA_PRSC_CODE,
               r.TRXA_REGI_LIST,
@@ -78,79 +156,53 @@ include "inc/sanie.php";
               LAST_TIME DESC
               ";
 
-          // $q = $db->query($xquery) or die("Gagal Maning!!");
-          
-          $q = $db->query($xquery);
+      $q = $db->query($xquery);
 
-          if (!$q) {
-            print_r($db->errorInfo());
-            exit;
-          }
+      if (!$q) {
+        print_r($db->errorInfo());
+        exit;
+      }
 
-          while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
-            $cnt_a = $k['CNT_A'];
-            $cnt_i = $k['CNT_I'];
+      while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
+        $cnt_a = $k['CNT_A'];
+        $cnt_i = $k['CNT_I'];
 
-            if ($cnt_i == 0) {
-              $status = '<span class="badge-warning">BELUM SIAP</span>';
-            } else if ($cnt_a == 0) {
-              $status = '<span class="badge-success">SUDAH SIAP</span>';
-            } else {
-              $status = '<span class="badge-info">DIPROSES</span>';
-            }
+        if ($cnt_i == 0) {
+          $status = '<span class="badge badge-antri">BELUM SIAP</span>';
+        } else if ($cnt_a == 0) {
+          $status = '<span class="badge badge-selesai">SUDAH SIAP</span>';
+        } else {
+          $status = '<span class="badge badge-periksa">DIPROSES</span>';
+        }
 
-            echo '<tr>';
-
-            echo '<td>' . $k['TRXA_REGI_LIST'] . '</td>';
-
-            echo '<td style="text-align:left">' .
-              $k['PATI_MAIN_TITL'] . ' ' .
-              $k['PATI_MAIN_NAME'] .
-              '</td>';
-
-            echo '<td style="text-align:left">' .
-              $k['PASS_USER_NAME'] .
-              '</td>';
-
-            echo '<td>' .
-              $k['PEMBAYARAN'] .
-              '</td>';
-
-            echo '<td>' .
-              $k['JML_OBAT'] . ' Item' .
-              '</td>';
-
-            echo '<td>' .
-              $status .
-              '</td>';
-
-            echo '
-      <td>
+        echo '<tr>';
+        echo '<td>' . $k['TRXA_REGI_LIST'] . '</td>';
+        echo '<td>' . $k['PATI_MAIN_TITL'] . ' ' . $k['PATI_MAIN_NAME'] . '</td>';
+        echo '<td>' . $k['PASS_USER_NAME'] . '</td>';
+        echo '<td>' . $k['PEMBAYARAN'] . '</td>';
+        echo '<td>' . $k['JML_OBAT'] . ' Item' . '</td>';
+        echo '<td>' . $status . '</td>';
+        echo '<td>';
+        echo '<div class="form-grid"> 
         <button
             type="button"
-            class="btn-detail"
+            class="btn-modern btn-save" style="height: 38px;"
             onclick="viewresep(\'' . $k['TRXA_PRSC_CODE'] . '\')">
             Detail
         </button>
 
         <button
             type="button"
-            class="btn-cetak"
+            class="btn-modern btn-refresh" style="height: 38px;"
             onclick="window.open(\'TRXADRUG01-ETIKET.php?prsccode=' . $k['TRXA_PRSC_CODE'] . '\')">
             E-Tiket
         </button>
-      </td>';
+        </div>';
+        echo '</td>';
 
-            echo '</tr>';
-          }
-          ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
+        echo '</tr>';
+      }
+      ?>
+    </tbody>
+  </table>
 </div>
-
-
-
-
-

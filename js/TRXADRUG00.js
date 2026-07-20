@@ -118,6 +118,65 @@ function stateChangedregi() {
   }
 }
 
+function setText(id, val) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = (val && String(val).length) ? val : '-';
+}
+
+function showFormResep() {
+  var list = document.getElementById('sectionList');
+  var form = document.getElementById('sectionForm');
+  if (list) list.style.display = 'none';
+  if (form) form.style.display = 'block';
+}
+
+function showListPasien() {
+  var list = document.getElementById('sectionList');
+  var form = document.getElementById('sectionForm');
+  if (form) form.style.display = 'none';
+  if (list) list.style.display = 'block';
+  ambilregicode('X');
+}
+
+function loadRekamMedisHariIni(regicode) {
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'TRXADRUG00C-REKAMMEDIS.php', true);
+  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4 && xhr.status == 200) {
+      try {
+        var d = JSON.parse(xhr.responseText);
+        if (!d || !d.ok) return;
+        setText('lblttv_td', d.td);
+        setText('lblttv_bb', d.bb);
+        setText('lblttv_tb', d.tb);
+        setText('lblttv_nadi', d.nadi);
+        setText('lblttv_suhu', d.suhu);
+        setText('lblttv_rr', d.rr);
+        setText('lblhasil_anam', d.anamnesa);
+        setText('lblhasil_diag', d.diagnosa);
+        setText('lblhasil_keluhan', d.keluhan);
+        setText('lbltl_rencana', d.rencana);
+        setText('lbltl_rujuk', d.rujukan);
+        setText('lbltl_resep', d.resep);
+      } catch (e) { }
+    }
+  };
+  xhr.send('q=' + encodeURIComponent(regicode));
+}
+
+function tutupResep() {
+  swal({
+    title: 'Berhasil',
+    text: 'Data berhasil disimpan',
+    icon: 'success',
+    button: 'OK'
+  }).then(function () {
+    showListPasien();
+    window.location.href = 'TRXADRUG00.php';
+  });
+}
+
 function isiregi(outprsccode, outpaticode, outmainname, outmaingend, outmainage, outregipaym, outpaymcode, outregipoli, outexamprsc, outexamdiag) {
   try {
     document.getElementById("txtprsccode").value = outprsccode;
@@ -131,32 +190,35 @@ function isiregi(outprsccode, outpaticode, outmainname, outmaingend, outmainage,
     document.getElementById("txtexamprsc").value = outexamprsc;
     document.getElementById("txtexamdiag").value = outexamdiag;
 
+    setText('lblprsccode', outprsccode);
+    setText('lblpaticode', outpaticode);
+    setText('lblmainname', outmainname);
+    setText('lblmaingend', outmaingend);
+    setText('lblmainage', outmainage);
+    setText('lblregipaym', outregipaym);
+    setText('lblhasil_diag', outexamdiag);
+
+    showFormResep();
+    loadRekamMedisHariIni(outprsccode);
     ambilscreen(outprsccode);
 
-    // Inisialisasi racikan
     try {
       loadRacikanHead();
       document.getElementById('section_racik_detail').style.display = 'none';
       document.getElementById('hidselectedracikid').value = '';
       document.getElementById('lblSelectedRacik').innerHTML = 'Racikan Terpilih: -';
-    } catch(e) {}
+    } catch (e) { }
 
     document.getElementById("txtstockcode").removeAttribute('disabled');
     document.getElementById("txtstockquty").removeAttribute('disabled');
-
     document.getElementById("txtsigna").removeAttribute('disabled');
-    //   document.getElementById("txtusage").removeAttribute('disabled');
 
     document.getElementById("txtsearch").value = '';
-
     document.getElementById("txtstockcode").focus();
-    document.getElementById("inputresep").scrollIntoView({
+    document.getElementById("titlecarddp").scrollIntoView({
       behavior: "smooth",
       block: "start"
     });
-    // document.getElementById("tblregi").style.visibility = "hidden";
-    // document.getElementById("tblregi").innerHTML = "";
-
   }
   catch (err) { alert(err.message); }
 }
@@ -532,7 +594,7 @@ function cekResepBaru() {
               var parts = examCode.split("|");
               var regCode = parts[0] || "";
               var patientName = parts[1] || "Pasien";
-              
+
               var options = {
                 body: "Ada resep dokter baru masuk untuk pasien:\n" + patientName + " (" + regCode + ")",
                 icon: "assets/img/icon.png",
@@ -540,14 +602,14 @@ function cekResepBaru() {
                 requireInteraction: true // Notif tetap tampil di layar windows sampai diklik
               };
               var notif = new Notification("SISKA - Resep Baru Masuk!", options);
-              notif.onclick = function() {
+              notif.onclick = function () {
                 window.focus();
                 try {
                   ambilregicode('X');
-                } catch(err){}
+                } catch (err) { }
                 notif.close();
               };
-            } catch(e) {
+            } catch (e) {
               console.log("Gagal memunculkan push notification: " + e.message);
             }
           }
@@ -683,11 +745,11 @@ function isiresep_racik(outstockcode, outstockbtch, outstockname, outstockpric, 
 function loadRacikanHead() {
   var prsccode = document.getElementById("txtprsccode").value;
   if (prsccode == "") return;
-  
+
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=tmpl_head", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       document.getElementById("tblracikhead").innerHTML = xhr.responseText;
     }
@@ -701,7 +763,7 @@ function tambahRacikanHead() {
   var nama = document.getElementById("txtracikname").value;
   var signa = document.getElementById("txtraciksigna").value;
   var qty = document.getElementById("txtracikqty").value;
-  
+
   if (prsccode == "") {
     swal({ title: "Gagal", text: "Pilih pasien terlebih dahulu", icon: "warning" });
     return;
@@ -710,11 +772,11 @@ function tambahRacikanHead() {
     swal({ title: "Gagal", text: "Nama racikan wajib diisi", icon: "warning" });
     return;
   }
-  
+
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=add_head", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       var res = xhr.responseText.split("|");
       if (res[0] === "OK") {
@@ -723,12 +785,12 @@ function tambahRacikanHead() {
         document.getElementById("hidraciksignacode").value = "";
         document.getElementById("hidracikusage").value = "";
         document.getElementById("txtracikqty").value = "1";
-        
+
         loadRacikanHead();
-        
+
         // Otomatis select racikan yang baru dibuat
         var newId = res[1];
-        setTimeout(function() {
+        setTimeout(function () {
           selectRacikanRow(newId, nama);
         }, 300);
       } else {
@@ -743,11 +805,11 @@ function tambahRacikanHead() {
 // Logic hapus kepala racikan
 function hapusRacikan(id) {
   if (!confirm("Hapus racikan beserta seluruh obat di dalamnya?")) return;
-  
+
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=del_head", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (xhr.responseText.trim() === "OK") {
         // Reset selection if the deleted one was selected
@@ -772,19 +834,19 @@ function hapusRacikan(id) {
 function selectRacikanRow(id, nama) {
   // Remove active class from all rows
   var rows = document.querySelectorAll(".tbl-racik tbody tr");
-  rows.forEach(function(r) {
+  rows.forEach(function (r) {
     r.classList.remove("active-row");
   });
-  
+
   var activeRow = document.getElementById("row_racik_" + id);
   if (activeRow) {
     activeRow.classList.add("active-row");
   }
-  
+
   document.getElementById("hidselectedracikid").value = id;
   document.getElementById("lblSelectedRacik").innerHTML = "Racikan Terpilih: " + nama;
   document.getElementById("section_racik_detail").style.display = "block";
-  
+
   loadRacikanDetail(id);
 }
 
@@ -793,7 +855,7 @@ function loadRacikanDetail(id) {
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=tmpl_detail", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       document.getElementById("tblracikdetail").innerHTML = xhr.responseText;
     }
@@ -805,14 +867,14 @@ function loadRacikanDetail(id) {
 function tambahObatKeRacikan() {
   var prsccode = document.getElementById("txtprsccode").value;
   var racik_id = document.getElementById("hidselectedracikid").value;
-  
+
   var stockcode = document.getElementById("hidracikstockcode").value;
   var stockname = document.getElementById("txtracikstockname").value;
   var stockbtch = document.getElementById("hidracikstockbtch").value;
   var stockpric = document.getElementById("hidracikstockpric").value;
   var qty = document.getElementById("txtracikstockqty").value;
   var tersedia = parseInt(document.getElementById("hidracikstockamnt").value || 0);
-  
+
   if (prsccode == "" || racik_id == "") {
     swal({ title: "Gagal", text: "Pilih racikan terlebih dahulu", icon: "warning" });
     return;
@@ -829,11 +891,11 @@ function tambahObatKeRacikan() {
     swal({ title: "Stok Kurang", text: "Stok obat hanya tersedia " + tersedia, icon: "warning" });
     return;
   }
-  
+
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=add_detail", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (xhr.responseText.trim() === "OK") {
         // Reset input fields
@@ -842,7 +904,7 @@ function tambahObatKeRacikan() {
         document.getElementById("hidracikstockbtch").value = "";
         document.getElementById("hidracikstockpric").value = "";
         document.getElementById("txtracikstockqty").value = "1";
-        
+
         loadRacikanDetail(racik_id);
         ambilscreen(prsccode); // Refresh list resep total
       } else {
@@ -859,11 +921,11 @@ function hapusObatKomposisi(prsccode, stockcode) {
   var racik_id = document.getElementById("hidselectedracikid").value;
   if (racik_id == "") return;
   if (!confirm("Hapus obat ini dari racikan?")) return;
-  
+
   var xhr = new XMLHttpRequest();
   xhr.open("POST", "TRXADRUG00_RACIK.php?action=del_detail", true);
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
+  xhr.onreadystatechange = function () {
     if (xhr.readyState == 4 && xhr.status == 200) {
       if (xhr.responseText.trim() === "OK") {
         loadRacikanDetail(racik_id);

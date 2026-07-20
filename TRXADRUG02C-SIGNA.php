@@ -13,12 +13,11 @@ include "conf/config.php";
   <tbody>
 <?php
   $kata = $_POST['q'];
-  //list($kata, $regipoli) = explode("|",$rawdata);
 
   if (strlen($kata) == 1)
   {
 
-  $xquery = "SELECT TBLP_SGNA_CODE, TBLP_SGNA_NAME 
+  $xquery = "SELECT TBLP_SGNA_CODE, TBLP_SGNA_NAME, TBLP_SGNA_USAG 
               FROM tblpsgna 
               WHERE TBLP_SGNA_STAT ='Y'
               ORDER by TBLP_SGNA_CODE";    
@@ -26,7 +25,7 @@ include "conf/config.php";
   }
   else
   {
-  $xquery = "SELECT TBLP_SGNA_CODE, TBLP_SGNA_NAME 
+  $xquery = "SELECT TBLP_SGNA_CODE, TBLP_SGNA_NAME, TBLP_SGNA_USAG 
               FROM tblpsgna 
               WHERE TBLP_SGNA_NAME LIKE '$kata%'
               AND TBLP_SGNA_STAT ='Y'
@@ -38,9 +37,10 @@ while ($k = $q->fetch(PDO::FETCH_ASSOC))
 {
   $outsgnacode = $k['TBLP_SGNA_CODE'];
   $outsgnaname = $k['TBLP_SGNA_NAME'];
+  $outsgnausag = $k['TBLP_SGNA_USAG'];
 
 echo '<tr>';
-echo '<td style="width: 300px;" onClick="isisigna(\''.$outsgnacode.'\',\''.$outsgnaname.'\');" 
+echo '<td style="width: 300px;" onClick="isisigna(\''.$outsgnacode.'\',\''.$outsgnaname.'\',\''.$outsgnausag.'\');" 
       style="cursor:pointer">'.$k['TBLP_SGNA_NAME'].'</td>';
 
 echo '</tr>';
@@ -48,11 +48,3 @@ echo '</tr>';
 ?>
   </tbody>
   </table>
-
-
-
-
-
-
-
-

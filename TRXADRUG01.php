@@ -16,100 +16,17 @@ if (isset($_SESSION['username'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sistem Informasi Klinik Pratama">
     <title>Farmasi</title>
-    <link rel="shortcut icon" href="assets/img/icon.png">
+    <link rel="shortcut icon" href="assets/img/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/layouts/header.css">
-    <link rel="stylesheet" href="assets/css/bootstrap/bootstrap.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/pure/pure-min.css">
-    <!--[if lte IE 8]>
-  <link rel="stylesheet" href="assets/css/layouts/side-menu-old-ie.css">
-<![endif]-->
-    <!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="assets/css/bootstrap/bootstrap.css">
+    <link rel="stylesheet" href="assets/css/layouts/header.css">
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
-    <!--<![endif]-->
-    <style type="text/css">
-      
-
-      .button-print {
-        background: rgb(223, 117, 20);
-        /* this is an orange */
-      }
-
-      .button-view {
-        background: rgb(28, 184, 65);
-        /* this is an green */
-      }
-
-      .button-delete {
-        background: rgb(202, 60, 60);
-        /* this is an maroon */
-      }
-    </style>
-
+    <link rel="stylesheet" href="assets/css/trxapati-shared.css">
 
     <style>
-      :root {
-        --primary: #16a34a;
-        --primary-dark: #15803d;
-        --primary-soft: #dcfce7;
-        --bg: #f3f6fb;
-        --card: #ffffff;
-        --border: #dbe4ee;
-        --text: #0f172a;
-        --muted: #64748b;
-        --shadow: 0 2px 6px rgba(15, 23, 42, .04),
-          0 8px 24px rgba(15, 23, 42, .06);
-        --radius: 16px;
-      }
-
-      .content {
-        background: var(--bg);
-        padding: 20px;
-      }
-
-      .card-modern {
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        margin-bottom: 16px;
-      }
-
-      .card-title {
-        padding: 12px 16px;
-        background: linear-gradient(90deg, #16a34a, #22c55e);
-        color: #fff;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .card-body {
-        padding: 14px;
-      }
-
-      .input-modern {
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        padding: 10px 12px;
-        font-size: 13px;
-      }
-
-      .input-modern:focus {
-        outline: none;
-        border-color: #16a34a;
-        box-shadow: 0 0 0 4px rgba(22, 163, 74, .12);
-      }
-
-      #resepdetail {
-        margin-top: 16px;
-      }
-
       /* Modal */
       .modal {
         display: none;
@@ -189,12 +106,6 @@ if (isset($_SESSION['username'])) {
         box-shadow: 0 0 0 4px rgba(22, 163, 74, .12);
       }
 
-      .form-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
       .modal-footer {
         display: flex;
         justify-content: flex-end;
@@ -226,6 +137,7 @@ if (isset($_SESSION['username'])) {
       .btn-modal-save:hover {
         background: #15803d;
       }
+
       /* End Modal */
 
       /* Punya Detail */
@@ -294,171 +206,128 @@ if (isset($_SESSION['username'])) {
         font-weight: 700;
         cursor: pointer;
       }
-
-      /* end punya detail */
     </style>
 
-      <link rel="stylesheet" href="assets/css/modern-table.css">`n</head>
-  <script type="text/javascript" src="js/jquery.js"></script>
-  <script src="js/sanie.js"></script>
-  <script src="js/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/sanie.js"></script>
+    <script src="js/sweetalert.min.js"></script>
 
-  <script>
-    $(document).ready(function () {
-      setInterval(timestamp, 1000);
-    });
-    function timestamp() { $.ajax({ url: 'inc/timestamp.php', success: function (data) { $('#timestamp').html(data); }, }); }
+    <script>
+      $(document).ready(function () {
+        setInterval(timestamp, 1000);
+      });
+      function timestamp() { $.ajax({ url: 'inc/timestamp.php', success: function (data) { $('#timestamp').html(data); }, }); }
 
-  </script>
+    </script>
 
-  <body onLoad="periksaakses('PASS_DRUG_ENTR'); 
-">
+  <body onLoad="periksaakses('PASS_DRUG_ENTR');">
     <div id="wrapper">
       <!-- Side Menu -->
       <?php include "inc/side-menu.php"; ?>
 
       <!-- tampilan menu -->
       <div id="content-wrapper">
-<?php include "inc/header.php"; ?>
+        <?php include "inc/header.php"; ?>
         <div class="content">
+          <div class="content-modern">
 
-          <!-- Tab Menu -->
-          <div class="pure-menu pure-menu-horizontal">
-            <ul class="pure-menu-list">
+            <div class="card-modern">
+              <div class="card-title">Daftar Resep Masuk</div>
 
-              <li class="pure-menu-item pure-menu-selected" onclick="javascript: location.href = 'TRXADRUG00.php'">
-                <a class="pure-menu-link">
-                  Input Resep
-                </a>
-              </li>
-
-              <li class="pure-menu-item pure-menu-disabled">
-                Penyerahan Obat
-              </li>
-
-              <li class="pure-menu-item pure-menu-selected" onclick="javascript: location.href = 'TRXADRUG02.php'">
-                <a class="pure-menu-link">
-                  Penjualan Obat
-                </a>
-              </li>
-
-              <li class="pure-menu-item pure-menu-selected" onclick="javascript: location.href = 'TRXADRUG03.php'">
-                <a class="pure-menu-link">
-                  Faktur
-                </a>
-              </li>
-
-
-            </ul>
-          </div>
-          <!-- Tab Menu -->
-
-          <div class="card-modern">
-            <div class="card-title">
-              Daftar Resep Masuk
-            </div>
-
-            <div class="card-body">
-              <input type="text" id="txtsearch" autocomplete="off" class="input-modern" name="txtsearch"
+              <input type="text" id="txtsearch" autocomplete="off" class="form-control" name="txtsearch"
                 placeholder="Cari Pasien / No Antrian..." maxlength="20"
                 onkeyup="if (value.length > 0) { ambilscreen(this.value); } else {ambilscreen('')};">
-              <div style="margin-top:15px">
-                <div id="tblscreen"></div>
-              </div>
+
+              <div id="tblscreen"></div>
             </div>
-          </div>
 
-          <div id="resepdetail" style="display:none;margin-top:15px">
-          </div>
+            <!-- Detail Resep Card-->
+            <div id="resepdetail"></div>
 
+            <div id="modalEditObat" class="modal">
 
+              <div class="modal-content">
 
-          <div id="modalEditObat" class="modal">
+                <div class="modal-header">
 
-            <div class="modal-content">
+                  <div class="modal-title">
+                    Edit Obat
+                  </div>
 
-              <div class="modal-header">
+                  <button type="button" class="modal-close" onclick="closemodal()">
+                    Ã—
+                  </button>
 
-                <div class="modal-title">
-                  Edit Obat
                 </div>
 
-                <button type="button" class="modal-close" onclick="closemodal()">
-                  Ã—
-                </button>
-
-              </div>
-
-              <input type="hidden" id="edit_prsccode">
-              <input type="hidden" id="edit_stockcode">
-
-              <div class="form-group">
-                <label>Nama Obat</label>
-                <input type="text" id="edit_stockname" readonly>
-              </div>
-
-              <div class="form-grid">
+                <input type="hidden" id="edit_prsccode">
+                <input type="hidden" id="edit_stockcode">
 
                 <div class="form-group">
-                  <label>Qty</label>
-                  <input type="number" id="edit_qty">
+                  <label>Nama Obat</label>
+                  <input type="text" id="edit_stockname" readonly>
+                </div>
+
+                <div class="form-grid">
+
+                  <div class="form-group">
+                    <label>Qty</label>
+                    <input type="number" id="edit_qty">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Jenis</label>
+                    <select id="edit_conc">
+                      <option value="N">Non Racikan</option>
+                      <option value="Y">Racikan</option>
+                    </select>
+                  </div>
+
                 </div>
 
                 <div class="form-group">
-                  <label>Jenis</label>
-                  <select id="edit_conc">
-                    <option value="N">Non Racikan</option>
-                    <option value="Y">Racikan</option>
-                  </select>
+                  <label>Batch</label>
+                  <input type="text" id="edit_batch" readonly>
                 </div>
 
-              </div>
+                <div class="modal-footer">
 
-              <div class="form-group">
-                <label>Batch</label>
-                <input type="text" id="edit_batch" readonly>
-              </div>
+                  <button type="button" class="btn-modal-cancel" onclick="closemodal()">
 
-              <div class="modal-footer">
+                    Batal
 
-                <button type="button" class="btn-modal-cancel" onclick="closemodal()">
+                  </button>
 
-                  Batal
+                  <button type="button" class="btn-modal-save" onclick="simpanobat()">
 
-                </button>
+                    Simpan Perubahan
 
-                <button type="button" class="btn-modal-save" onclick="simpanobat()">
+                  </button>
 
-                  Simpan Perubahan
-
-                </button>
+                </div>
 
               </div>
 
             </div>
 
+            </form>
+
+          </div><!-- div content -->
+          <div class="footerdate">
+            <span class="labelTime Time"><b>Date :</b> <?php $tgl = date('d-m-Y');
+            echo $tgl; ?></span>
+          </div>
+          <div class="footertime">
+            <span class="labelTime Time" id="timestamp"></span>
           </div>
 
-          </form>
-
-        </div><!-- div content -->
-        <div class="footerdate">
-          <span class="labelTime Time"><b>Date :</b> <?php $tgl = date('d-m-Y');
-          echo $tgl; ?></span>
         </div>
-        <div class="footertime">
-          <span class="labelTime Time" id="timestamp"></span>
-        </div>
-
-
       </div>
     </div>
+
     <script src="js/TRXADRUG01.js"></script>
-    
-
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/ui.js"></script>
-
+    <script src="js/ui.js"></script>
 
   </body>
 
