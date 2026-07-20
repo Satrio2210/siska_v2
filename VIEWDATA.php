@@ -78,24 +78,49 @@ $month_start = date('Y-m-01', $current_time);
 $month_end = date('Y-m-t', $current_time);
 $month_label = sk_month_name($datenow) . ' ' . date('Y', $current_time);
 
-$total_antrian = sk_value(
-    $db,
-    "SELECT COUNT(*) AS TOTAL FROM trxaregi
-     WHERE TRXA_REGI_DATE = '$latest_date' AND TRXA_VIEW_STAT = 'Y'",
-    'TOTAL'
-);
+$range_start = date('Y-m-01', strtotime('-5 month', $current_time));
+$range_end = $month_end;
+$latest_date_q = $db->quote($latest_date);
+$month_start_q = $db->quote($month_start);
+$month_end_q = $db->quote($month_end);
+$range_start_q = $db->quote($range_start);
+$range_end_q = $db->quote($range_end);
+
+$regi_batch = $db->query("
+    SELECT
+        SUM(CASE WHEN TRXA_REGI_DATE = $latest_date_q THEN 1 ELSE 0 END) AS TOTAL_ANTRIAN,
+        SUM(CASE WHEN TRXA_REGI_DATE = $latest_date_q AND TRXA_REGI_PAYM = 'U' THEN 1 ELSE 0 END) AS PASIEN_UMUM,
+        SUM(CASE WHEN TRXA_REGI_DATE = $latest_date_q AND TRXA_REGI_PAYM = 'B' THEN 1 ELSE 0 END) AS PASIEN_BPJS,
+        SUM(CASE WHEN TRXA_REGI_DATE BETWEEN $month_start_q AND $month_end_q AND TRXA_REGI_POLI = 'PU' THEN 1 ELSE 0 END) AS POLI_UMUM,
+        SUM(CASE WHEN TRXA_REGI_DATE BETWEEN $month_start_q AND $month_end_q AND TRXA_REGI_POLI = 'KB' THEN 1 ELSE 0 END) AS POLI_KIA,
+        SUM(CASE WHEN TRXA_REGI_DATE BETWEEN $month_start_q AND $month_end_q AND TRXA_REGI_POLI = 'LB' THEN 1 ELSE 0 END) AS POLI_LAB,
+        SUM(CASE WHEN TRXA_REGI_DATE BETWEEN $month_start_q AND $month_end_q AND TRXA_REGI_POLI = 'PG' THEN 1 ELSE 0 END) AS POLI_GIGI
+    FROM trxaregi
+    WHERE TRXA_VIEW_STAT = 'Y'
+      AND TRXA_REGI_DATE BETWEEN $range_start_q AND $range_end_q
+")->fetch(PDO::FETCH_ASSOC);
+
+$total_antrian     = (int) ($regi_batch['TOTAL_ANTRIAN'] ?? 0);
+$pasien_umum_hari  = (int) ($regi_batch['PASIEN_UMUM'] ?? 0);
+$pasien_bpjs_hari  = (int) ($regi_batch['PASIEN_BPJS'] ?? 0);
+$poli_umum         = (int) ($regi_batch['POLI_UMUM'] ?? 0);
+$poli_kia          = (int) ($regi_batch['POLI_KIA'] ?? 0);
+$poli_lab          = (int) ($regi_batch['POLI_LAB'] ?? 0);
+$poli_gigi         = (int) ($regi_batch['POLI_GIGI'] ?? 0);
+$total_poli        = $poli_umum + $poli_kia + $poli_lab + $poli_gigi;
+$total_pasien_bulan = $total_poli;
 
 $pendapatan_hari_rajal = sk_value(
     $db,
     "SELECT SUM(TRXA_PAYM_AMNT) AS TOTAL FROM trxasale
-     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_ENTR_DATE = '$latest_date'",
+     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_ENTR_DATE = $latest_date_q",
     'TOTAL'
 );
 
 $pendapatan_hari_obat = sk_value(
     $db,
     "SELECT SUM(TRXA_PAYM_OUTS) AS TOTAL FROM trxadrug
-     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_DRUG_STAT = 'P' AND TRXA_ENTR_DATE = '$latest_date'",
+     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_DRUG_STAT = 'P' AND TRXA_ENTR_DATE = $latest_date_q",
     'TOTAL'
 );
 
@@ -104,7 +129,7 @@ $pendapatan_hari = (float) $pendapatan_hari_rajal + (float) $pendapatan_hari_oba
 $pendapatan_bulan_rajal = sk_value(
     $db,
     "SELECT SUM(TRXA_PAYM_AMNT) AS TOTAL FROM trxasale
-     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_ENTR_DATE BETWEEN '$month_start' AND '$month_end'",
+     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_ENTR_DATE BETWEEN $month_start_q AND $month_end_q",
     'TOTAL'
 );
 
@@ -112,66 +137,60 @@ $pendapatan_bulan_obat = sk_value(
     $db,
     "SELECT SUM(TRXA_PAYM_OUTS) AS TOTAL FROM trxadrug
      WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_DRUG_STAT = 'P'
-     AND TRXA_ENTR_DATE BETWEEN '$month_start' AND '$month_end'",
+     AND TRXA_ENTR_DATE BETWEEN $month_start_q AND $month_end_q",
     'TOTAL'
 );
 
 $pendapatan_bulan = (float) $pendapatan_bulan_rajal + (float) $pendapatan_bulan_obat;
 
-$poli_umum = sk_value($db, "SELECT COUNT(*) AS TOTAL FROM trxaregi WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_POLI = 'PU' AND TRXA_REGI_DATE BETWEEN '$month_start' AND '$month_end'", 'TOTAL');
-$poli_kia = sk_value($db, "SELECT COUNT(*) AS TOTAL FROM trxaregi WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_POLI = 'KB' AND TRXA_REGI_DATE BETWEEN '$month_start' AND '$month_end'", 'TOTAL');
-$poli_lab = sk_value($db, "SELECT COUNT(*) AS TOTAL FROM trxaregi WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_POLI = 'LB' AND TRXA_REGI_DATE BETWEEN '$month_start' AND '$month_end'", 'TOTAL');
-$poli_gigi = sk_value($db, "SELECT COUNT(*) AS TOTAL FROM trxaregi WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_POLI = 'PG' AND TRXA_REGI_DATE BETWEEN '$month_start' AND '$month_end'", 'TOTAL');
-$total_poli = (int) $poli_umum + (int) $poli_kia + (int) $poli_lab + (int) $poli_gigi;
-$total_pasien_bulan = $total_poli;
-
-$kunjungan_rows = sk_rows(
-    $db,
-    "SELECT DATE_FORMAT(TRXA_REGI_DATE, '%Y-%m') AS BULAN,
+$kunjungan_rows = $db->query("
+    SELECT DATE_FORMAT(TRXA_REGI_DATE, '%Y-%m') AS BULAN,
             SUM(CASE WHEN TRXA_REGI_PAYM = 'U' THEN 1 ELSE 0 END) AS TOTAL_UMUM,
             SUM(CASE WHEN TRXA_REGI_PAYM = 'B' THEN 1 ELSE 0 END) AS TOTAL_BPJS
      FROM trxaregi
      WHERE TRXA_VIEW_STAT = 'Y'
-     AND TRXA_REGI_DATE BETWEEN DATE_SUB('$month_start', INTERVAL 5 MONTH) AND '$month_end'
+       AND TRXA_REGI_DATE BETWEEN $range_start_q AND $range_end_q
      GROUP BY DATE_FORMAT(TRXA_REGI_DATE, '%Y-%m')
-     ORDER BY BULAN"
-);
+     ORDER BY BULAN
+")->fetchAll(PDO::FETCH_ASSOC);
 
 $kunjungan_map_umum = array();
 $kunjungan_map_bpjs = array();
+$kunjungan_map_total = array();
+
+$monthly_keys = array();
+for ($i = 5; $i >= 0; $i--) {
+    $date = date('Y-m-01', strtotime("-$i month", strtotime($month_start)));
+    $monthly_keys[] = date('Y-m', strtotime($date));
+}
+
 foreach ($kunjungan_rows as $row) {
-    $kunjungan_map_umum[$row['BULAN']] = (int) $row['TOTAL_UMUM'];
-    $kunjungan_map_bpjs[$row['BULAN']] = (int) $row['TOTAL_BPJS'];
+    $bulan = $row['BULAN'];
+    $kunjungan_map_umum[$bulan] = (int) $row['TOTAL_UMUM'];
+    $kunjungan_map_bpjs[$bulan] = (int) $row['TOTAL_BPJS'];
+    $kunjungan_map_total[$bulan] = $kunjungan_map_umum[$bulan] + $kunjungan_map_bpjs[$bulan];
 }
 
 $monthly_labels = array();
 $monthly_visits_umum = array();
 $monthly_visits_bpjs = array();
 
-for ($i = 5; $i >= 0; $i--) {
-    $date = date('Y-m-01', strtotime("-$i month", strtotime($month_start)));
-    $key = date('Y-m', strtotime($date));
-    
-    // Simpan ke dalam array terpisah untuk dipakai di Chart.js
-    $monthly_labels[] = sk_month_name($date);
-    $monthly_visits_umum[] = isset($kunjungan_map_umum[$key]) ? $kunjungan_map_umum[$key] : 0;
-    $monthly_visits_bpjs[] = isset($kunjungan_map_bpjs[$key]) ? $kunjungan_map_bpjs[$key] : 0;
-}
-
-$kunjungan_map = array();
-foreach ($kunjungan_rows as $row) {
-    $kunjungan_map[$row['BULAN']] = (int) $row['TOTAL'];
-}
-
 $monthly_visits = array();
 $max_visit = 1;
-for ($i = 5; $i >= 0; $i--) {
-    $date = date('Y-m-01', strtotime("-$i month", strtotime($month_start)));
-    $key = date('Y-m', strtotime($date));
-    $total = isset($kunjungan_map[$key]) ? $kunjungan_map[$key] : 0;
+
+foreach ($monthly_keys as $key) {
+    $dateAny = $key . '-01';
+    $umum = isset($kunjungan_map_umum[$key]) ? $kunjungan_map_umum[$key] : 0;
+    $bpjs = isset($kunjungan_map_bpjs[$key]) ? $kunjungan_map_bpjs[$key] : 0;
+    $total = isset($kunjungan_map_total[$key]) ? $kunjungan_map_total[$key] : ($umum + $bpjs);
+
+    $monthly_labels[] = sk_month_name($dateAny);
+    $monthly_visits_umum[] = $umum;
+    $monthly_visits_bpjs[] = $bpjs;
+
     $max_visit = max($max_visit, $total);
     $monthly_visits[] = array(
-        'label' => sk_month_name($date),
+        'label' => sk_month_name($dateAny),
         'total' => $total,
     );
 }
@@ -184,29 +203,27 @@ $pie_background = $total_poli > 0
     ? "radial-gradient(circle, #ffffff 0 38%, transparent 39%), conic-gradient(#4f97ca 0 $pie_umum%, #4fb48f $pie_umum% " . ($pie_umum + $pie_kia) . "%, #b8ad46 " . ($pie_umum + $pie_kia) . "% " . ($pie_umum + $pie_kia + $pie_lab) . "%, #f19a4e " . ($pie_umum + $pie_kia + $pie_lab) . "% 100%)"
     : "radial-gradient(circle, #ffffff 0 38%, transparent 39%), conic-gradient(#e5eaf0 0 100%)";
 
-$top_obat = sk_rows(
-    $db,
-    "SELECT COALESCE(i.INVE_PART_NAME, p.TRXA_STOCK_CODE) AS NAME,
-            SUM(p.TRXA_STOCK_QUTY) AS TOTAL
-     FROM trxaprsc p
-     LEFT JOIN invemast i ON i.INVE_MAST_CODE = p.TRXA_STOCK_CODE
-     WHERE p.TRXA_VIEW_STAT = 'Y'
-     AND p.TRXA_ENTR_DATE BETWEEN '$month_start' AND '$month_end'
-     GROUP BY COALESCE(i.INVE_PART_NAME, p.TRXA_STOCK_CODE)
-     ORDER BY TOTAL DESC
-     LIMIT 5"
-);
+$top_obat = $db->query("
+    SELECT COALESCE(i.INVE_PART_NAME, p.TRXA_STOCK_CODE) AS NAME,
+           SUM(p.TRXA_STOCK_QUTY) AS TOTAL
+    FROM trxaprsc p
+    LEFT JOIN invemast i ON i.INVE_MAST_CODE = p.TRXA_STOCK_CODE
+    WHERE p.TRXA_VIEW_STAT = 'Y'
+      AND p.TRXA_ENTR_DATE BETWEEN $month_start_q AND $month_end_q
+    GROUP BY COALESCE(i.INVE_PART_NAME, p.TRXA_STOCK_CODE)
+    ORDER BY TOTAL DESC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
 
-$top_diagnosis = sk_rows(
-    $db,
-    "SELECT TRXA_DIAG_NAME AS NAME, COUNT(*) AS TOTAL
-     FROM trxadiag
-     WHERE TRXA_VIEW_STAT = 'Y'
-     AND TRXA_ENTR_DATE BETWEEN '$month_start' AND '$month_end'
-     GROUP BY TRXA_DIAG_NAME
-     ORDER BY TOTAL DESC
-     LIMIT 5"
-);
+$top_diagnosis = $db->query("
+    SELECT TRXA_DIAG_NAME AS NAME, COUNT(*) AS TOTAL
+    FROM trxadiag
+    WHERE TRXA_VIEW_STAT = 'Y'
+      AND TRXA_ENTR_DATE BETWEEN $month_start_q AND $month_end_q
+    GROUP BY TRXA_DIAG_NAME
+    ORDER BY TOTAL DESC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
 
 if (count($top_obat) === 0) {
     $top_obat = array(
@@ -228,21 +245,7 @@ if (count($top_diagnosis) === 0) {
     );
 }
 
-$pasien_umum_hari = sk_value(
-    $db,
-    "SELECT COUNT(*) AS TOTAL FROM trxaregi
-     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_DATE = '$latest_date' AND TRXA_REGI_PAYM = 'U'",
-    'TOTAL'
-);
-
-$pasien_bpjs_hari = sk_value(
-    $db,
-    "SELECT COUNT(*) AS TOTAL FROM trxaregi
-     WHERE TRXA_VIEW_STAT = 'Y' AND TRXA_REGI_DATE = '$latest_date' AND TRXA_REGI_PAYM = 'B'",
-    'TOTAL'
-);
-
-$total_paym_hari = (int) $pasien_umum_hari + (int) $pasien_bpjs_hari;
+$total_paym_hari = $pasien_umum_hari + $pasien_bpjs_hari;
 $persen_umum_hari = sk_percent($pasien_umum_hari, max($total_paym_hari, 1));
 $persen_bpjs_hari = max(0, 100 - $persen_umum_hari);
 ?>
@@ -723,37 +726,24 @@ $persen_bpjs_hari = max(0, 100 - $persen_umum_hari);
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // BUNGKUS DALAM FUNCTION AGAR BISA DIPANGGIL DARI VIEWDATA.js
     function renderLineChartDashboard() {
-        // Cek dulu apakah canvasnya ada
         const canvasElement = document.getElementById('lineChartKunjungan');
         if (!canvasElement) return;
 
-        // Siapkan data dari PHP ke JavaScript
-        // const labelBulan = [
-        //     <?php foreach ($monthly_visits as $visit) { echo "'" . $visit['label'] . "',"; } ?>
-        // ];
-        // const dataKunjungan = [
-        //     <?php foreach ($monthly_visits as $visit) { echo $visit['total'] . ","; } ?>
-        // ];
         const labelBulan = <?php echo json_encode($monthly_labels); ?>;
         const dataUmum = <?php echo json_encode($monthly_visits_umum); ?>;
         const dataBpjs = <?php echo json_encode($monthly_visits_bpjs); ?>;
 
-        // Konfigurasi dan Render Line Chart
         const ctx = canvasElement.getContext('2d');
-        
-        // Gradient Warna BPJS (Biru)
-        let gradientBpjs = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientBpjs.addColorStop(0, 'rgba(79, 151, 202, 0.4)'); 
-        gradientBpjs.addColorStop(1, 'rgba(79, 151, 202, 0)');   
 
-        // Gradient Warna UMUM (Hijau)
+        let gradientBpjs = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientBpjs.addColorStop(0, 'rgba(79, 151, 202, 0.4)');
+        gradientBpjs.addColorStop(1, 'rgba(79, 151, 202, 0)');
+
         let gradientUmum = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientUmum.addColorStop(0, 'rgba(79, 180, 143, 0.4)'); 
+        gradientUmum.addColorStop(0, 'rgba(79, 180, 143, 0.4)');
         gradientUmum.addColorStop(1, 'rgba(79, 180, 143, 0)');
 
-        // Hapus chart lama jika sudah ada (mencegah bug chart menumpuk saat reload ajax)
         if (window.myLineChart) {
             window.myLineChart.destroy();
         }
@@ -766,30 +756,30 @@ $persen_bpjs_hari = max(0, 100 - $persen_umum_hari);
                     {
                         label: 'Pasien BPJS',
                         data: dataBpjs,
-                        borderColor: '#4f97ca', // Warna garis Biru
-                        backgroundColor: gradientBpjs, 
+                        borderColor: '#4f97ca',
+                        backgroundColor: gradientBpjs,
                         borderWidth: 2,
-                        pointBackgroundColor: '#ffffff', 
+                        pointBackgroundColor: '#ffffff',
                         pointBorderColor: '#4f97ca',
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
-                        fill: true, 
-                        tension: 0.4 
+                        fill: true,
+                        tension: 0.4
                     },
                     {
                         label: 'Pasien Umum',
                         data: dataUmum,
-                        borderColor: '#4fb48f', // Warna garis Hijau
-                        backgroundColor: gradientUmum, 
+                        borderColor: '#4fb48f',
+                        backgroundColor: gradientUmum,
                         borderWidth: 2,
-                        pointBackgroundColor: '#ffffff', 
+                        pointBackgroundColor: '#ffffff',
                         pointBorderColor: '#4fb48f',
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
-                        fill: true, 
-                        tension: 0.4 
+                        fill: true,
+                        tension: 0.4
                     }
                 ]
             },
@@ -818,7 +808,7 @@ $persen_bpjs_hari = max(0, 100 - $persen_umum_hari);
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: '#e5eaf0', 
+                            color: '#e5eaf0',
                             drawBorder: false,
                         },
                         ticks: {
@@ -828,7 +818,7 @@ $persen_bpjs_hari = max(0, 100 - $persen_umum_hari);
                     },
                     x: {
                         grid: {
-                            display: false, 
+                            display: false,
                             drawBorder: false,
                         },
                         ticks: {
