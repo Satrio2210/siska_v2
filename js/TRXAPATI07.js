@@ -219,15 +219,16 @@ function stateChangedView() {
 
 // Tampilkan data yang diinput dalam datable
 var drz;
-function ambilscreen(kata) {
+function ambilscreen(kata, page) {
   if (kata.length > 13) {
     document.getElementById("tblscreen").style.visibility = "hidden";
   }
   else {
+    if (typeof page === 'undefined') { page = 1; }
     drz = buatajaxscreen();
     var url = "TRXAPATI07V.php";
     drz.onreadystatechange = stateChangedscreen;
-    var params = "q=" + kata;
+    var params = "q=" + encodeURIComponent(kata) + "&page=" + page;
     drz.open("POST", url, true);
     //beberapa http header harus kita set kalau menggunakan POST
     drz.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -235,6 +236,14 @@ function ambilscreen(kata) {
     drz.setRequestHeader("Connection", "close");
     drz.send(params);
   }
+}
+
+function tblScreenGo(e, page) {
+  if (e && e.preventDefault) { e.preventDefault(); }
+  if (page < 1) { return false; }
+  var kata = document.getElementById('txtsearch') ? document.getElementById('txtsearch').value : '';
+  ambilscreen(kata, page);
+  return false;
 }
 
 function buatajaxscreen() {

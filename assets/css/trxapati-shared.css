@@ -390,7 +390,8 @@ textarea.form-control {
   margin-bottom: 0;
 }
 
-.badge-belum-periksa {
+.badge-belum-periksa,
+.badge-red {
   display: inline-flex;
   align-items: center;
   gap: 6px;

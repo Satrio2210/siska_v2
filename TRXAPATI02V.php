@@ -38,7 +38,41 @@ $paymentLabels = [
     </thead>
     <tbody>
       <?php
-      $baseSql = "SELECT
+      $kata = isset($_POST['q']) ? trim($_POST['q']) : '';
+      $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+      $perpage = 5;
+      $offset = ($page - 1) * $perpage;
+
+      $where = "r.TRXA_REGI_STAT IN ('W', 'C', 'P')
+          AND r.TRXA_VIEW_STAT = 'Y'
+          AND r.TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)";
+
+      $params = [];
+      if ($kata !== '') {
+        // Search: gunakan prepared statement dengan parameter binding
+        $where .= " AND p.PATI_MAIN_NAME LIKE :kata";
+        $params[':kata'] = '%' . $kata . '%';
+      }
+
+      // Hitung total untuk pagination
+      $countSql = "SELECT COUNT(*)
+        FROM trxaregi r
+        LEFT JOIN patimast p ON p.PATI_MAST_CODE = r.TRXA_PATI_CODE
+        WHERE $where";
+      $stmtCount = $db->prepare($countSql);
+      $stmtCount->execute($params);
+      $total = (int) $stmtCount->fetchColumn();
+      $totalPages = max(1, (int) ceil($total / $perpage));
+      if ($page > $totalPages) {
+        $page = $totalPages;
+        $offset = ($page - 1) * $perpage;
+      }
+
+      $order = ($kata !== '')
+        ? "ORDER BY r.TRXA_REGI_LIST"
+        : "ORDER BY r.TRXA_ENTR_DATE DESC, r.TRXA_ENTR_TIME DESC";
+
+      $sql = "SELECT
           r.TRXA_REGI_CODE,
           r.TRXA_REGI_DATE,
           DATE_FORMAT(r.TRXA_REGI_DATE, '%d/%m/%Y') AS REGI_DATE,
@@ -54,21 +88,15 @@ $paymentLabels = [
         LEFT JOIN patimast p ON p.PATI_MAST_CODE = r.TRXA_PATI_CODE
         LEFT JOIN passiden doc ON doc.PASS_USER_IDEN = r.TRXA_REGI_DOCT
         LEFT JOIN tblapoli poli ON poli.TBLA_POLI_CODE = r.TRXA_REGI_POLI
-        WHERE r.TRXA_REGI_STAT IN ('W', 'C', 'P')
-          AND r.TRXA_VIEW_STAT = 'Y'
-          AND r.TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)";
+        WHERE $where
+        $order
+        LIMIT $offset, $perpage";
 
-      if ($kata !== '') {
-        // Search: gunakan prepared statement dengan parameter binding
-        $sql = $baseSql . " AND p.PATI_MAIN_NAME LIKE :kata ORDER BY r.TRXA_REGI_LIST";
-        $stmt = $db->prepare($sql);
-        $stmt->execute([':kata' => '%' . $kata . '%']);
-      } else {
-        // Tampilkan semua (30 hari terakhir)
-        $sql = $baseSql . " ORDER BY r.TRXA_ENTR_DATE DESC, r.TRXA_ENTR_TIME DESC";
-        $stmt = $db->prepare($sql);
-        $stmt->execute();
+      $stmt = $db->prepare($sql);
+      foreach ($params as $k => $v) {
+        $stmt->bindValue($k, $v);
       }
+      $stmt->execute();
 
       // === Rendering loop ===
       while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -91,27 +119,15 @@ $paymentLabels = [
         $escCode = htmlspecialchars($regicode, ENT_QUOTES);
 
         echo '<tr>';
-
-        $tanggalDaftar = $row['TRXA_REGI_DATE'];
         echo '<td class="w-10p">';
-        if ($tanggalDaftar == $datenow) {
-          echo '<span class="regi-date-label">Hari ini</span><br>';
-        } else {
-          $hariLalu = hitungTanggal($tanggalDaftar, $datenow);
-          echo '<span class="regi-date-label">' . $hariLalu . ' hari lalu</span><br>';
-        }
         echo '<span>' . $regiDate . '<br>' . $entrTime . '</span>';
         echo '</td>';
-
         // --- KOLOM 2: ANTRIAN ---
         echo '<td class="w-10p"><strong>' . htmlspecialchars($noantri, ENT_QUOTES) . '</strong></td>';
-
         // --- KOLOM 3: POLI ---
         echo '<td>' . $poliName . '<br>' . $doctName . '</td>';
-
         // --- KOLOM 4: PASIEN ---
         echo '<td>' . $patiName . '</td>';
-
         // --- KOLOM 5: TIPE PEMBAYARAN ---
         echo '<td class="w-10p">';
         if ($paymCode === 'B') {
@@ -120,7 +136,6 @@ $paymentLabels = [
           echo '<span class="pay-umum">' . $paymLabel . '</span>';
         }
         echo '</td>';
-
         // --- KOLOM 6: STATUS ---
         echo '<td class="w-10p">';
         if ($statCode === 'W') {
@@ -135,10 +150,8 @@ $paymentLabels = [
           echo '<span class="status-badge status-belum">No Status</span>';
         }
         echo '</td>';
-
         // --- KOLOM 7: ACTION ---
         echo '<td><div class="action-group">';
-
         // Tombol Update
         echo '<button type="button" class="button-view" onclick="'
           . "viewcode('" . $escCode . "');"
@@ -147,13 +160,11 @@ $paymentLabels = [
           . "document.getElementById('txtregidoct').focus();"
           . "},300);"
           . '">Update</button>';
-
         // Tombol Cetak Antrian
         $printUrl = 'print.php?nomor=' . urlencode($noantri)
           . '&pasien=' . urlencode($row['PATI_NAME'] ?? '')
           . '&layanan=' . urlencode($row['POLI_NAME'] ?? '');
         echo '<button type="button" class="button-print" href="' . htmlspecialchars($printUrl, ENT_QUOTES) . '" target="_blank">Antrian</button>';
-
         // Tombol Closing
         if ($statCode === 'C') {
           echo '<button type="button" class="button-delete" onclick="alert(\'Pemeriksaan Belum lengkap ?\');">Close</button>';
@@ -166,7 +177,6 @@ $paymentLabels = [
             . "}"
             . '">Close</button>';
         }
-
         echo '</div></td>';
         echo '</tr>';
       }
@@ -174,3 +184,44 @@ $paymentLabels = [
     </tbody>
   </table>
 </div>
+
+<?php if ($total > 0) { ?>
+  <div class="table-pagination" id="tblscreenPagination">
+    <?php
+    $prev = $page - 1;
+    $next = $page + 1;
+    $prevClass = $page <= 1 ? 'disabled' : '';
+    $nextClass = $page >= $totalPages ? 'disabled' : '';
+    ?>
+    <a href="#" class="<?php echo $prevClass; ?>" onclick="return tblScreenGo(event, <?php echo $prev; ?>);">&laquo;</a>
+
+    <?php
+    $start = max(1, $page - 2);
+    $end = min($totalPages, $page + 2);
+    if ($start > 1) {
+      echo '<a href="#" onclick="return tblScreenGo(event, 1);">1</a>';
+      if ($start > 2) {
+        echo '<span>&hellip;</span>';
+      }
+    }
+    for ($i = $start; $i <= $end; $i++) {
+      if ($i === $page) {
+        echo '<span class="active">' . $i . '</span>';
+      } else {
+        echo '<a href="#" onclick="return tblScreenGo(event, ' . $i . ');">' . $i . '</a>';
+      }
+    }
+    if ($end < $totalPages) {
+      if ($end < $totalPages - 1) {
+        echo '<span>&hellip;</span>';
+      }
+      echo '<a href="#" onclick="return tblScreenGo(event, ' . $totalPages . ');">' . $totalPages . '</a>';
+    }
+    ?>
+
+    <a href="#" class="<?php echo $nextClass; ?>" onclick="return tblScreenGo(event, <?php echo $next; ?>);">&raquo;</a>
+
+    <span class="trx06-info"><?php echo $total; ?> pasien &middot; hlm
+      <?php echo $page; ?>/<?php echo $totalPages; ?></span>
+  </div>
+<?php } ?>

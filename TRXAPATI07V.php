@@ -29,8 +29,39 @@ $payment_types = [
             <?php
             // Ambil input pencarian dengan aman
             $kata = isset($_POST['q']) ? trim($_POST['q']) : '';
+            $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+            $perpage = 5;
+            $offset = ($page - 1) * $perpage;
 
-            // Optimasi Query menggunakan LEFT JOIN (Bukan Subquery di SELECT)
+            // Kondisi WHERE (Optimasi Query menggunakan LEFT JOIN)
+            $where = "r.TRXA_REGI_STAT = 'W' 
+                      AND r.TRXA_VIEW_STAT = 'Y' 
+                      AND DATE(r.TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY";
+
+            $params = [];
+            if (!empty($kata)) {
+                $where .= " AND (r.TRXA_PATI_CODE LIKE :kata OR p.PATI_MAIN_NAME LIKE :kata)";
+                $params[':kata'] = "%$kata%";
+            }
+
+            $order = !empty($kata)
+                ? "ORDER BY r.TRXA_REGI_LIST"
+                : "ORDER BY r.TRXA_ENTR_DATE DESC, r.TRXA_ENTR_TIME DESC";
+
+            // Hitung total data untuk pagination
+            $countSql = "SELECT COUNT(*)
+                FROM trxaregi r
+                LEFT JOIN patimast p ON p.PATI_MAST_CODE = r.TRXA_PATI_CODE
+                WHERE $where";
+            $stmtCount = $db->prepare($countSql);
+            $stmtCount->execute($params);
+            $total = (int) $stmtCount->fetchColumn();
+            $totalPages = max(1, (int) ceil($total / $perpage));
+            if ($page > $totalPages) {
+                $page = $totalPages;
+                $offset = ($page - 1) * $perpage;
+            }
+
             $sql = "SELECT 
                         r.TRXA_REGI_CODE, 
                         r.TRXA_PATI_CODE,
@@ -45,24 +76,16 @@ $payment_types = [
                     FROM trxaregi r
                     LEFT JOIN patimast p ON p.PATI_MAST_CODE = r.TRXA_PATI_CODE
                     LEFT JOIN tblapoli pl ON pl.TBLA_POLI_CODE = r.TRXA_REGI_POLI
-                    WHERE r.TRXA_REGI_STAT = 'W' 
-                      AND r.TRXA_VIEW_STAT = 'Y' 
-                      AND DATE(r.TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY";
-
-            // Modifikasi query berdasarkan input pencarian
-            if (!empty($kata)) {
-                $sql .= " AND (r.TRXA_PATI_CODE LIKE :kata OR p.PATI_MAIN_NAME LIKE :kata)
-                          ORDER BY r.TRXA_REGI_LIST";
-            } else {
-                $sql .= " ORDER BY r.TRXA_ENTR_DATE DESC, r.TRXA_ENTR_TIME DESC";
-            }
+                    WHERE $where
+                    $order
+                    LIMIT $offset, $perpage";
 
             try {
                 // Gunakan Prepared Statement untuk mencegah SQL Injection
                 $stmt = $db->prepare($sql);
 
-                if (!empty($kata)) {
-                    $stmt->bindValue(':kata', "%$kata%", PDO::PARAM_STR);
+                foreach ($params as $k => $v) {
+                    $stmt->bindValue($k, $v, PDO::PARAM_STR);
                 }
 
                 $stmt->execute();
@@ -129,3 +152,43 @@ $payment_types = [
         </tbody>
     </table>
 </div>
+
+<?php if ($total > 0) { ?>
+    <div class="table-pagination" id="tblscreenPagination">
+        <?php
+        $prev = $page - 1;
+        $next = $page + 1;
+        $prevClass = $page <= 1 ? 'disabled' : '';
+        $nextClass = $page >= $totalPages ? 'disabled' : '';
+        ?>
+        <a href="#" class="<?php echo $prevClass; ?>" onclick="return tblScreenGo(event, <?php echo $prev; ?>);">&laquo;</a>
+
+        <?php
+        $start = max(1, $page - 2);
+        $end = min($totalPages, $page + 2);
+        if ($start > 1) {
+            echo '<a href="#" onclick="return tblScreenGo(event, 1);">1</a>';
+            if ($start > 2) {
+                echo '<span>&hellip;</span>';
+            }
+        }
+        for ($i = $start; $i <= $end; $i++) {
+            if ($i === $page) {
+                echo '<span class="active">' . $i . '</span>';
+            } else {
+                echo '<a href="#" onclick="return tblScreenGo(event, ' . $i . ');">' . $i . '</a>';
+            }
+        }
+        if ($end < $totalPages) {
+            if ($end < $totalPages - 1) {
+                echo '<span>&hellip;</span>';
+            }
+            echo '<a href="#" onclick="return tblScreenGo(event, ' . $totalPages . ');">' . $totalPages . '</a>';
+        }
+        ?>
+
+        <a href="#" class="<?php echo $nextClass; ?>" onclick="return tblScreenGo(event, <?php echo $next; ?>);">&raquo;</a>
+
+        <span class="trx06-info"><?php echo $total; ?> pasien &middot; hlm <?php echo $page; ?>/<?php echo $totalPages; ?></span>
+    </div>
+<?php } ?>

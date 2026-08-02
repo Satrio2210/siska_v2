@@ -42,8 +42,27 @@ if (isset($_SESSION['username'])) {
           <form name="frmtrxaregi" method="post" action="">
             <div class="content-modern">
               <div class="card-modern" id="cariDaftar">
-                <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D; Pasien
-                  Terdaftar
+                <?php
+                $countSkrining = 0;
+                try {
+                  $qC = $db->query("SELECT COUNT(*) FROM trxaregi r
+                    WHERE r.TRXA_REGI_STAT = 'W'
+                    AND r.TRXA_VIEW_STAT = 'Y'
+                    AND DATE(r.TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY
+                    AND (SELECT COUNT(*) FROM trxaexam e WHERE e.TRXA_EXAM_CODE = r.TRXA_REGI_CODE) = 0");
+                  $countSkrining = (int) $qC->fetchColumn();
+                } catch (Exception $e) {
+                  $countSkrining = 0;
+                }
+                ?>
+                <div class="poli-card-header">
+                  <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D;
+                    Pasien Terdaftar
+                  </div>
+                  <span class="badge-red">
+                    <i class="bi bi-hourglass-split"></i>
+                    <?php echo $countSkrining; ?> Pasien Menunggu Skrining
+                  </span>
                 </div>
                 <input type="text" name="txtsearch" id="txtsearch" class="form-control" style="width: 250px;"
                   placeholder="Ketik nama untuk mencari pasien..." autocomplete="off"

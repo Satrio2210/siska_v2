@@ -46,8 +46,6 @@ include "inc/sanie.php";
     }
 
     $stmt->execute($params);
-
-    // 6. Looping data
     while ($k = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
       // Definisikan kolom-kolom yang akan dikirim ke fungsi JS (Sesuai urutan isipaticode)

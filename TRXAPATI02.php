@@ -350,7 +350,7 @@ if (isset($_SESSION['username'])) {
               </div>
 
               <input type="text" class="form-control" placeholder="Cari Pasien..." autocomplete="off"
-                style="max-width:250px;" onkeyup="
+                id="txtsearchscreen" style="max-width:250px;" onkeyup="
                 if (value.length < 16)
                 {
                   ambilscreen(this.value);
