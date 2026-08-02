@@ -1,214 +1,129 @@
 ﻿<?php
 include "conf/config.php";
+
+// Array mapping untuk tipe pembayaran (Lebih bersih daripada if-else berjejer)
+$payment_types = [
+    'U' => 'Umum',
+    'B' => 'BPJS',
+    'A' => 'Asuransi',
+    'P' => 'Perusahaan',
+    'H' => 'Halodoc'
+];
 ?>
 
-<style>
-    .table-container {
-        overflow: auto;
-        border-radius: 16px;
-        max-height: 420px;
-        border: 1px solid #e2e8f0;
-    }
-
-    #screen {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-    }
-
-    #screen thead {
-        background: #10b981;
-        color: white;
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-
-    #screen th {
-        padding: 10px 6px;
-        font-size: 11px;
-        font-weight: 600;
-        text-align: center;
-        vertical-align: middle;
-        border: none;
-        letter-spacing: 0.3px;
-    }
-
-    #screen td {
-        padding: 8px 6px;
-        font-size: 12px;
-        /* color: #374151; */
-        text-align: center;
-        vertical-align: middle;
-        border-bottom: 1px solid #e5e7eb;
-        overflow-wrap: break-word;
-        word-break: break-word;
-    }
-
-    #screen th:nth-child(1),
-    #screen td:nth-child(1) {
-        width: 60px;
-    }
-
-    #screen th:nth-child(2),
-    #screen td:nth-child(2) {
-        width: 200px;
-    }
-
-    #screen th:nth-child(3),
-    #screen td:nth-child(3) {
-        width: 85px;
-    }
-
-    #screen th:nth-child(4),
-    #screen td:nth-child(4) {
-        width: 150px;
-    }
-
-    #screen th:nth-child(5),
-    #screen td:nth-child(5) {
-        width: 90px;
-    }
-
-    #screen th:nth-child(6),
-    #screen td:nth-child(6) {
-        width: 95px;
-    }
-
-    #screen th:nth-child(7),
-    #screen td:nth-child(7) {
-        width: 155px;
-    }
-
-    #screen tr {
-        transition: .2s;
-    }
-
-    #screen tbody tr:hover {
-        background: #d0e3f7;
-    }
-
-    .badge {
-        padding: 4px 8px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
-        display: inline-block;
-        white-space: nowrap;
-    }
-
-    .badge-primary {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .badge-secondary {
-        background: #dcfce7;
-        color: #166534;
-    }
-</style>
-
-<div class="table-container">
-    <table id="screen">
+<link rel="stylesheet" href="assets/css/modern-table.css">
+<div class="table-wrapper">
+    <table class="modern-table">
         <thead>
             <tr>
-                <th>ANTRIAN</th>
-                <th>PASIEN</th>
-                <th>TIPE</th>
-                <th>DOKTER</th>
-                <th>POLI</th>
-                <th>STATUS</th>
+                <th>Tgl Daftar</th>
+                <th>No. Antrian</th>
+                <th>Poli</th>
+                <th>Nama Pasien</th>
+                <th>Pembayaran</th>
+                <th>Status</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $kata = $_POST['q'];
-            //$kode = 'ACC';
-            $panjangkata = strlen($kata);
-            if ($panjangkata == 0) {
-                $xquery = "SELECT TRXA_REGI_CODE, TRXA_PATI_CODE,
-              (SELECT CONCAT(PATI_MAIN_TITL,' ',PATI_MAIN_NAME) FROM patimast WHERE PATI_MAST_CODE=TRXA_PATI_CODE) AS PATI_NAME,
-              TRXA_REGI_LIST, TRXA_REGI_PAYM, 
-              TRXA_REGI_DOCT, (SELECT PASS_USER_NAME FROM passiden WHERE PASS_USER_IDEN = TRXA_REGI_DOCT) AS DOCT_NAME, 
-              TRXA_REGI_POLI, (SELECT TBLA_POLI_NAME FROM tblapoli WHERE TBLA_POLI_CODE = TRXA_REGI_POLI) AS POLI_NAME,
-              TRXA_REGI_STAT, TRXA_ENTR_USER, 
-              (SELECT PASS_USER_NAME FROM passiden WHERE PASS_USER_IDEN=TRXA_ENTR_USER) AS ENTR_USER, 
-              (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-              FROM trxaregi
-              WHERE TRXA_REGI_STAT = 'W' 
-              AND TRXA_VIEW_STAT = 'Y' 
-              AND DATE(TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY
-              ORDER BY TRXA_ENTR_DATE DESC, TRXA_ENTR_TIME DESC";
+            // Ambil input pencarian dengan aman
+            $kata = isset($_POST['q']) ? trim($_POST['q']) : '';
+
+            // Optimasi Query menggunakan LEFT JOIN (Bukan Subquery di SELECT)
+            $sql = "SELECT 
+                        r.TRXA_REGI_CODE, 
+                        r.TRXA_PATI_CODE,
+                        r.TRXA_ENTR_DATE,
+                        r.TRXA_REGI_LIST, 
+                        r.TRXA_REGI_PAYM, 
+                        r.TRXA_REGI_STAT,
+                        r.TRXA_ENTR_TIME,
+                        CONCAT(p.PATI_MAIN_TITL, ' ', p.PATI_MAIN_NAME) AS PATI_NAME,
+                        pl.TBLA_POLI_NAME AS POLI_NAME,
+                        (SELECT COUNT(*) FROM trxaexam e WHERE e.TRXA_EXAM_CODE = r.TRXA_REGI_CODE) AS SUDAH_PERIKSA
+                    FROM trxaregi r
+                    LEFT JOIN patimast p ON p.PATI_MAST_CODE = r.TRXA_PATI_CODE
+                    LEFT JOIN tblapoli pl ON pl.TBLA_POLI_CODE = r.TRXA_REGI_POLI
+                    WHERE r.TRXA_REGI_STAT = 'W' 
+                      AND r.TRXA_VIEW_STAT = 'Y' 
+                      AND DATE(r.TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY";
+
+            // Modifikasi query berdasarkan input pencarian
+            if (!empty($kata)) {
+                $sql .= " AND (r.TRXA_PATI_CODE LIKE :kata OR p.PATI_MAIN_NAME LIKE :kata)
+                          ORDER BY r.TRXA_REGI_LIST";
             } else {
-                $xquery = "SELECT TRXA_REGI_CODE, TRXA_PATI_CODE,
-              (SELECT CONCAT(PATI_MAIN_TITL,' ',PATI_MAIN_NAME) FROM patimast WHERE PATI_MAST_CODE=TRXA_PATI_CODE) AS PATI_NAME,
-              TRXA_REGI_LIST, TRXA_REGI_PAYM, 
-              TRXA_REGI_DOCT, (SELECT PASS_USER_NAME FROM passiden WHERE PASS_USER_IDEN = TRXA_REGI_DOCT) AS DOCT_NAME, 
-              TRXA_REGI_POLI, (SELECT TBLA_POLI_NAME FROM tblapoli WHERE TBLA_POLI_CODE = TRXA_REGI_POLI) AS POLI_NAME,
-              TRXA_REGI_STAT, TRXA_ENTR_USER, 
-              (SELECT PASS_USER_NAME FROM passiden WHERE PASS_USER_IDEN=TRXA_ENTR_USER) AS ENTR_USER, 
-              (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-              FROM trxaregi
-              WHERE TRXA_REGI_STAT = 'W'
-              AND TRXA_VIEW_STAT = 'Y' 
-              AND DATE(TRXA_ENTR_DATE) >= CURDATE() - INTERVAL 2 DAY
-              AND (
-                  TRXA_PATI_CODE LIKE '%$kata%' 
-                  OR (SELECT PATI_MAIN_NAME FROM patimast WHERE PATI_MAST_CODE=TRXA_PATI_CODE) LIKE '%$kata%' 
-              )
-              ORDER BY TRXA_REGI_LIST";
+                $sql .= " ORDER BY r.TRXA_ENTR_DATE DESC, r.TRXA_ENTR_TIME DESC";
             }
 
-            $q = $db->query($xquery) or die("Gagal Maning!!");
-            while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
-                echo '<tr>';
-                $regicode = $k['TRXA_REGI_CODE'];
-                echo '<td>' . $k['TRXA_REGI_LIST'] . '</td>';
-                echo '<td>' . $k['PATI_NAME'] . '</td>';
-                // echo '<td style="width: 100px">' . $k['TRXA_PATI_CODE'] . '</td>';
-            
-                $xregipaym = $k['TRXA_REGI_PAYM'];
-                if ($xregipaym == 'U') {
-                    $regipaym = 'Umum';
-                } else if ($xregipaym == 'B') {
-                    $regipaym = 'BPJS';
-                } else if ($xregipaym == 'A') {
-                    $regipaym = 'Asuransi';
-                } else if ($xregipaym == 'P') {
-                    $regipaym = 'Perusahaan';
-                } else if ($xregipaym == 'H') {
-                    $regipaym = 'Halodoc';
-                } else {
-                    $regipaym = 'Fail get Payment';
+            try {
+                // Gunakan Prepared Statement untuk mencegah SQL Injection
+                $stmt = $db->prepare($sql);
+
+                if (!empty($kata)) {
+                    $stmt->bindValue(':kata', "%$kata%", PDO::PARAM_STR);
                 }
 
-                echo '<td>' . $regipaym . '</td>';
-                echo '<td>' . $k['DOCT_NAME'] . '</td>';
-                echo '<td>' . $k['POLI_NAME'] . '</td>';
-                // echo '>R'] . '</td>';
-                $sudah_periksa = $k['SUDAH_PERIKSA'];
-                $registat = $k['TRXA_REGI_STAT'];
+                $stmt->execute();
 
-                echo '<td>';
-                if ($registat == 'W') {
-                    // Kalo subquery nemu datanya di trxaexam (artinya sudah diklik submit/simpan)
-                    if ($sudah_periksa > 0) {
-                        echo '<span class="badge badge-secondary">Siap Diperiksa</span>';
+                // Looping Data
+                while ($k = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $regicode = htmlspecialchars($k['TRXA_REGI_CODE'] ?? '');
+                    $tgl_daftar = htmlspecialchars($k['TRXA_ENTR_DATE'] ?? '');
+                    $waktu_daftar = htmlspecialchars($k['TRXA_ENTR_TIME'] ?? '');
+                    $no_antrian = htmlspecialchars($k['TRXA_REGI_LIST'] ?? '');
+                    $poli_name = htmlspecialchars($k['POLI_NAME'] ?? '-');
+                    $pati_name = htmlspecialchars($k['PATI_NAME'] ?? '-');
+
+                    // Ambil string pembayaran dari array mapping
+                    $xregipaym = $k['TRXA_REGI_PAYM'] ?? '';
+                    $regipaym = $payment_types[$xregipaym] ?? 'Fail get Payment';
+
+                    if ($regipaym === 'BPJS') {
+                        $paymtype = '<span class="pay-bpjs">BPJS</span>';
+                    } else {
+                        $paymtype = '<span class="pay-umum">Umuum</span>';
                     }
-                    // Kalo belum ada data pemeriksaan awal di trxaexam
-                    else {
-                        echo '<span class="badge badge-primary">Menunggu Skrining</span>';
+
+                    $sudah_periksa = (int) $k['SUDAH_PERIKSA'];
+                    $registat = $k['TRXA_REGI_STAT'];
+
+                    // Logika Status
+                    if ($registat === 'W') {
+                        if ($sudah_periksa > 0) {
+                            $badge = '<span class="status-badge status-done">Siap Diperiksa</span>';
+                        } else {
+                            $badge = '<span class="status-badge status-wait">Menunggu Skrining</span>';
+                        }
+                    } else {
+                        $badge = '<span>Bukan Antrian</span>';
                     }
-                } else {
-                    echo '<span>Bukan Antrian</span>';
+
+                    // Output Baris (Telah disesuaikan urutannya dengan tag <th>)
+                    echo '<tr>';
+                    echo '<td>' . $tgl_daftar . '<br>' . $waktu_daftar . '</td>';
+                    echo '<td>' . $no_antrian . '</td>';
+                    echo '<td>' . $poli_name . '</td>';
+                    echo '<td>' . $pati_name . '</td>';
+                    echo '<td>' . $paymtype . '</td>';
+                    echo '<td>' . $badge . '</td>';
+                    echo '<td>';
+                    echo '<div class="action-group">';
+                    echo '<button type="button" class="button-view" onclick="viewcode(\'' . $regicode . '\');">Periksa</button>';
+                    echo '</div>';
+                    echo '</td>';
+                    echo '</tr>';
                 }
-                echo '</td>';
 
-                echo '<td>';
-                echo '<button type="button" class="btn-modern btn-save" style="width: 100px;" onclick="viewcode(\'' . $regicode . '\');">Periksa</button>';
-                echo '</td>';
-                echo '</tr>';
+                // Jika data tidak ditemukan
+                if ($stmt->rowCount() == 0) {
+                    echo '<tr><td colspan="7" style="text-align:center;">Data antrian tidak ditemukan.</td></tr>';
+                }
+
+            } catch (PDOException $e) {
+                // Tampilkan pesan error jika query gagal (Jangan gunakan die() di production)
+                echo '<tr><td colspan="7">Terjadi kesalahan pada sistem: ' . htmlspecialchars($e->getMessage()) . '</td></tr>';
             }
             ?>
         </tbody>

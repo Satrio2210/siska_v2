@@ -239,7 +239,7 @@ if (isset($_SESSION['username'])) {
                 placeholder="Cari Pasien / No Antrian..." maxlength="20"
                 onkeyup="if (value.length > 0) { ambilscreen(this.value); } else {ambilscreen('')};">
 
-              <div id="tblscreen"></div>
+              <div id="tblscreen" style="margin-top: 10px;"></div>
             </div>
 
             <!-- Detail Resep Card-->

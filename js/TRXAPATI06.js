@@ -52,7 +52,7 @@
 
 
 var drz;
-function ambilviewprice(kata)
+function ambilviewprice(kata, page)
 {
   if(kata.length > 13)
   {
@@ -60,10 +60,11 @@ function ambilviewprice(kata)
   }
   else
   {
+  if (typeof page === 'undefined') { page = 1; }
   drz = buatajaxviewid();
   var url="TRXAPATI06V.php";
   drz.onreadystatechange=stateChangedviewid;
-  var params = "q="+kata;
+  var params = "q="+encodeURIComponent(kata)+"&page="+page;
   drz.open("POST",url,true);
   //beberapa http header harus kita set kalau menggunakan POST
   drz.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -71,6 +72,14 @@ function ambilviewprice(kata)
   drz.setRequestHeader("Connection", "close");
   drz.send(params);
   }
+}
+
+function trx06Go(e, page)
+{
+  if (e && e.preventDefault) { e.preventDefault(); }
+  if (page < 1) { return false; }
+  ambilviewprice(document.getElementById('txtmedicode').value, page);
+  return false;
 } 
 
   function buatajaxviewid()

@@ -607,18 +607,27 @@ function stateChangedView() {
 
 // Tampilkan data yang diinput dalam datable
 var drz;
-function ambilscreen(dokter) {
+function ambilscreen(dokter, page) {
   if (!document.getElementById('tblscreen')) return;
+  if (typeof page === 'undefined') { page = 1; }
   drz = buatajaxscreen();
   var url = "TRXAPOLI01V.php";
   drz.onreadystatechange = stateChangedscreen;
-  var params = "q=" + dokter;
+  var params = "q=" + encodeURIComponent(dokter) + "&page=" + page;
   drz.open("POST", url, true);
   //beberapa http header harus kita set kalau menggunakan POST
   drz.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   drz.setRequestHeader("Content-length", params.length);
   drz.setRequestHeader("Connection", "close");
   drz.send(params);
+}
+
+function poliGo(e, page) {
+  if (e && e.preventDefault) { e.preventDefault(); }
+  if (page < 1) { return false; }
+  var dokter = document.getElementById('hidexamdoct') ? document.getElementById('hidexamdoct').value : '';
+  ambilscreen(dokter, page);
+  return false;
 }
 
 function buatajaxscreen() {

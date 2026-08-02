@@ -63,7 +63,26 @@ if (isset($_SESSION['username'])) {
           <input type="hidden" id="hidexamdoct" value="<?php echo $user; ?>">
           <div class="content-modern">
             <div class="card-modern" id="daftarPasien">
-              <div class="card-title">Pasien Terdaftar</div>
+              <?php
+              $countBelum = 0;
+              try {
+                $qC = $db->query("SELECT COUNT(*) FROM trxaregi
+                  WHERE TRXA_VIEW_STAT='Y'
+                  AND TRXA_REGI_STAT='W'
+                  AND TRXA_REGI_POLI = 'PU'
+                  AND TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)");
+                $countBelum = (int) $qC->fetchColumn();
+              } catch (Exception $e) {
+                $countBelum = 0;
+              }
+              ?>
+              <div class="poli-card-header">
+                <div class="card-title">Pasien Terdaftar</div>
+                <span class="badge-belum-periksa">
+                  <i class="bi bi-exclamation-circle"></i>
+                  <?php echo $countBelum; ?> Pasien Belum di Periksa
+                </span>
+              </div>
               <div id="tblscreen">
               </div>
             </div>

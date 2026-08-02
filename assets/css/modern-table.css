@@ -1,66 +1,79 @@
-﻿#screen, .modern-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  background: #fff;
-}
+﻿/* ==========================================================================
+   MODERN TABLE COMPONENT (Flexbox Version)
+   ========================================================================== */
 
 .table-wrapper {
   width: 100%;
   border-radius: 18px;
-  overflow: hidden;
   border: 1px solid #e5e7eb;
   background: white;
+  overflow: hidden;
+  /* Menjaga border-radius pojokan tetap rapi */
 }
 
-#screen thead, .modern-table thead {
-  position: sticky;
-  top: 0;
-  z-index: 2;
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+  display: flex;
+  /* Mengubah tabel jadi flexbox container */
+  flex-direction: column;
 }
 
-#screen thead tr, .modern-table thead tr {
+.modern-table thead,
+.modern-table tbody {
+  display: block;
+  /* Mengubah container internal jadi block agar flexbox sinkron */
+  width: 100%;
+}
+
+.modern-table thead tr,
+.modern-table tbody tr {
   display: table;
+  /* Mengembalikan struktur baris agar kolom sejajar */
   width: 100%;
   table-layout: fixed;
 }
 
-#screen th, .modern-table th {
+/* KUNCI UTAMA: Scroll hanya terjadi di dalam tbody (di bawah header) */
+.modern-table tbody {
+  max-height: 380px;
+  /* Batasi tinggi area data saja */
+  overflow-y: auto;
+  /* Aktifkan scroll vertikal di bawah header */
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* ==========================================================================
+   STYLING & DESIGN
+   ========================================================================== */
+
+.modern-table th {
   padding: 16px;
   font-size: 14px;
   font-weight: 700;
   text-align: center;
   border: none;
-  background: #10b981;
+  background: #169C89;
   color: white;
 }
 
-#screen tbody, .modern-table tbody {
-  display: block;
-  max-height: 380px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  width: 100%;
-  scrollbar-gutter: stable;
-}
-
-#screen tbody tr, .modern-table tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed;
+.modern-table tbody tr {
   transition: .2s ease;
   background: white;
 }
 
-#screen tbody tr:nth-child(even), .modern-table tbody tr:nth-child(even) {
+.modern-table tbody tr:nth-child(even) {
   background: #f9fafb;
 }
 
-#screen tbody tr:hover, .modern-table tbody tr:hover {
+.modern-table tbody tr:hover {
   background: #f3f4f6;
 }
 
-#screen td, .modern-table td {
+.modern-table td {
   padding: 14px 12px;
   font-size: 12px;
   font-weight: 600;
@@ -71,54 +84,230 @@
   word-wrap: break-word;
 }
 
-#screen th:nth-child(1), .modern-table th:nth-child(1),
-#screen td:nth-child(1), .modern-table td:nth-child(1) {
-  width: 90px;
+/* Custom Scrollbar khusus di area tbody */
+.modern-table tbody::-webkit-scrollbar {
+  width: 8px;
 }
 
-#screen th:nth-child(2), .modern-table th:nth-child(2),
-#screen td:nth-child(2), .modern-table td:nth-child(2) {
+.modern-table tbody::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+.modern-table th:nth-child(1),
+.modern-table td:nth-child(1) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(2),
+.modern-table td:nth-child(2) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(3),
+.modern-table td:nth-child(3) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(4),
+.modern-table td:nth-child(4) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(5),
+.modern-table td:nth-child(5) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(6),
+.modern-table td:nth-child(6) {
+  width: 14.3%;
+}
+
+.modern-table th:nth-child(7),
+.modern-table td:nth-child(7) {
+  width: 14.3%;
+}
+
+/* ==========================================================================
+   MODERN INLINE
+   ========================================================================== */
+.modern-inline {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+  display: flex;
+  /* Mengubah tabel jadi flexbox container */
+  flex-direction: column;
+}
+
+.modern-inline tbody {
+  display: block;
+  /* Mengubah container internal jadi block agar flexbox sinkron */
+  width: 100%;
+}
+
+.modern-inline tbody tr {
+  display: table;
+  /* Mengembalikan struktur baris agar kolom sejajar */
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* KUNCI UTAMA: Scroll hanya terjadi di dalam tbody (di bawah header) */
+.modern-inline tbody {
+  max-height: 380px;
+  /* Batasi tinggi area data saja */
+  overflow-y: auto;
+  /* Aktifkan scroll vertikal di bawah header */
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+.modern-inline tbody tr {
+  transition: .2s ease;
+  background: white;
+}
+
+.modern-inline tbody tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.modern-inline tbody tr:hover {
+  background: #f3f4f6;
+}
+
+.modern-inline td {
+  padding: 14px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+.patient-head {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
+.patient-info {
+  font-size: 13px;
+  font-weight: 400;
+  color: #202020;
+}
+
+/* Custom Scrollbar khusus di area tbody */
+.modern-inline tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modern-inline tbody::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+
+/* ==========================================================================
+   UTILITY CLASSES (Lebar Kolom Fleksibel - Pilih salah satu tipe di HTML)
+   ========================================================================== */
+
+/* Versi Piksel (px) */
+.w-70 {
   width: 70px;
 }
 
-#screen th:nth-child(3), .modern-table th:nth-child(3),
-#screen td:nth-child(3), .modern-table td:nth-child(3) {
+.w-90 {
   width: 90px;
 }
 
-#screen th:nth-child(4), .modern-table th:nth-child(4),
-#screen td:nth-child(4), .modern-table td:nth-child(4) {
-  width: 150px;
-}
-
-#screen th:nth-child(5), .modern-table th:nth-child(5),
-#screen td:nth-child(5), .modern-table td:nth-child(5) {
-  width: 90px;
-}
-
-#screen th:nth-child(6), .modern-table th:nth-child(6),
-#screen td:nth-child(6), .modern-table td:nth-child(6) {
+.w-100 {
   width: 100px;
 }
 
-#screen th:nth-child(7), .modern-table th:nth-child(7),
-#screen td:nth-child(7), .modern-table td:nth-child(7) {
+.w-150 {
   width: 150px;
   min-width: 150px;
 }
 
-#screen td:nth-child(7), .modern-table td:nth-child(7) {
+/* Versi Persen (%) */
+.w-5p {
+  width: 5% !important;
+}
+
+.w-10p {
+  width: 10% !important;
+}
+
+.w-15p {
+  width: 15% !important
+}
+
+.w-20p {
+  width: 20% !important;
+}
+
+.w-25p {
+  width: 25% !important;
+}
+
+.w-30p {
+  width: 30% !important;
+}
+
+.w-40p {
+  width: 40% !important;
+}
+
+.w-50p {
+  width: 50% !important;
+}
+
+/* Tambahan proteksi kolom aksi/terakhir */
+.modern-table th:last-child,
+.modern-table td:last-child {
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   BADGES & BUTTONS COMPONENTS
+   ========================================================================== */
 
 .status-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 14px;
+  padding: 6px 14px;
+  /* Sedikit disesuaikan biar seimbang atas-bawah */
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+  line-height: 1;
+  /* KUNCI: Memaksa teks tegak lurus di tengah secara vertikal */
+  text-align: center;
+  /* Memastikan teks rata tengah secara horizontal */
+  width: max-content;
+  /* Memaksa badge mengikuti lebar teks, gak melebar ekstrem */
+  margin: 0 auto;
+}
+
+.status-wait {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-process {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-done {
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .status-lunas {
@@ -131,9 +320,8 @@
   color: #991b1b;
 }
 
-.pay-umum {
-  background: #dcfce7;
-  color: #15803d;
+.pay-umum,
+.pay-bpjs {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
@@ -141,14 +329,14 @@
   font-weight: 700;
 }
 
+.pay-umum {
+  background: #dcfce7;
+  color: #15803d;
+}
+
 .pay-bpjs {
   background: #dbeafe;
   color: #1d4ed8;
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .action-group {
@@ -163,8 +351,10 @@
 
 .action-group .button-view,
 .action-group .button-panggil,
+.action-group .button-delete,
+.action-group .button-print,
 .action-group a.pure-button {
-  display: inline-flex;
+  display: inline-block;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
@@ -181,12 +371,12 @@
 }
 
 .button-view {
-  background: #10b981;
+  background: #169C89;
   color: white;
 }
 
 .button-view:hover {
-  background: #059669;
+  background: #0f7a6b;
 }
 
 .button-panggil {
@@ -198,6 +388,24 @@
   background: #2563eb;
 }
 
+.button-delete {
+  background: #EF4444;
+  color: white;
+}
+
+.button-delete:hover {
+  background: #DC2626;
+}
+
+.button-print {
+  background: #1E3A8A;
+  color: white;
+}
+
+.button-print:hover {
+  background: #172554;
+}
+
 .button-disabled {
   background: #d1d5db !important;
   color: #9ca3af !important;
@@ -206,21 +414,19 @@
   box-shadow: none !important;
 }
 
-#screen tbody::-webkit-scrollbar, .modern-table tbody::-webkit-scrollbar {
-  width: 8px;
-}
-
-#screen tbody::-webkit-scrollbar-thumb, .modern-table tbody::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 999px;
-}
+/* ==========================================================================
+   RESPONSIVE DEVICE (Mobile & Tablet)
+   ========================================================================== */
 
 @media (max-width: 768px) {
+
+  /* Di layar kecil, biarkan wrapper yang melakukan scroll horizontal */
   .table-wrapper {
     overflow-x: auto;
   }
 
-  #screen, .modern-table {
+  /* Memaksa tabel tetap lebar di hp agar tidak gepeng */
+  .modern-table {
     min-width: 900px;
   }
 }

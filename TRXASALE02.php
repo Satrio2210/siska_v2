@@ -62,7 +62,7 @@ if (isset($_SESSION['username'])) {
                         document.getElementById('txtregicode').focus()
                         }">
 
-                <div id="tblviewid"></div>
+                <div id="tblviewid" style="margin-top:10px;"></div>
               </div>
             </div>
           </form>

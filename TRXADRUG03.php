@@ -187,17 +187,13 @@ if (isset($_SESSION['username'])) {
                 <div class="card-title">Print Faktur</div>
                 <label class="form-label" for="txtdrugcode">Cari Faktur</label>
                 <input type="text" class="form-control" name="txtdrugcode" id="txtdrugcode" maxlength="20"
-                  placeholder="Ketik nomor faktur..."
-                  onkeyup="if (value.length > 0) { ambilviewid(this.value); };"
+                  placeholder="Ketik nomor faktur..." onkeyup="if (value.length > 0) { ambilviewid(this.value); };"
                   onkeydown="if (event.keyCode == 13 && value.length > 13) {
                     document.getElementById('txtdrugcode').value = '';
                     document.getElementById('txtdrugcode').focus();
                   }">
-              </div>
 
-              <div class="card-modern">
-                <div class="card-title">Daftar Faktur</div>
-                <div id="tblviewid"></div>
+                <div id="tblviewid" style="margin-top: 10px;"></div>
               </div>
             </form>
 

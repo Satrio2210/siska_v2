@@ -96,95 +96,99 @@ function rm05_usia($birt)
 
 function rm05_gender($g)
 {
-  if ($g === 'M') return 'Laki-laki';
-  if ($g === 'F') return 'Perempuan';
+  if ($g === 'M')
+    return 'Laki-laki';
+  if ($g === 'F')
+    return 'Perempuan';
   return '-';
 }
 
 $qEnc = urlencode($kata);
 ?>
-<table id="screen" class="modern-table">
-  <thead>
-    <tr>
-      <th style="width:110px">No. RM</th>
-      <th>Nama Pasien</th>
-      <th style="width:120px">Jenis Kelamin</th>
-      <th style="width:90px">Usia</th>
-      <th style="width:150px">Kunjungan Terakhir</th>
-      <th style="width:130px">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php if (count($rows) === 0) { ?>
+<div class="table-wrapper">
+  <table class="modern-table">
+    <thead>
       <tr>
-        <td colspan="6" class="rm05-empty">Data pasien tidak ditemukan.</td>
+        <th>No. RM</th>
+        <th>Nama Pasien</th>
+        <th>Jenis Kelamin</th>
+        <th>Usia</th>
+        <th>Kunjungan Terakhir</th>
+        <th>Action</th>
       </tr>
-    <?php } else {
-      foreach ($rows as $k) {
-        $paticode = htmlspecialchars($k['PATI_MAST_CODE'], ENT_QUOTES, 'UTF-8');
-        $nama = htmlspecialchars($k['PATI_MAIN_NAME'], ENT_QUOTES, 'UTF-8');
-        $jk = rm05_gender($k['PATI_MAIN_GEND']);
-        $usia = rm05_usia($k['PATI_MAIN_BIRT']);
-        $last = !empty($k['LAST_VISIT']) ? date('d-m-Y', strtotime($k['LAST_VISIT'])) : '-';
-    ?>
-      <tr>
-        <td><?php echo $paticode; ?></td>
-        <td style="text-align:left;"><?php echo $nama; ?></td>
-        <td><?php echo $jk; ?></td>
-        <td><?php echo $usia; ?></td>
-        <td><?php echo $last; ?></td>
-        <td>
-          <a class="rm05-btn-detail" href="MEDIRECO05-detail.php?id=<?php echo $paticode; ?>">
-            <i class="bi bi-eye"></i> Lihat Detail
-          </a>
-        </td>
-      </tr>
-    <?php }
-    } ?>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <?php if (count($rows) === 0) { ?>
+        <tr>
+          <td colspan="6" class="rm05-empty">Data pasien tidak ditemukan.</td>
+        </tr>
+      <?php } else {
+        foreach ($rows as $k) {
+          $paticode = htmlspecialchars($k['PATI_MAST_CODE'], ENT_QUOTES, 'UTF-8');
+          $nama = htmlspecialchars($k['PATI_MAIN_NAME'], ENT_QUOTES, 'UTF-8');
+          $jk = rm05_gender($k['PATI_MAIN_GEND']);
+          $usia = rm05_usia($k['PATI_MAIN_BIRT']);
+          $last = !empty($k['LAST_VISIT']) ? date('d-m-Y', strtotime($k['LAST_VISIT'])) : '-';
+          ?>
+          <tr>
+            <td><?php echo $paticode; ?></td>
+            <td style="text-align:left;"><?php echo $nama; ?></td>
+            <td><?php echo $jk; ?></td>
+            <td><?php echo $usia; ?></td>
+            <td><?php echo $last; ?></td>
+            <td>
+              <div class="action-group">
+                <a class="button-view" href="MEDIRECO05-detail.php?id=<?php echo $paticode; ?>">
+                  <i class="bi bi-eye"> </i> Lihat Detail
+                </a>
+              </div>
+            </td>
+          </tr>
+        <?php }
+      } ?>
+    </tbody>
+  </table>
+</div>
 
 <?php if ($total > 0) { ?>
-<div class="rm05-pagination" id="rm05Pagination">
-  <?php
-  $prev = $page - 1;
-  $next = $page + 1;
-  $prevClass = $page <= 1 ? 'disabled' : '';
-  $nextClass = $page >= $totalPages ? 'disabled' : '';
-  ?>
-  <a href="MEDIRECO05.php?q=<?php echo $qEnc; ?>&page=<?php echo $prev; ?>"
-     class="<?php echo $prevClass; ?>"
-     data-page="<?php echo $prev; ?>"
-     onclick="return goPage(event, <?php echo $prev; ?>);">&laquo;</a>
+  <div class="table-pagination" id="rm05Pagination">
+    <?php
+    $prev = $page - 1;
+    $next = $page + 1;
+    $prevClass = $page <= 1 ? 'disabled' : '';
+    $nextClass = $page >= $totalPages ? 'disabled' : '';
+    ?>
+    <a href="MEDIRECO05.php?q=<?php echo $qEnc; ?>&page=<?php echo $prev; ?>" class="<?php echo $prevClass; ?>"
+      data-page="<?php echo $prev; ?>" onclick="return goPage(event, <?php echo $prev; ?>);">&laquo;</a>
 
-  <?php
-  $start = max(1, $page - 2);
-  $end = min($totalPages, $page + 2);
-  if ($start > 1) {
-    echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=1" data-page="1" onclick="return goPage(event,1);">1</a>';
-    if ($start > 2) echo '<span>…</span>';
-  }
-  for ($i = $start; $i <= $end; $i++) {
-    $cls = ($i === $page) ? 'active' : '';
-    if ($i === $page) {
-      echo '<span class="active">' . $i . '</span>';
-    } else {
-      echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=' . $i . '" class="' . $cls . '" data-page="' . $i . '" onclick="return goPage(event,' . $i . ');">' . $i . '</a>';
+    <?php
+    $start = max(1, $page - 2);
+    $end = min($totalPages, $page + 2);
+    if ($start > 1) {
+      echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=1" data-page="1" onclick="return goPage(event,1);">1</a>';
+      if ($start > 2)
+        echo '<span>…</span>';
     }
-  }
-  if ($end < $totalPages) {
-    if ($end < $totalPages - 1) echo '<span>…</span>';
-    echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=' . $totalPages . '" data-page="' . $totalPages . '" onclick="return goPage(event,' . $totalPages . ');">' . $totalPages . '</a>';
-  }
-  ?>
+    for ($i = $start; $i <= $end; $i++) {
+      $cls = ($i === $page) ? 'active' : '';
+      if ($i === $page) {
+        echo '<span class="active">' . $i . '</span>';
+      } else {
+        echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=' . $i . '" class="' . $cls . '" data-page="' . $i . '" onclick="return goPage(event,' . $i . ');">' . $i . '</a>';
+      }
+    }
+    if ($end < $totalPages) {
+      if ($end < $totalPages - 1)
+        echo '<span>…</span>';
+      echo '<a href="MEDIRECO05.php?q=' . $qEnc . '&page=' . $totalPages . '" data-page="' . $totalPages . '" onclick="return goPage(event,' . $totalPages . ');">' . $totalPages . '</a>';
+    }
+    ?>
 
-  <a href="MEDIRECO05.php?q=<?php echo $qEnc; ?>&page=<?php echo $next; ?>"
-     class="<?php echo $nextClass; ?>"
-     data-page="<?php echo $next; ?>"
-     onclick="return goPage(event, <?php echo $next; ?>);">&raquo;</a>
+    <a href="MEDIRECO05.php?q=<?php echo $qEnc; ?>&page=<?php echo $next; ?>" class="<?php echo $nextClass; ?>"
+      data-page="<?php echo $next; ?>" onclick="return goPage(event, <?php echo $next; ?>);">&raquo;</a>
 
-  <span style="border:none;background:transparent;font-weight:500;color:#64748b;min-width:auto;">
-    <?php echo $total; ?> data · hlm <?php echo $page; ?>/<?php echo $totalPages; ?>
-  </span>
-</div>
+    <span style="border:none;background:transparent;font-weight:500;color:#64748b;min-width:auto;">
+      <?php echo $total; ?> data · hlm <?php echo $page; ?>/<?php echo $totalPages; ?>
+    </span>
+  </div>
 <?php } ?>

@@ -122,7 +122,8 @@ body {
   gap: 16px;
 }
 
-.form-grid-3.racik {
+.form-grid-3.racik,
+.form-grid-3.pati {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
   gap: 16px;
@@ -181,20 +182,20 @@ textarea.form-control {
 }
 
 .btn-save {
-  background: #10B981;
+  background: #169C89;
   color: #FFFFFF;
   width: 100%;
 }
 
 .btn-input {
-  background: #2563EB;
+  background: #169C89;
   color: #FFFFFF;
   width: 100%;
 }
 
 .btn-print {
-  background: #64748B;
-  color: #FFFFFF;
+  background: #1E3A8A;
+  color: white;
   width: 100%;
 }
 
@@ -322,4 +323,83 @@ textarea.form-control {
   .form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Pagination TRXAPATI06 List Harga */
+.table-pagination {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-bottom: 4px;
+}
+
+.table-pagination a,
+.table-pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  background: #fff;
+}
+
+.table-pagination a:hover {
+  border-color: #0D9488;
+  color: #0D9488;
+}
+
+.table-pagination .active {
+  background: #0D9488;
+  border-color: #0D9488;
+  color: #fff;
+}
+
+.table-pagination .disabled {
+  opacity: .45;
+  pointer-events: none;
+}
+
+.table-pagination .trx06-info {
+  border: none;
+  background: transparent;
+  font-weight: 500;
+  color: #64748b;
+  min-width: auto;
+}
+
+/* Header Card TRXAPOLI00 */
+.poli-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.poli-card-header .card-title {
+  margin-bottom: 0;
+}
+
+.badge-belum-periksa {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #EF4444;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.35);
 }

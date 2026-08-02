@@ -4,7 +4,7 @@ include "inc/sanie.php";
 ?>
 
 <link rel="stylesheet" href="assets/css/modern-table.css">
-<table id="screen" class="modern-table">
+<table class="modern-table">
   <thead>
     <tr>
       <th>Obat</th>
@@ -78,9 +78,9 @@ include "inc/sanie.php";
       $harga_asli = $k['INVE_STOCK_PRIC'];
       $qty = $k['INVE_STOCK_QUTY'];
 
-      $outstockpric = pembulatan((int)round($harga_asli * $profit));
+      $outstockpric = pembulatan((int) round($harga_asli * $profit));
       $view_outstockpric = number_format($outstockpric, 0, ',', '.');
-      
+
       $outstockquty = $qty;
 
       echo '<tr onClick="isiresep_racik(\'' . $outstockcode . '\',\'' . $outstockbtch . '\',\'' . htmlspecialchars($outstockname, ENT_QUOTES) . '\',\'' . $outstockpric . '\',\'' . $outstockquty . '\');" style="cursor:pointer">';
@@ -102,7 +102,3 @@ include "inc/sanie.php";
     ?>
   </tbody>
 </table>
-
-
-
-

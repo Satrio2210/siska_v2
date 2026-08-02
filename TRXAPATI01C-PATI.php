@@ -5,25 +5,14 @@ include "conf/config.php";
 include "inc/sanie.php";
 ?>
 
-
-
 <link rel="stylesheet" href="assets/css/modern-table.css">
-<table id="screen" class="modern-table">
-  <!-- <thead>
-  <tr>
-  <th style="width: 100%;">Pasien</th>
-  </tr>
-  </thead> -->
+<table class="modern-inline">
   <tbody>
     <?php
-    // 1. Pastikan $_POST['q'] ada untuk menghindari error "Undefined index"
     $kata = isset($_POST['q']) ? $_POST['q'] : '';
-
-    // 2. Persiapkan parameter wildcard untuk keamanan PDO (menghindari SQL Injection)
     $paramStart = $kata . '%';     // Untuk pencarian dari depan
     $paramBoth = '%' . $kata . '%'; // Untuk pencarian di mana saja (tengah/belakang)
     
-    // 3. Query yang lebih bersih. Kelompokkan kondisi OR dalam kurung ()
     $xquery = "SELECT PATI_MAST_CODE, PATI_MAIN_PIDN, PATI_MAIN_TITL, PATI_MAIN_NAME, 
                   PATI_MAIN_GEND, PATI_MAIN_BIRT, PATI_MAIN_BLOD, PATI_MAIN_ADDR, 
                   PATI_MAIN_WARD, PATI_MAIN_DIST, PATI_MAIN_CITY, PATI_MAIN_PROV,
@@ -40,14 +29,12 @@ include "inc/sanie.php";
              )
            ORDER BY PATI_MAST_CODE";
 
-    // 4. Gunakan Prepare dan Execute untuk PDO
     $q = $db->prepare($xquery);
     $q->execute([
       ':paramStart' => $paramStart,
       ':paramBoth' => $paramBoth
     ]);
 
-    // Kolom yang berurutan sesuai dengan argumen fungsi isipaticode()
     $columns = [
       'PATI_MAST_CODE',
       'PATI_MAIN_PIDN',
@@ -84,6 +71,7 @@ include "inc/sanie.php";
 
       // Variabel untuk ditampilin di text HTML
       $disp_name = htmlspecialchars($k['PATI_MAIN_NAME'] ?? '', ENT_QUOTES, 'UTF-8');
+      $disp_nik = htmlspecialchars($k['PATI_MAIN_PIDN'] ?? '', ENT_QUOTES, 'UTF-8');
       $disp_birt = htmlspecialchars($k['PATI_MAIN_BIRT'] ?? '', ENT_QUOTES, 'UTF-8');
       $disp_addr = htmlspecialchars($k['PATI_MAIN_ADDR'] ?? '', ENT_QUOTES, 'UTF-8');
 
@@ -91,14 +79,17 @@ include "inc/sanie.php";
       echo <<<HTML
     <tr onclick="isipaticode({$js_args_string})" style="cursor:pointer;">
         <td>
-            <div class="patient-name">
+            <div class="patient-head">
                 {$disp_name}
             </div>
-            <div class="patient-birth">
-                {$disp_birt}
+            <div class="patient-info">
+              NIK  :{$disp_nik}
             </div>
-            <div class="patient-addr">
-                {$disp_addr}
+            <div class="patient-info">
+              TL :{$disp_birt}
+            </div>
+            <div class="patient-info">
+              Addr :{$disp_addr}
             </div>
         </td>
     </tr>
@@ -107,8 +98,3 @@ include "inc/sanie.php";
     ?>
   </tbody>
 </table>
-
-
-
-
-

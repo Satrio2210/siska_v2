@@ -47,16 +47,15 @@ if (isset($_SESSION['username'])) {
           <form name="frmtblfmedi" method="post">
             <div class="content-modern">
               <div class="card-modern">
-                <div class="card-title">&#x1F3F7; Daftar Harga</div>
+                <div class="card-title">Daftar Harga</div>
                 <label for="txtmedicode" class="form-label">Cari Harga</label>
                 <input type="text" class="form-control" name="txtmedicode" id="txtmedicode" maxlength="20"
-                  style="width: 200px; margin-bottom:10px;"
-                  onkeyup="if (value.length > 0) { ambilviewprice(this.value); };" onkeydown="if (event.keyCode == 13 && value.length > 13) 
+                  style="width: 200px;" onkeyup="if (value.length > 0) { ambilviewprice(this.value); };" onkeydown="if (event.keyCode == 13 && value.length > 13) 
                         { 
                         document.getElementById('txtmedicode').value = '';
                         document.getElementById('txtmedicode').focus()
                         }">
-                <div id="tblviewprice"></div>
+                <div id="tblviewprice" style="margin-top: 10px;"></div>
               </div>
           </form>
         </div>

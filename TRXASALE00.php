@@ -24,29 +24,6 @@ if (isset($_SESSION['username'])) {
         <link rel="stylesheet" href="assets/css/layouts/header.css">
         <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
         <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-
-        <style type="text/css">
-            #tblscreen {
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            #tblscreen .action-group {
-                display: inline-flex;
-                flex-direction: row;
-                flex-wrap: nowrap;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
-            }
-
-            #tblscreen .action-group a {
-                display: inline-flex;
-                flex: 0 0 auto;
-                white-space: nowrap;
-            }
-        </style>
-
     </head>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -74,19 +51,17 @@ if (isset($_SESSION['username'])) {
                     <div class="content-modern">
                         <div class="card-modern">
                             <div class="card-title">Daftar Pasien</div>
-
                             <div class="form-group">
                                 <label class="form-label" for="txtregicode">Cari Pasien</label>
                                 <input type="text" class="form-control" name="txtregicode" id="txtregicode" maxlength="20"
-                                    style="margin-bottom: 10px; width: 250px;"
-                                    onkeyup="if (value.length > 0) { ambilscreen(this.value); };" onkeydown="if (event.keyCode == 13 && value.length > 13) 
+                                    style="width: 250px;" onkeyup="if (value.length > 0) { ambilscreen(this.value); };"
+                                    onkeydown="if (event.keyCode == 13 && value.length > 13) 
                                     { 
                                     document.getElementById('txtregicode').value = '';
                                     document.getElementById('txtregicode').focus()
                                     }">
                             </div>
-                            <div id="tblscreen"></div>
-
+                            <div id="tblscreen" style="margin-top: 10px;"></div>
                         </div>
                     </div>
                 </div>

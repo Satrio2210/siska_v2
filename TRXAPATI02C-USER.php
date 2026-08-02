@@ -6,7 +6,7 @@ include "conf/config.php";
 
 
 <link rel="stylesheet" href="assets/css/modern-table.css">
-<table id="screen" class="modern-table">
+<table class="modern-inline">
   <!-- <thead>
     <tr>
       <th style="width: 200px;">DOCTOR</th>
@@ -41,14 +41,14 @@ include "conf/config.php";
       $outroomname = $k['ROOM_NAME'];
 
       // echo '<tr>';
-
+    
       // echo '<td style="width: 200px;" onClick="isidoctuser(\'' . $outdoctuser . '\',\'' . $outdoctname . '\',\'' . $outmediroom . '\',\'' . $outroomname . '\');" 
       // style="cursor:pointer">' . $k['TRXA_DOCT_NAME'] . '</td>';
       // echo '<td style="width: 200px;" onClick="isidoctuser(\'' . $outdoctuser . '\',\'' . $outdoctname . '\',\'' . $outmediroom . '\',\'' . $outroomname . '\');" 
       // style="cursor:pointer">' . $k['ROOM_NAME'] . '</td>';
-
+    
       // echo '</tr>';
-
+    
       echo '
       <tr onclick="isidoctuser(
       \'' . $outdoctuser . '\',
@@ -59,11 +59,11 @@ include "conf/config.php";
 
       <td>
 
-      <div class="doctor-name">
+      <div class="patient-head">
       ' . $k['TRXA_DOCT_NAME'] . '
       </div>
 
-      <div class="room-name">
+      <div class="patient-info">
       ' . $k['ROOM_NAME'] . '
       </div>
 
@@ -75,8 +75,3 @@ include "conf/config.php";
     ?>
   </tbody>
 </table>
-
-
-
-
-

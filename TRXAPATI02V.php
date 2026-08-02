@@ -22,229 +22,18 @@ $paymentLabels = [
 ];
 ?>
 
-<style>
-  /* ============================================
-     TRXAPATI02V - Tabel Daftar Pasien
-     Responsif, tanpa scroll horizontal
-     ============================================ */
-
-  /* === TABLE CONTAINER === */
-  .table-container {
-    overflow: auto;
-    border-radius: 16px;
-    max-height: 420px;
-    border: 1px solid #e2e8f0;
-  }
-
-  /* === TABLE BASE === */
-  #screen {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  /* === TABLE HEADER === */
-  #screen thead {
-    background: #10b981;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .table-pasien #screen th {
-    padding: 10px 6px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    vertical-align: middle;
-    border: none;
-    letter-spacing: 0.3px;
-  }
-
-  /* === TABLE CELLS === */
-  .table-pasien #screen td {
-    padding: 8px 6px;
-    font-size: 12px;
-    border-bottom: 1px solid #edf2f7;
-    text-align: center;
-    vertical-align: middle;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-  }
-
-  /* === COLUMN WIDTHS (total: 100%) === */
-  /* TERDAFTAR */
-  #screen th:nth-child(1),
-  #screen td:nth-child(1) {
-    width: 13%;
-  }
-
-  /* ANTRIAN */
-  #screen th:nth-child(2),
-  #screen td:nth-child(2) {
-    width: 6%;
-  }
-
-  /* PASIEN */
-  #screen th:nth-child(3),
-  #screen td:nth-child(3) {
-    width: 24%;
-    text-align: center;
-  }
-
-  /* TIPE */
-  #screen th:nth-child(4),
-  #screen td:nth-child(4) {
-    width: 7%;
-  }
-
-  /* DOKTER */
-  #screen th:nth-child(5),
-  #screen td:nth-child(5) {
-    width: 18%;
-  }
-
-  /* STATUS */
-  #screen th:nth-child(6),
-  #screen td:nth-child(6) {
-    width: 7%;
-  }
-
-  /* ACTION */
-  #screen th:nth-child(7),
-  #screen td:nth-child(7) {
-    width: 25%;
-  }
-
-  /* === ROW HOVER === */
-  #screen tr {
-    transition: .2s;
-  }
-
-  #screen tbody tr:hover {
-    background: #d0e3f7;
-  }
-
-  /* === COMPACT DATE DISPLAY (2 baris dalam 1 cell) === */
-  .regi-date-label {
-    display: block;
-    font-size: 10px;
-    color: #64748b;
-    line-height: 1.2;
-  }
-
-  .regi-date-value {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    color: #1e293b;
-    line-height: 1.3;
-  }
-
-  /* === BADGES === */
-  .badge {
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    white-space: nowrap;
-  }
-
-  .badge-antri {
-    background: #fef3c7;
-    color: #92400e;
-  }
-
-  .badge-periksa {
-    background: #dbeafe;
-    color: #1d4ed8;
-  }
-
-  .badge-bayar {
-    background: #dcfce7;
-    color: #166534;
-  }
-
-  .badge-selesai {
-    background: #bbf7d0;
-    color: #166534;
-  }
-
-  /* === ACTION BUTTONS === */
-  .action-group {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-    width: 100%;
-  }
-
-  .btn-action {
-    border: none;
-    border-radius: 8px;
-    padding: 5px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s;
-    margin-right: 0;
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    line-height: 1.2;
-    white-space: nowrap;
-    min-width: 60px;
-  }
-
-  /* === BPJS highlight === */
-  .paym-bpjs {
-    background-color: #e0f7ff;
-    font-weight: 600;
-  }
-
-  /* === RESPONSIVE: layar lebih kecil === */
-  @media (max-width: 1200px) {
-    .table-pasien #screen th {
-      font-size: 10px;
-      padding: 8px 4px;
-    }
-
-    .table-pasien #screen td {
-      font-size: 11px;
-      padding: 6px 4px;
-    }
-
-    .regi-date-label {
-      font-size: 9px;
-    }
-
-    .regi-date-value {
-      font-size: 10px;
-    }
-
-    .badge {
-      padding: 3px 6px;
-      font-size: 9px;
-    }
-  }
-</style>
-
-<div class="table-container table-pasien">
-  <table id="screen">
+<link rel="stylesheet" href="assets/css/modern-table.css">
+<div class="table-wrapper">
+  <table class="modern-table">
     <thead>
       <tr>
-        <th>TERDAFTAR</th>
-        <th>ANTRIAN</th>
-        <th>PASIEN</th>
-        <th>TIPE</th>
-        <th>DOKTER</th>
-        <th>STATUS</th>
-        <th>ACTION</th>
+        <th class="w-10p">Tgl Daftar</th>
+        <th class="w-10p">No. Antrian</th>
+        <th>Poli</th>
+        <th>Nama Pasien</th>
+        <th class="w-10p">Pembayaran</th>
+        <th class="w-10p">Status</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -298,51 +87,52 @@ $paymentLabels = [
         $doctName = htmlspecialchars($row['DOCT_NAME'] ?? '-', ENT_QUOTES);
         $poliName = htmlspecialchars($row['POLI_NAME'] ?? '', ENT_QUOTES);
         $regiDate = htmlspecialchars($row['REGI_DATE'], ENT_QUOTES);
-        $entrTime = htmlspecialchars(substr($row['TRXA_ENTR_TIME'], 0, 5), ENT_QUOTES);
+        $entrTime = htmlspecialchars($row['TRXA_ENTR_TIME'], ENT_QUOTES);
         $escCode = htmlspecialchars($regicode, ENT_QUOTES);
 
         echo '<tr>';
 
-        // --- KOLOM 1: TERDAFTAR (format 2 baris agar compact) ---
         $tanggalDaftar = $row['TRXA_REGI_DATE'];
-        echo '<td>';
+        echo '<td class="w-10p">';
         if ($tanggalDaftar == $datenow) {
-          echo '<span class="regi-date-label">Hari ini</span>';
+          echo '<span class="regi-date-label">Hari ini</span><br>';
         } else {
           $hariLalu = hitungTanggal($tanggalDaftar, $datenow);
-          echo '<span class="regi-date-label">' . $hariLalu . ' hari lalu</span>';
+          echo '<span class="regi-date-label">' . $hariLalu . ' hari lalu</span><br>';
         }
-        echo '<span class="regi-date-value">' . $regiDate . ' ' . $entrTime . '</span>';
+        echo '<span>' . $regiDate . '<br>' . $entrTime . '</span>';
         echo '</td>';
 
         // --- KOLOM 2: ANTRIAN ---
-        echo '<td><strong>' . htmlspecialchars($noantri, ENT_QUOTES) . '</strong></td>';
+        echo '<td class="w-10p"><strong>' . htmlspecialchars($noantri, ENT_QUOTES) . '</strong></td>';
 
-        // --- KOLOM 3: PASIEN ---
+        // --- KOLOM 3: POLI ---
+        echo '<td>' . $poliName . '<br>' . $doctName . '</td>';
+
+        // --- KOLOM 4: PASIEN ---
         echo '<td>' . $patiName . '</td>';
 
-        // --- KOLOM 4: TIPE PEMBAYARAN ---
+        // --- KOLOM 5: TIPE PEMBAYARAN ---
+        echo '<td class="w-10p">';
         if ($paymCode === 'B') {
-          echo '<td class="paym-bpjs">' . $paymLabel . '</td>';
+          echo '<span class="pay-bpjs">' . $paymLabel . '</span>';
         } else {
-          echo '<td>' . $paymLabel . '</td>';
+          echo '<span class="pay-umum">' . $paymLabel . '</span>';
         }
-
-        // --- KOLOM 5: DOKTER ---
-        echo '<td>' . $doctName . '</td>';
+        echo '</td>';
 
         // --- KOLOM 6: STATUS ---
-        echo '<td>';
+        echo '<td class="w-10p">';
         if ($statCode === 'W') {
-          echo '<span class="badge badge-antri">Antri</span>';
+          echo '<span class="status-badge status-wait">Antri</span>';
         } elseif ($statCode === 'C' && $paymCode === 'U') {
-          echo '<span class="badge badge-periksa">Periksa</span>';
+          echo '<span class="status-badge status-process">Periksa</span>';
         } elseif ($statCode === 'P') {
-          echo '<span class="badge badge-bayar">Bayar</span>';
+          echo '<span class="status-badge status-done">Bayar</span>';
         } elseif ($statCode === 'C' && $paymCode === 'B') {
-          echo '<span class="badge badge-selesai">Selesai</span>';
+          echo '<span class="status-badge status-selesai">Selesai</span>';
         } else {
-          echo '<span class="badge badge-selesai">No Status</span>';
+          echo '<span class="status-badge status-belum">No Status</span>';
         }
         echo '</td>';
 
@@ -350,7 +140,7 @@ $paymentLabels = [
         echo '<td><div class="action-group">';
 
         // Tombol Update
-        echo '<button class="btn-action btn-save" onclick="'
+        echo '<button type="button" class="button-view" onclick="'
           . "viewcode('" . $escCode . "');"
           . "setTimeout(function(){"
           . "document.getElementById('regidoct').scrollIntoView({behavior:'smooth',block:'start'});"
@@ -362,19 +152,19 @@ $paymentLabels = [
         $printUrl = 'print.php?nomor=' . urlencode($noantri)
           . '&pasien=' . urlencode($row['PATI_NAME'] ?? '')
           . '&layanan=' . urlencode($row['POLI_NAME'] ?? '');
-        echo '<a class="btn-action btn-refresh" href="' . htmlspecialchars($printUrl, ENT_QUOTES) . '" target="_blank">Antrian</a>';
+        echo '<button type="button" class="button-print" href="' . htmlspecialchars($printUrl, ENT_QUOTES) . '" target="_blank">Antrian</button>';
 
         // Tombol Closing
         if ($statCode === 'C') {
-          echo '<a class="btn-action btn-delete" onclick="alert(\'Pemeriksaan Belum lengkap ?\');">Tutup</a>';
+          echo '<button type="button" class="button-delete" onclick="alert(\'Pemeriksaan Belum lengkap ?\');">Close</button>';
         } else {
-          echo '<a class="btn-action btn-delete" onclick="'
+          echo '<button type="button" class="button-delete" onclick="'
             . "if(confirm('Are You Sure To Delete ?')){"
             . "hapuscode('" . $escCode . "');"
             . "}else{"
             . "document.getElementById('txtsearch').focus();"
             . "}"
-            . '">Tutup</a>';
+            . '">Close</button>';
         }
 
         echo '</div></td>';

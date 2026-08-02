@@ -201,6 +201,10 @@ if (isset($_SESSION['username'])) {
 
           <!-- REKAM MEDIS (moved to top) -->
           <div class="content-modern">
+            <a href="TRXAPOLI00.php"
+              style="display: inline-flex;align-items: center; gap: 6px; margin-bottom: 12px; color: #169C89; font-weight: 600; text-decoration: none; font-size: 14px;">
+              <i class="bi bi-arrow-left"></i> Kembali ke Daftar Pasien
+            </a>
             <div class="card-modern">
               <div class="card-title">
                 Riwayat Medis
@@ -211,7 +215,6 @@ if (isset($_SESSION['username'])) {
             <!-- Form Input -->
 
             <form name="frmtrxapoli" method="post" action="">
-
               <div class="card-modern" id="infoPasien">
                 <div class="card-title">
                   Informasi Pasien
@@ -296,7 +299,7 @@ if (isset($_SESSION['username'])) {
 
                     <textarea id="txtexamcomp" name="txtexamcomp" rows="3" class="form-control" readonly="true"
                       style="resize: vertical;">
-                                                                                                                                                                                                                                                                                                                    </textarea>
+                                                                                                                                                                                                                                                                                                                                                                              </textarea>
                   </div>
                 </div>
 
@@ -794,9 +797,8 @@ if (isset($_SESSION['username'])) {
                       <option value="SURAT_SEHAT">Surat Sehat</option>
                       <option value="SURAT_KETERANGAN">Surat Keterangan</option>
                     </select>
-                    <button type="button" id="btn-cetak-surat" class="btn-modern btn-refresh"
-                      onclick="executeCetakSurat()" style="margin-top: 10px; align-self: flex-start;"
-                      disabled="true">Cetak Surat</button>
+                    <button type="button" id="btn-cetak-surat" class="btn-modern btn-print" onclick="executeCetakSurat()"
+                      style="margin-top: 10px; align-self: flex-start;" disabled="true">Cetak Surat</button>
                   </div>
 
 
@@ -824,7 +826,7 @@ if (isset($_SESSION['username'])) {
                         class="form-control" style="min-height: 60px;"></textarea>
                     </div>
 
-                    <button type="button" id="btn-rujuk" class="btn-modern btn-refresh" onclick="executeRujukPasien()"
+                    <button type="button" id="btn-rujuk" class="btn-modern btn-save" onclick="executeRujukPasien()"
                       disabled style="margin-top: 10px; align-self: flex-start;">Rujuk Pasien</button>
                   </div>
                 </div>
@@ -866,7 +868,7 @@ if (isset($_SESSION['username'])) {
                   <input type="hidden" name="hidmediroom" id="hidmediroom">
                   <input type="hidden" name="hidregipaym" id="hidregipaym">
 
-                  <button type="button" id="btn-input-tindakan" class="btn-modern btn-save"
+                  <button type="button" id="btn-input-tindakan" class="btn-modern btn-input"
                     onclick="executeInputTindakan()" disabled style="margin-top: 15px; align-self: flex-start;">Input
                     Tindakan</button>
 

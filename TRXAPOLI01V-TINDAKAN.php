@@ -95,7 +95,7 @@ if (!empty($tretcode)) {
     }
 
     #screen thead {
-        background: #10b981;
+        background: #0D9488;
         color: white;
         position: sticky;
         top: 0;

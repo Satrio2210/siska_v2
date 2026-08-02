@@ -242,25 +242,21 @@ if (isset($_SESSION['username'])) {
                       <div id="tbluser" class="search-dropdown" style="visibility:hidden;"></div>
 
                     </div>
+                  </div>
 
+                  <div class="form-grid-3 pati" style="margin-top: 10px;">
                     <div class="form-group">
-
                       <label class="form-label">
                         Poli
                       </label>
-
                       <input type="text" name="txtregipoli" id="txtregipoli" class="form-control" readonly>
-
                       <input type="hidden" name="hidregipoli" id="hidregipoli">
-
                     </div>
 
                     <div class="form-group">
-
                       <label class="form-label">
                         Pembayaran
                       </label>
-
                       <select name="optregipaym" id="optregipaym" class="form-control" onchange="
                       if(this.value == 'B'){
                       document.getElementById('hidregifee').value='N';
@@ -280,25 +276,18 @@ if (isset($_SESSION['username'])) {
 
                     </div>
 
-                    <div class="form-group full">
-
+                    <div class="form-group">
                       <label class="form-label">
                         Biaya Admin
                       </label>
-
                       <select name="hidregifee" id="hidregifee" class="form-control">
-
                         <option value="">- PILIH -</option>
                         <option value="Y">Ya</option>
                         <option value="N">Tidak</option>
-
                       </select>
                       <!-- <input type="text" id="txtregifeeview" class="form-control" autocomplete="off"> -->
-
                       <input type="hidden" id="hidregifee">
-
                     </div>
-
                   </div>
 
                   <div class="action-group pati">
@@ -310,7 +299,6 @@ if (isset($_SESSION['username'])) {
                       Refresh
                     </button>
                   </div>
-
                 </div>
 
                 <!-- ANTRIAN -->
@@ -331,15 +319,15 @@ if (isset($_SESSION['username'])) {
                     </div>
 
                     <div class="queue-estimation">
-                      Estimasi Dilayani Â± 15 Menit
+                      Estimasi Dilayani ± 15 Menit
                     </div>
                     <div class="action-group pati">
-                      <button id="btnPrintAntrian" class="btn-modern btn-save" style="width:100%;margin-top:10px;"
+                      <button id="btnPrintAntrian" class="btn-modern btn-print" style="width:100%;"
                         onclick="printAntrian();">
                         Cetak
                       </button>
 
-                      <button id="btnSkipAntrian" class="btn-modern btn-reset" style="width:100%;margin-top:10px;"
+                      <button id="btnSkipAntrian" class="btn-modern btn-refresh" style="width:100%;"
                         onclick="resetFormAfterPrint();">
                         Skip
                       </button>
@@ -358,11 +346,11 @@ if (isset($_SESSION['username'])) {
             <div class="card-modern">
 
               <div class="card-title">
-                &#x1F4CB; Daftar Pasien
+                &#x1F4CB; Pasein Terdaftar
               </div>
 
               <input type="text" class="form-control" placeholder="Cari Pasien..." autocomplete="off"
-                style="max-width:250px;margin-bottom:20px;" onkeyup="
+                style="max-width:250px;" onkeyup="
                 if (value.length < 16)
                 {
                   ambilscreen(this.value);
@@ -373,10 +361,8 @@ if (isset($_SESSION['username'])) {
                 }
                 ">
 
-              <div class="table-wrapper">
-                <div id="tblscreen">
-                </div>
-              </div>
+              <div id="tblscreen" style="margin-top: 10px;"></div>
+
             </div>
           </div>
 

@@ -3,16 +3,16 @@ include "conf/config.php";
 ?>
 
 <link rel="stylesheet" href="assets/css/modern-table.css">
-<table id="screen" class="modern-table">
+<table class="modern-table">
   <thead>
     <tr>
-      <th>SIGNA</th>
+      <th style="padding: 8px;">SIGNA</th>
     </tr>
   </thead>
   <tbody>
     <?php
     $kata = $_POST['q'] ?? '';
-    
+
     if (strlen($kata) == 1) {
       $xquery = "SELECT TBLP_SGNA_CODE, TBLP_SGNA_NAME, TBLP_SGNA_USAG 
               FROM tblpsgna 
@@ -34,7 +34,7 @@ include "conf/config.php";
 
       echo '<tr onClick="isisigna_racik(\'' . $outsgnacode . '\',\'' . $outsgnaname . '\',\'' . $outsgnausag . '\');" 
       style="cursor:pointer">';
-      echo '<td>' . htmlspecialchars($k['TBLP_SGNA_NAME']) . '<br>
+      echo '<td style="padding: 8px;">' . htmlspecialchars($k['TBLP_SGNA_NAME']) . '<br>
       <small>' . htmlspecialchars($k['TBLP_SGNA_USAG']) . '</small>
       </td>';
       echo '</tr>';
@@ -42,7 +42,3 @@ include "conf/config.php";
     ?>
   </tbody>
 </table>
-
-
-
-

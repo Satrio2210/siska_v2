@@ -3,7 +3,6 @@ include "conf/config.php";
 ?>
 
 <link rel="stylesheet" href="assets/css/rekam-medis-table.css">
-
 <div class="rekam-medis-wrap">
   <table class="rekam-medis-table">
     <thead>

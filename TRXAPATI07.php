@@ -42,15 +42,15 @@ if (isset($_SESSION['username'])) {
           <form name="frmtrxaregi" method="post" action="">
             <div class="content-modern">
               <div class="card-modern" id="cariDaftar">
-                <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D; Daftar Pasien
+                <div class="card-title" id="cariDaftarTitle" tabindex="-1" style="outline: none;">&#x1F50D; Pasien
+                  Terdaftar
                 </div>
-                <input type="text" name="txtsearch" id="txtsearch" class="form-control"
-                  style="margin-bottom: 10px; width: 250px;" placeholder="Ketik nama untuk mencari pasien..."
-                  autocomplete="off"
+                <input type="text" name="txtsearch" id="txtsearch" class="form-control" style="width: 250px;"
+                  placeholder="Ketik nama untuk mencari pasien..." autocomplete="off"
                   onkeyup="if (value.length > 0) { ambilscreen(this.value); } else { ambilscreen(''); }"
                   onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtsearch').value = ''; document.getElementById('txtsearch').focus(); }">
 
-                <div id="tblscreen"></div>
+                <div id="tblscreen" style="margin-top: 10px; "></div>
               </div>
 
               <div class="card-modern" id="dataKunjungan">

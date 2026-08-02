@@ -2,7 +2,7 @@
 include "conf/config.php";
 include "inc/sanie.php";
 ?>
-<style>
+<!-- <style>
   #screen {
     width: 100%;
     border-collapse: collapse;
@@ -213,55 +213,59 @@ include "inc/sanie.php";
     }
 
   }
-</style>
+</style> -->
+<link rel="stylesheet" href="assets/css/modern-table.css">
 <div class="table-wrapper">
-  <table id="screen">
+  <table class="modern-table">
     <thead>
       <tr>
         <th>Tgl Daftar</th>
-        <th>Terdaftar</th>
         <th>No. Antrian</th>
+        <th>Poli</th>
         <th>Nama Pasien</th>
         <th>Pembayaran</th>
         <th>Status</th>
         <th>Action</th>
-
       </tr>
     </thead>
     <tbody>
       <?php
-      $dokter = $_POST['q'];
-      //$kata = '';
+      $dokter = isset($_POST['q']) ? $_POST['q'] : '';
+      $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+      $perpage = 5;
+      $offset = ($page - 1) * $perpage;
       $panjangkata = strlen($dokter);
-      if ($panjangkata == 0) {
 
-        // TAMBAHAN: (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-        $xquery = "SELECT TRXA_REGI_CODE, TRXA_PATI_CODE, TRXA_REGI_DATE, TRXA_ENTR_TIME,
-        (SELECT PATI_MAIN_TITL FROM patimast WHERE PATI_MAST_CODE = TRXA_PATI_CODE) AS PATI_TITL,
-        (SELECT PATI_MAIN_NAME FROM patimast WHERE PATI_MAST_CODE = TRXA_PATI_CODE) AS PATI_NAME,
-        TRXA_REGI_LIST, TRXA_REGI_PAYM, TRXA_REGI_STAT, TRXA_REGI_POLI,
-        (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-        FROM trxaregi WHERE TRXA_VIEW_STAT='Y'
+      $baseWhere = "TRXA_VIEW_STAT='Y'
         AND TRXA_REGI_STAT IN ('W','C')
-        AND TRXA_REGI_POLI = 'PU' 
-        AND TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)
-        ORDER BY TRXA_ENTR_DATE DESC, TRXA_ENTR_TIME DESC
-        ";
+        AND TRXA_REGI_POLI = 'PU'
+        AND TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)";
+
+      if ($panjangkata > 0) {
+        $dokter_esc = addslashes($dokter);
+        $where = "$baseWhere AND TRXA_REGI_DOCT = '$dokter_esc'";
       } else {
-        // TAMBAHAN: (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-        $xquery = "SELECT TRXA_REGI_CODE, TRXA_PATI_CODE, TRXA_REGI_DATE, TRXA_ENTR_TIME,
+        $where = $baseWhere;
+      }
+
+      $total = (int) $db->query("SELECT COUNT(*) FROM trxaregi WHERE $where")->fetchColumn();
+      $totalPages = max(1, (int) ceil($total / $perpage));
+      if ($page > $totalPages) {
+        $page = $totalPages;
+        $offset = ($page - 1) * $perpage;
+      }
+
+      // TAMBAHAN: (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
+      $select = "SELECT TRXA_REGI_CODE, TRXA_PATI_CODE, TRXA_REGI_DATE, TRXA_ENTR_TIME,
         (SELECT PATI_MAIN_TITL FROM patimast WHERE PATI_MAST_CODE = TRXA_PATI_CODE) AS PATI_TITL,
         (SELECT PATI_MAIN_NAME FROM patimast WHERE PATI_MAST_CODE = TRXA_PATI_CODE) AS PATI_NAME,
         TRXA_REGI_LIST, TRXA_REGI_PAYM, TRXA_REGI_STAT, TRXA_REGI_POLI,
-        (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA
-        FROM trxaregi WHERE TRXA_VIEW_STAT='Y'
-        AND TRXA_REGI_STAT IN ('W','C') 
-        AND TRXA_REGI_POLI = 'PU'
-        AND TRXA_REGI_DOCT = '$dokter'
-        AND TRXA_ENTR_DATE > DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+        (SELECT COUNT(*) FROM trxaexam WHERE TRXA_EXAM_CODE = TRXA_REGI_CODE) AS SUDAH_PERIKSA";
+
+      $xquery = "$select
+        FROM trxaregi WHERE $where
         ORDER BY TRXA_ENTR_DATE DESC, TRXA_ENTR_TIME DESC
-        ";
-      }
+        LIMIT $offset, $perpage";
 
       $prefixMap = [
         'PU' => 'A', // Poli Umum
@@ -295,34 +299,20 @@ include "inc/sanie.php";
         // nama lengkap pasien
         $nama_lengkap = $k['PATI_TITL'] . ' ' . $k['PATI_NAME'];
 
-        echo '<td>' . $k['TRXA_REGI_DATE'] . ' ' . $k['TRXA_ENTR_TIME'] . '</td>';
-
-        $tanggal_daftar = $k['TRXA_REGI_DATE'];
-
-        if ($tanggal_daftar == $datenow) {
-          echo '<td><span class="status-badge status-now">Hari ini</span></td>';
-        } else {
-          $hasil_hitung_tanggal = hitungTanggal($tanggal_daftar, $datenow);
-
-
-          echo '<td><span class="status-badge status-old">' . $hasil_hitung_tanggal . ' hari lalu</span></td>';
-
-        }
-
+        echo '<td>' . $k['TRXA_REGI_DATE'] . '<br>' . $k['TRXA_ENTR_TIME'] . '</td>';
         echo '<td>' . $noantri_full . '</td>';
-        //echo '<td style="width: 150px; text-align: left;">'.$k['TRXA_REGI_CODE'].'</td>';
+        echo '<td>' . $namapoli . '</td>';
         echo '<td>' . $nama_lengkap . '</td>';
-        //echo '<td style="width: 100px">'.$k['TRXA_PATI_CODE'].'</td>';
-      
+
         $regipaym = $k['TRXA_REGI_PAYM'];
         if ($regipaym == 'U') {
-          echo '<td> Umum </td>';
+          echo '<td><span class="status-badge pay-umum"> Umum </span></td>';
         } else if ($regipaym == 'B') {
-          echo '<td> BPJS </td>';
+          echo '<td><span class="status-badge pay-bpjs"> BPJS </span></td>';
         } else if ($regipaym == 'A') {
-          echo '<td> Asuransi </td>';
+          echo '<td><span class="status-badge pay-umum"> Asuransi </span></td>';
         } else if ($regipaym == 'P') {
-          echo '<td> Perusahaan </td>';
+          echo '<td><span class="status-badge pay-umum"> Perusahaan </span></td>';
         }
         // echo '<td>' . $regipaym . '</td>';
       
@@ -342,24 +332,14 @@ include "inc/sanie.php";
           echo '<td><span class="status-badge status-done">Sudah di periksa</span></td>';
         }
 
-        //$regidate = $k['TRXA_REGI_DATE'];
-      
         echo '<td><div class="action-group">';
 
-        //if ($regidate == $datenow)
-//{
         echo '<a href="TRXAPOLI01.php?pati=' . urlencode($paticode) . '&exam=' . urlencode($regicode) . '" class="button-view pure-button">Periksa</a>';
         echo '<a class="button-panggil pure-button"
           data-noantri="' . $noantri_full . '"
           data-nama="' . htmlspecialchars($nama_lengkap, ENT_QUOTES, 'UTF-8') . '"
           data-poli="' . $namapoli . '"
           data-channel="POLI">Panggil</a>';
-        //}
-//else
-//{
-//   echo '<b>Register Expired</b>';  
-      
-        //}
         echo '</div></td>';
 
         echo '</tr>';
@@ -368,3 +348,43 @@ include "inc/sanie.php";
     </tbody>
   </table>
 </div>
+
+<?php if ($total > 0) { ?>
+  <div class="table-pagination" id="poliPagination">
+    <?php
+    $prev = $page - 1;
+    $next = $page + 1;
+    $prevClass = $page <= 1 ? 'disabled' : '';
+    $nextClass = $page >= $totalPages ? 'disabled' : '';
+    ?>
+    <a href="#" class="<?php echo $prevClass; ?>" onclick="return poliGo(event, <?php echo $prev; ?>);">&laquo;</a>
+
+    <?php
+    $start = max(1, $page - 2);
+    $end = min($totalPages, $page + 2);
+    if ($start > 1) {
+      echo '<a href="#" onclick="return poliGo(event, 1);">1</a>';
+      if ($start > 2) {
+        echo '<span>&hellip;</span>';
+      }
+    }
+    for ($i = $start; $i <= $end; $i++) {
+      if ($i === $page) {
+        echo '<span class="active">' . $i . '</span>';
+      } else {
+        echo '<a href="#" onclick="return poliGo(event, ' . $i . ');">' . $i . '</a>';
+      }
+    }
+    if ($end < $totalPages) {
+      if ($end < $totalPages - 1) {
+        echo '<span>&hellip;</span>';
+      }
+      echo '<a href="#" onclick="return poliGo(event, ' . $totalPages . ');">' . $totalPages . '</a>';
+    }
+    ?>
+
+    <a href="#" class="<?php echo $nextClass; ?>" onclick="return poliGo(event, <?php echo $next; ?>);">&raquo;</a>
+
+    <span class="trx06-info"><?php echo $total; ?> pasien &middot; hlm <?php echo $page; ?>/<?php echo $totalPages; ?></span>
+  </div>
+<?php } ?>

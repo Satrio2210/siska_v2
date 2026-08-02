@@ -22,7 +22,6 @@ if (isset($_SESSION['username'])) {
     <link rel="stylesheet" href="assets/css/layouts/header.css">
     <link rel="stylesheet" href="assets/css/layouts/side-menu.css">
     <link rel="stylesheet" href="assets/css/trxapati-shared.css">
-
   </head>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

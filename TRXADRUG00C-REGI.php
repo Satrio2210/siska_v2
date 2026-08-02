@@ -1,94 +1,18 @@
 ﻿<?php
 include "conf/config.php";
 ?>
-<style>
-  .table-container {
-    overflow: auto;
-    border-radius: 16px;
-    max-height: 420px;
-    border: 1px solid #e2e8f0;
-    margin-top: 10px;
-  }
-
-  #tblregi-farm-receipt {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  #tblregi-farm-receipt th,
-  #tblregi-farm-receipt td {
-    padding: 10px 20px;
-  }
-
-  #tblregi-farm-receipt thead {
-    background: #0D9488;
-    color: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  #tblregi-farm-receipt th {
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
-    vertical-align: middle;
-    border: none;
-    letter-spacing: 0.3px;
-  }
-
-  #tblregi-farm-receipt td {
-    font-size: 12px;
-    /* color: #374151; */
-    text-align: center;
-    vertical-align: middle;
-    border-bottom: 1px solid #e5e7eb;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  #tblregi-farm-receipt th:nth-child(1),
-  #tblregi-farm-receipt td:nth-child(1) {
-    width: 10%;
-  }
-
-  #tblregi-farm-receipt th:nth-child(2),
-  #tblregi-farm-receipt td:nth-child(2) {
-    width: 20%;
-  }
-
-  #tblregi-farm-receipt th:nth-child(3),
-  #tblregi-farm-receipt td:nth-child(3) {
-    width: 20%;
-  }
-
-  #tblregi-farm-receipt th:nth-child(4),
-  #tblregi-farm-receipt td:nth-child(4) {
-    width: 20%;
-  }
-
-  #tblregi-farm-receipt th:nth-child(5),
-  #tblregi-farm-receipt td:nth-child(5) {
-    width: 10%;
-  }
-
-  #tblregi-farm-receipt th:nth-child(6),
-  #tblregi-farm-receipt td:nth-child(6) {
-    width: 20%;
-  }
-</style>
-
-<div class="table-container">
-  <table id="tblregi-farm-receipt">
+<link rel="stylesheet" href="assets/css/modern-table.css">
+<div class="table-wrapper">
+  <table class="modern-table">
     <thead>
       <tr>
-        <th>Antri</th>
-        <th>Nama Pasien</th>
+        <th>Tgl Daftar</th>
+        <th>No. Antrian</th>
         <th>Poli</th>
+        <th>Nama Pasien</th>
+        <th>Pembayaran</th>
         <th>Status</th>
-        <th>Payment</th>
-        <th>Aksi</th>
+        <th>action</th>
       </tr>
     </thead>
 
@@ -106,6 +30,8 @@ include "conf/config.php";
         r.TRXA_REGI_LIST, 
         r.TRXA_REGI_PAYM, 
         r.TRXA_REGI_POLI,
+        r.TRXA_ENTR_DATE,
+        r.TRXA_ENTR_TIME,
         e.TRXA_EXAM_PRSC AS EXAM_PRSC,
         d.DIAGNOSA
         FROM trxaregi r
@@ -138,6 +64,8 @@ include "conf/config.php";
         $outmainname = $k['MAIN_NAME'];
         $mainage = $k['MAIN_AGE'];
         $outexamdiag = $k['DIAGNOSA'];
+        $tgldaftard = $k['TRXA_ENTR_DATE'];
+        $tgldaftart = $k['TRXA_ENTR_TIME'];
 
         $tanggal = new DateTime($mainage);
         $today = new DateTime('today');
@@ -187,34 +115,35 @@ include "conf/config.php";
 
         $regipaym = $outregipaym;
         if ($regipaym == 'BPJS') {
-          $badgepay = '<span class="badge-pay badge-bpjs">BPJS</span>';
+          $badgepay = '<span class="status-badge pay-bpjs">BPJS</span>';
         } else if ($regipaym == 'Umum') {
-          $badgepay = '<span class="badge-pay badge-umum">Umum</span>';
+          $badgepay = '<span class="status-badge pay-umum">Umum</span>';
         } else if ($regipaym == 'Asuransi') {
-          $badgepay = '<span class="badge-pay badge-asuransi">Asuransi</span>';
+          $badgepay = '<span class="status-badge pay-umum">Asuransi</span>';
         } else {
-          $badgepay = '<span class="badge-pay badge-perusahaan">Perusahaan</span>';
+          $badgepay = '<span class="status-badge pay-umum">Perusahaan</span>';
         }
 
         $cntresep = $k['CNT_RESEP'];
         if ($cntresep > 0) {
-          $statusfarmasi = '<span class="badge-status badge-success">Sudah Dilayani</span>';
+          $statusfarmasi = '<span class="status-badge status-done">Sudah Dilayani</span>';
         } else {
-          $statusfarmasi = '<span class="badge-status badge-warning">Belum Dilayani</span>';
+          $statusfarmasi = '<span class="status-badge status-wait">Belum Dilayani</span>';
         }
 
         $jsArgs = "'" . $outprsccode . "','" . $outpaticode . "','" . addslashes($outmainname) . "','" . $outmaingend . "','" . $outmainage . "','" . $outregipaym . "','" . $outpaymcode . "','" . $outregipoli . "','" . addslashes($outexamprsc) . "','" . addslashes($outexamdiag) . "'";
 
         echo '<tr>';
+        echo '<td>' . $tgldaftard . '<br>' . $tgldaftart . '</td>';
         echo '<td>' . $k['TRXA_REGI_LIST'] . '</td>';
-        echo '<td>' . htmlspecialchars($k['MAIN_NAME']) . '</td>';
         echo '<td>' . $regipoli . '</td>';
+        echo '<td>' . htmlspecialchars($k['MAIN_NAME']) . '</td>';
         echo '<td>' . $badgepay . '</td>';
         echo '<td>' . $statusfarmasi . '</td>';
         echo '<td>';
-        echo '<div  class="form-grid">';
-        echo '<button type="button" class="btn-modern btn-save" onclick="isiregi(' . $jsArgs . ');">Periksa</button>';
-        echo '<button type="button" class="btn-modern btn-refresh" href="TRXADRUG01.php?regicode=' . urlencode($outprsccode) . '">Penyerahan Obat</button>';
+        echo '<div  class="action-group">';
+        echo '<button type="button" class="button-view" onclick="isiregi(' . $jsArgs . ');">Periksa</button>';
+        echo '<button type="button" class="button-print" href="TRXADRUG01.php?regicode=' . urlencode($outprsccode) . '">Siapkan</button>';
         echo '</div>';
         echo '</td>';
         echo '</tr>';

@@ -165,52 +165,6 @@ if (isset($_SESSION['username'])) {
         z-index: auto;
       }
 
-      #tblsigna,
-      #tblsigna_racik {
-        position: absolute;
-        background: white;
-        border-radius: 10px;
-        overflow: auto;
-        box-shadow: 0 8px 10px rgba(0, 0, 0, .10);
-        border: 1px solid #e2e8f0;
-        z-index: 9999;
-      }
-
-      #tblsigna table tbody,
-      #tblsigna_racik table tbody {
-        display: block;
-        max-height: 140px;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-
-      #tblsigna table thead,
-      #tblsigna table tbody tr,
-      #tblsigna_racik table thead,
-      #tblsigna_racik table tbody tr {
-        display: table;
-        width: auto;
-        table-layout: fixed;
-      }
-
-      #tblresep,
-      #tblresep_racik {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        min-width: 500px;
-        max-height: 220px;
-        margin-top: 4px;
-        background: #fff;
-        border: 1px solid #a5a4a4;
-        border-radius: 10px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        z-index: 9999;
-        display: none;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-
       @media(max-width:1100px) {
         .workspace-grid {
           grid-template-columns: 1fr;
@@ -403,7 +357,7 @@ if (isset($_SESSION['username'])) {
                     onkeyup="if (value.length > 0) { ambilregicode(this.value); } else { ambilregicode('X')};">
                 </div>
 
-                <div id="tblregi"></div>
+                <div id="tblregi" style="margin-top: 10px;"></div>
 
               </div>
 
@@ -541,12 +495,12 @@ if (isset($_SESSION['username'])) {
 
                     <div class="form-grid">
 
-                      <div class="form-group">
+                      <div class="form-group" style="position:relative; width:450px;">
                         <label class="form-label">Cari Obat</label>
                         <input type="text" name="txtstockcode" id="txtstockcode" class="form-control" autocomplete="off"
                           placeholder="Ketik nama obat..."
                           onkeyup="if (value.length > 0) { var regipoli = document.getElementById('hidmediroom').value; var regipaym = document.getElementById('hidregipaym').value; ambilresep(this.value,regipoli,regipaym); } else { document.getElementById('tblresep').innerHTML=''; document.getElementById('tblresep').style.display='none'; }">
-                        <div id="tblresep"></div>
+                        <div id="tblresep" class="search-dropdown" style="display:none;"></div>
                       </div>
 
                       <div class="form-group">
@@ -554,12 +508,12 @@ if (isset($_SESSION['username'])) {
                         <input type="text" name="txtstockquty" id="txtstockquty" value="1" class="form-control">
                       </div>
 
-                      <div class="form-group full">
+                      <div class="form-group full" style="position:relative;">
                         <label class="form-label">Signa</label>
                         <input type="text" name="txtsigna" id="txtsigna" autocomplete="off" class="form-control"
                           placeholder="Aturan makan..."
                           onkeyup="if (value.length > 0) { ambilsignacode(this.value); } else { document.getElementById('tblsigna').style.display='none'; }">
-                        <div id="tblsigna" style="display: none;"></div>
+                        <div id="tblsigna" class="search-dropdown" style="display: none; height: 200px;"></div>
                       </div>
 
                       <div class="form-group full">
@@ -619,13 +573,13 @@ if (isset($_SESSION['username'])) {
                         <input type="number" id="txtracikqty" class="form-control" value="1" min="1">
                       </div>
 
-                      <div class="form-group full" style="margin-bottom: 12px;">
+                      <div class="form-group full" style="margin-bottom: 12px; position:relative;">
                         <label class="form-label">Signa</label>
                         <input type="text" id="txtraciksigna" class="form-control" placeholder="Aturan makan..."
                           autocomplete="off"
                           onkeyup="if (value.length > 0) { ambilsignacode_racik(value); } else { document.getElementById('tblsigna_racik').style.display='none'; }">
 
-                        <div id="tblsigna_racik"></div>
+                        <div id="tblsigna_racik" class="search-dropdown" style="display: none; height: 200px;"></div>
 
                         <input type="hidden" id="hidraciksignacode">
                         <input type="hidden" id="hidracikusage">
@@ -650,12 +604,12 @@ if (isset($_SESSION['username'])) {
 
                       <div class="form-grid-3 racik">
 
-                        <div class="form-group">
+                        <div class="form-group" style="position: relative;">
                           <label class="form-label">Cari Obat</label>
-                          <input type="text" id="txtracikstockname" class="form-control" placeholder="Ketik nama obat..."
-                            autocomplete="off"
+                          <input type="text" id="txtracikstockname" class="form-control" style="width: 400px;"
+                            placeholder="Ketik nama obat..." autocomplete="off"
                             onkeyup="if (value.length > 0) { var regipoli = document.getElementById('hidmediroom').value; var regipaym = document.getElementById('hidregipaym').value; ambilresep_racik(this.value,regipoli,regipaym); } else { document.getElementById('tblresep_racik').innerHTML=''; document.getElementById('tblresep_racik').style.display='none'; }">
-                          <div id="tblresep_racik"></div>
+                          <div id="tblresep_racik" class="search-dropdown" style="display: none;"></div>
                           <input type="hidden" id="hidracikstockcode">
                           <input type="hidden" id="hidracikstockbtch">
                           <input type="hidden" id="hidracikstockpric">
