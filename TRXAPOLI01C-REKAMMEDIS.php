@@ -3,6 +3,27 @@ include "conf/config.php";
 ?>
 
 <link rel="stylesheet" href="assets/css/rekam-medis-table.css">
+<style>
+    .rm-lab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 4px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 8px;
+        background: #169C89;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .15s;
+    }
+
+    .rm-lab-btn:hover {
+        background: #0f7a6b;
+    }
+</style>
 <div class="rekam-medis-wrap">
   <table class="rekam-medis-table">
     <thead>
@@ -27,10 +48,25 @@ include "conf/config.php";
       );
 
       $koderm = $_POST['q'];
+      $page = isset($_POST['page']) ? max(1, intval($_POST['page'])) : 1;
+      $perpage = 1;
+      $offset = ($page - 1) * $perpage;
+
+      // Hitung total kunjungan untuk pagination
+      $countSql = "SELECT COUNT(*)
+          FROM trxaregi r
+          WHERE r.TRXA_PATI_CODE = '$koderm'
+            AND r.TRXA_REGI_STAT IN ('C','P','X')
+            AND r.TRXA_REGI_POLI <> '$code_lab_room'";
+      $total = (int) $db->query($countSql)->fetchColumn();
+      $totalPages = max(1, (int) ceil($total / $perpage));
+      if ($page > $totalPages) {
+        $page = $totalPages;
+        $offset = ($page - 1) * $perpage;
+      }
 
       // Penambahan subquery untuk mapping kolom TTV dan Hasil
-      $xquery = "
-      SELECT 
+      $xquery = "SELECT 
           r.TRXA_REGI_CODE AS REGI_CODE, 
           r.TRXA_PATI_CODE AS PATI_CODE, 
           r.TRXA_REGI_DATE, 
@@ -62,9 +98,10 @@ include "conf/config.php";
       ) d ON d.TRXA_EXAM_CODE = r.TRXA_REGI_CODE
       WHERE 
           r.TRXA_PATI_CODE = '$koderm' 
-          AND r.TRXA_REGI_STAT IN ('C','X')
+          AND r.TRXA_REGI_STAT IN ('C','P','X')
           AND r.TRXA_REGI_POLI <> '$code_lab_room'
       ORDER BY r.TRXA_REGI_DATE DESC
+      LIMIT $offset, $perpage
   ";
 
       $q = $db->query($xquery) or die("Gagal Ambil Data / Data Tidak di Temukan!!");
@@ -97,6 +134,20 @@ include "conf/config.php";
         // Variabel Tindak Lanjut
         $outcatatan = !empty($k['CATATAN']) ? $k['CATATAN'] : '';
         $outresep = !empty($k['RESEP']) ? $k['RESEP'] : '-';
+
+        // Cari registrasi laboratorium utk kunjungan ini (pasien + tanggal sama,
+        // hanya yang sudah punya hasil lab)
+        $labRegis = array();
+        $qlab = $db->prepare("SELECT r.TRXA_REGI_CODE FROM trxaregi r
+            WHERE r.TRXA_PATI_CODE = :pati AND r.TRXA_REGI_DATE = :tgl
+            AND r.TRXA_REGI_POLI = 'LB' AND r.TRXA_VIEW_STAT = 'Y'
+            AND EXISTS (
+                SELECT 1 FROM trxalabo_detail_hasil h
+                WHERE h.TRXA_LABO_REGI = r.TRXA_REGI_CODE AND h.HASIL_VIEW_STAT = 'Y'
+            )
+            ORDER BY r.TRXA_ENTR_TIME DESC");
+        $qlab->execute(array(':pati' => $k['PATI_CODE'], ':tgl' => $k['TRXA_REGI_DATE']));
+        $labRegis = $qlab->fetchAll(PDO::FETCH_COLUMN);
 
         echo '<tr>';
 
@@ -167,7 +218,17 @@ include "conf/config.php";
         echo '-<br>'; // Sementara diisi "-" sesuai request
       
         echo '<span class="label-bold">-Farmakoterapi</span><br>';
-        echo nl2br($outresep);
+        echo nl2br($outresep) . '<br>';
+
+        echo '<span class="label-bold">-Pemeriksaan Laboratorium</span><br>';
+        if (count($labRegis) > 0) {
+          foreach ($labRegis as $lcode) {
+            echo '<button type="button" class="rm-lab-btn" onclick="lihatHasilLab(\'' . htmlspecialchars($lcode) . '\')">
+                    <i class="bi bi-eyedropper"></i> Lihat Hasil Lab</button><br>';
+          }
+        } else {
+          echo '-';
+        }
         echo '</td>';
 
         echo '</tr>';
@@ -175,4 +236,44 @@ include "conf/config.php";
       ?>
     </tbody>
   </table>
+
+  <?php if ($total > 0) { ?>
+    <div class="table-pagination" id="rmPagination">
+      <?php
+      $prev = $page - 1;
+      $next = $page + 1;
+      $prevClass = $page <= 1 ? 'disabled' : '';
+      $nextClass = $page >= $totalPages ? 'disabled' : '';
+      ?>
+      <a href="#" class="<?php echo $prevClass; ?>" onclick="return goRekamMedisPage(event, <?php echo $prev; ?>);">&laquo;</a>
+
+      <?php
+      $start = max(1, $page - 2);
+      $end = min($totalPages, $page + 2);
+      if ($start > 1) {
+        echo '<a href="#" onclick="return goRekamMedisPage(event, 1);">1</a>';
+        if ($start > 2) {
+          echo '<span>&hellip;</span>';
+        }
+      }
+      for ($i = $start; $i <= $end; $i++) {
+        if ($i === $page) {
+          echo '<span class="active">' . $i . '</span>';
+        } else {
+          echo '<a href="#" onclick="return goRekamMedisPage(event, ' . $i . ');">' . $i . '</a>';
+        }
+      }
+      if ($end < $totalPages) {
+        if ($end < $totalPages - 1) {
+          echo '<span>&hellip;</span>';
+        }
+        echo '<a href="#" onclick="return goRekamMedisPage(event, ' . $totalPages . ');">' . $totalPages . '</a>';
+      }
+      ?>
+
+      <a href="#" class="<?php echo $nextClass; ?>" onclick="return goRekamMedisPage(event, <?php echo $next; ?>);">&raquo;</a>
+
+      <span class="trx06-info"><?php echo $total; ?> kunjungan &middot; hlm <?php echo $page; ?>/<?php echo $totalPages; ?></span>
+    </div>
+  <?php } ?>
 </div>

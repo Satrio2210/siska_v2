@@ -274,3 +274,22 @@ body {
     color: var(--bs-primary);
     font-weight: 600;
 }
+
+/* Memberikan ruang/indentasi untuk child submenu */
+.nav-sub-submenu {
+    list-style: none;
+    padding-left: 15px;
+    /* Geser menu ke dalam */
+    display: none;
+    /* Sembunyikan default jika menggunakan JS toggle */
+}
+
+/* Jika class 'active' atau 'open' ditambahkan via JS */
+.has-child.open>.nav-sub-submenu {
+    display: block;
+}
+
+.has-child.open>a .bi-chevron-down {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}

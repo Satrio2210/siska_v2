@@ -152,6 +152,45 @@ body {
   grid-column: 1 / -1;
 }
 
+.checkbox-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.checkbox-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 7px 12px;
+  transition: .2s;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.checkbox-modern input[type="radio"] {
+  accent-color: #169C89;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.checkbox-modern:has(input:checked) {
+  background: #e6f4f2;
+  border-color: #169C89;
+  color: #0f766e;
+  font-weight: 600;
+}
+
 textarea.form-control {
   height: 60px;
   padding-top: 12px;

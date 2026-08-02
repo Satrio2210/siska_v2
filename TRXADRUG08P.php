@@ -37,6 +37,8 @@ if ($jenis == "B") {
     $nama_jenis = "UMUM";
 }
 
+$info_dokter = $dokter != '' ? ' | DOKTER: ' . $dokter : '';
+
 $xquery = "SELECT
             TRXA_PRSC_CODE,
             trxaregi.TRXA_PATI_CODE AS PATI_CODE,
@@ -79,13 +81,13 @@ $xquery = "SELECT
         JOIN passiden
             ON trxaprsc.TRXA_PRSC_DOCT = passiden.PASS_USER_IDEN
 
-        JOIN invemast
+        LEFT JOIN invemast
             ON trxaprsc.TRXA_STOCK_CODE = invemast.INVE_MAST_CODE
 
-        JOIN tblispec
+        LEFT JOIN tblispec
             ON invemast.INVE_MAIN_SPEC = tblispec.TBLI_SPEC_CODE
 
-        JOIN tbliunit
+        LEFT JOIN tbliunit
             ON invemast.INVE_SALE_UNIT = tbliunit.TBLI_UNIT_CODE
 
         WHERE
@@ -107,7 +109,7 @@ echo "
     <th colspan='7'>
         REPORT RESEP HARIAN<br>
         $startdate s/d $enddate<br>
-        JENIS PASIEN - $nama_jenis<?php echo $dokter != '' ? ' | DOKTER: ' . $dokter : ''; ?>
+        JENIS PASIEN - $nama_jenis$info_dokter
     </th>
 </tr>
 
@@ -142,7 +144,7 @@ while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
 
     $price_ritel = pembulatan($xint);
 
-    $subtotal = $price_ritel * $qtyy;
+    $subtotal = pembulatan($price_ritel * $qtyy);
 
     $grandtotal += $subtotal;
 
@@ -169,7 +171,7 @@ while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
 
 echo "
 <tr>
-    <td colspan='5' align='right'><b>TOTAL</b></td>
+    <td colspan='6' align='right'><b>TOTAL</b></td>
     <td><b>" . number_format($grandtotal, 0, ',', '.') . "</b></td>
     <td></td>
 </tr>

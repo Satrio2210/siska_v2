@@ -1027,6 +1027,23 @@ if (isset($_SESSION['username'])) {
       <span class="labelTime Time" id="timestamp"></span>
     </div>
 
+    <!-- Modal Hasil Laboratorium -->
+    <div class="modal fade" id="modalHasilLab" tabindex="-1" aria-labelledby="modalHasilLabLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header" style="background: #f0fdfa; border-bottom: 2px solid #10b981;">
+            <h5 class="modal-title" id="modalHasilLabLabel" style="font-weight:700; color:#0f766e;">
+              <i class="bi bi-eyedropper"></i> Hasil Pemeriksaan Laboratorium
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="modalHasilLabBody" style="background:#f8fafc; padding:16px;">
+            <div style="text-align:center;color:#9ca3af;padding:30px;">Memuat data...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     </div>
     </div>
     <script src="js/TRXAPOLI01.js"></script>

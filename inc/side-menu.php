@@ -2,7 +2,7 @@
 <aside id="sidebar">
     <!-- Sidebar Header / Logo -->
     <div class="sidebar-header">
-        <a href="#" class="d-flex align-items-center text-decoration-none text-reset">
+        <a href="index.php" class="d-flex align-items-center text-decoration-none text-reset">
             <i class="bi bi-person-lines-fill text-primary fs-3 me-2"></i>
             <span class="brand-name fs-5 fw-bold text-gradient"><?php echo $_SESSION['username']; ?></span>
         </a>
@@ -103,8 +103,22 @@
                             class="bi bi-caret-right"></i>Penjualan Obat</a></li>
                 <li><a href="TRXADRUG03.php" class="nav-link-custom submenu-link"><i
                             class="bi bi-caret-right"></i>Faktur</a></li>
-                <li><a href="TRXADRUG04.php" class="nav-link-custom submenu-link"><i
-                            class="bi bi-caret-right"></i>Report</a></li>
+                <li class="has-child">
+                    <a href="javascript:void(0)" class="nav-link-custom submenu-link"><i
+                            class="bi bi-caret-right"></i>Report</a>
+                    <ul class="nav-sub-submenu ms-3">
+                        <li>
+                            <a href="TRXADRUG04.php" class="nav-link-custom submenu-link">
+                                <i class="bi bi-caret-right"></i>Obat
+                            </a>
+                        </li>
+                        <li>
+                            <a href="TRXADRUG08.php" class="nav-link-custom submenu-link">
+                                <i class="bi bi-caret-right"></i>Resep
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </div>
 

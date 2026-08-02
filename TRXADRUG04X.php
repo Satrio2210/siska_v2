@@ -63,6 +63,7 @@ FROM trxaprsc p
 LEFT JOIN invemast m
     ON p.TRXA_STOCK_CODE = m.INVE_MAST_CODE
 WHERE p.TRXA_VIEW_STAT = 'Y'
+AND p.TRXA_PRSC_STAT = 'P'
 AND p.TRXA_ENTR_DATE BETWEEN '$startdate' AND '$enddate'
 GROUP BY
     p.TRXA_STOCK_CODE,

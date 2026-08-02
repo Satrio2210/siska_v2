@@ -716,22 +716,33 @@ function isiexamanam(outexamanam) {
 // tabel Rekam Medis Pasien
 var rekamku;
 
-function ambilrekammedis(rekammedis) {
+function ambilrekammedis(rekammedis, page) {
   if (!document.getElementById('tblrekammedis')) return;
   if (rekammedis.length > 10) {
     document.getElementById("tblrekammedis").style.visibility = "hidden";
   }
   else {
+    if (typeof page === 'undefined' || page === null) { page = 1; }
     rekamku = buatajaxrekammedis();
     var url = "TRXAPOLI01C-REKAMMEDIS.php";
     rekamku.onreadystatechange = stateChangedrekammedis;
-    var params = "q=" + rekammedis;
+    var params = "q=" + rekammedis + "&page=" + page;
     rekamku.open("POST", url, true);
     rekamku.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     rekamku.setRequestHeader("Content-length", params.length);
     rekamku.setRequestHeader("Connection", "close");
     rekamku.send(params);
   }
+}
+
+function goRekamMedisPage(e, page) {
+  if (e && e.preventDefault) { e.preventDefault(); }
+  if (page < 1) { return false; }
+  var patiEl = document.getElementById('txtpaticode');
+  var pati = patiEl ? patiEl.value : '';
+  if (!pati) { return false; }
+  ambilrekammedis(pati, page);
+  return false;
 }
 
 function buatajaxrekammedis() {
@@ -1212,3 +1223,44 @@ document.addEventListener('click', function (e) {
     }, 500);
   }
 })();
+
+// ============================================
+// MODAL HASIL LABORATORIUM (dari rekam medis)
+// ============================================
+var hasilLabModalInstance = null;
+
+function lihatHasilLab(labregi) {
+  if (!labregi) return;
+  var body = document.getElementById('modalHasilLabBody');
+  if (!body) return;
+
+  body.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px;">Memuat data...</div>';
+
+  if (!hasilLabModalInstance) {
+    var el = document.getElementById('modalHasilLab');
+    if (window.bootstrap && el) {
+      hasilLabModalInstance = new bootstrap.Modal(el);
+    }
+  }
+
+  $.ajax({
+    url: "TRXAPOLI01C-REKAMMEDIS-LAB.php",
+    type: "POST",
+    data: { q: labregi },
+    success: function (data) {
+      if (data && data.length > 0) {
+        body.innerHTML = data;
+      } else {
+        body.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px;">Data hasil lab tidak ditemukan.</div>';
+      }
+    },
+    error: function () {
+      body.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:30px;">Gagal memuat data hasil lab.</div>';
+    }
+  });
+
+  if (hasilLabModalInstance) {
+    hasilLabModalInstance.show();
+  }
+}
+

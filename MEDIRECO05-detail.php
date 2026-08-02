@@ -2,6 +2,7 @@
 <?php
 include "conf/config.php";
 include "inc/sanie.php";
+include "inc/lab_filter_rujukan.php";
 session_start();
 
 if (!isset($_SESSION['username'])) {
@@ -59,13 +60,17 @@ $genderIcon = ($maingend === 'M') ? 'bi-gender-male' : (($maingend === 'F') ? 'b
 $bloodLabel = (!empty($mainblod) && $mainblod !== 'X') ? $mainblod : 'N/A';
 
 $nama_hari_id = [
-  1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis',
-  5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+  1 => 'Senin',
+  2 => 'Selasa',
+  3 => 'Rabu',
+  4 => 'Kamis',
+  5 => 'Jumat',
+  6 => 'Sabtu',
+  7 => 'Minggu'
 ];
 
 // --- Riwayat kunjungan ---
-$stV = $db->prepare("
-  SELECT
+$stV = $db->prepare("SELECT
     r.TRXA_REGI_CODE AS REGI_CODE,
     r.TRXA_REGI_DATE,
     r.TRXA_REGI_DOCT,
@@ -96,11 +101,10 @@ $stV = $db->prepare("
     GROUP BY TRXA_EXAM_CODE
   ) d ON d.TRXA_EXAM_CODE = r.TRXA_REGI_CODE
   WHERE r.TRXA_PATI_CODE = :code
-    AND r.TRXA_REGI_STAT IN ('C','X')
-    AND r.TRXA_REGI_POLI <> :lab
+    AND r.TRXA_REGI_STAT IN ('C','P','X')
   ORDER BY r.TRXA_REGI_DATE DESC, r.TRXA_REGI_CODE DESC
 ");
-$stV->execute([':code' => $paticode, ':lab' => $code_lab_room]);
+$stV->execute([':code' => $paticode]);
 $visits = $stV->fetchAll(PDO::FETCH_ASSOC);
 
 // pilih visit aktif
@@ -122,13 +126,15 @@ if (count($visits) > 0) {
 
 function rm05_val($v, $suffix = '')
 {
-  if ($v === null || $v === '') return '-';
+  if ($v === null || $v === '')
+    return '-';
   return htmlspecialchars($v, ENT_QUOTES, 'UTF-8') . $suffix;
 }
 
 function rm05_text($v)
 {
-  if ($v === null || $v === '') return '-';
+  if ($v === null || $v === '')
+    return '-';
   return nl2br(htmlspecialchars($v, ENT_QUOTES, 'UTF-8'));
 }
 ?>
@@ -153,12 +159,14 @@ function rm05_text($v)
       --rm05-tosca: #169C89;
       --rm05-tosca-dark: #0f7a6b;
     }
+
     .rm05-profile {
       display: flex;
       gap: 20px;
       align-items: flex-start;
       flex-wrap: wrap;
     }
+
     .rm05-avatar {
       width: 96px;
       height: 96px;
@@ -168,10 +176,12 @@ function rm05_text($v)
       background: #e5e7eb;
       flex-shrink: 0;
     }
+
     .rm05-profile-main {
       flex: 1;
       min-width: 220px;
     }
+
     .rm05-name {
       font-size: 22px;
       font-weight: 700;
@@ -182,14 +192,22 @@ function rm05_text($v)
       gap: 10px;
       flex-wrap: wrap;
     }
-    .rm05-name .bi-gender-male { color: #2563eb; }
-    .rm05-name .bi-gender-female { color: #db2777; }
+
+    .rm05-name .bi-gender-male {
+      color: #2563eb;
+    }
+
+    .rm05-name .bi-gender-female {
+      color: #db2777;
+    }
+
     .rm05-meta {
       color: #64748b;
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 10px;
     }
+
     .rm05-info-row {
       display: flex;
       flex-wrap: wrap;
@@ -198,10 +216,12 @@ function rm05_text($v)
       color: #374151;
       font-weight: 500;
     }
+
     .rm05-info-row i {
       color: var(--rm05-tosca);
       margin-right: 6px;
     }
+
     .rm05-blood {
       display: inline-flex;
       align-items: center;
@@ -213,15 +233,20 @@ function rm05_text($v)
       padding: 4px 10px;
       border-radius: 999px;
     }
+
     .rm05-split {
       display: grid;
       grid-template-columns: 280px 1fr;
       gap: 16px;
       align-items: start;
     }
+
     @media (max-width: 992px) {
-      .rm05-split { grid-template-columns: 1fr; }
+      .rm05-split {
+        grid-template-columns: 1fr;
+      }
     }
+
     .rm05-visit-list {
       display: flex;
       flex-direction: column;
@@ -230,6 +255,7 @@ function rm05_text($v)
       overflow-y: auto;
       padding-right: 4px;
     }
+
     .rm05-visit-card {
       display: block;
       text-decoration: none;
@@ -240,30 +266,36 @@ function rm05_text($v)
       color: #374151;
       transition: .15s;
     }
+
     .rm05-visit-card:hover {
       border-color: #9ca3af;
       color: #111827;
     }
+
     .rm05-visit-card.active {
       border-color: var(--rm05-tosca);
       background: #fff;
       box-shadow: 0 2px 8px rgba(22, 156, 137, 0.15);
     }
+
     .rm05-visit-card .v-date {
       font-weight: 700;
       font-size: 13px;
       margin-bottom: 4px;
     }
+
     .rm05-visit-card .v-poli {
       font-size: 12px;
       color: #64748b;
       font-weight: 500;
     }
+
     .rm05-visit-card .v-doc {
       font-size: 12px;
       color: #6b7280;
       margin-top: 4px;
     }
+
     .rm05-detail-head {
       display: flex;
       justify-content: space-between;
@@ -272,6 +304,7 @@ function rm05_text($v)
       flex-wrap: wrap;
       margin-bottom: 14px;
     }
+
     .rm05-visit-banner {
       background: var(--rm05-tosca);
       color: #fff;
@@ -281,20 +314,26 @@ function rm05_text($v)
       font-size: 15px;
       margin-bottom: 8px;
     }
+
     .rm05-doct {
       font-size: 13px;
       color: #64748b;
       font-weight: 600;
       margin-bottom: 16px;
     }
+
     .rm05-blocks {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
     }
+
     @media (max-width: 1100px) {
-      .rm05-blocks { grid-template-columns: 1fr; }
+      .rm05-blocks {
+        grid-template-columns: 1fr;
+      }
     }
+
     .rm05-block {
       background: #f9fafb;
       border: 1px solid #e5e7eb;
@@ -302,6 +341,7 @@ function rm05_text($v)
       padding: 14px;
       min-height: 180px;
     }
+
     .rm05-block h4 {
       font-size: 14px;
       font-weight: 700;
@@ -310,34 +350,43 @@ function rm05_text($v)
       padding-bottom: 8px;
       border-bottom: 2px solid #d1fae5;
     }
+
     .rm05-kv {
       width: 100%;
       border-collapse: collapse;
       font-size: 13px;
     }
+
     .rm05-kv td {
       padding: 4px 0;
       vertical-align: top;
       color: #1f2937;
       font-weight: 500;
     }
+
     .rm05-kv td.lbl {
       width: 110px;
       font-weight: 700;
       color: #4b5563;
       white-space: nowrap;
     }
+
     .rm05-kv td.sep {
       width: 10px;
       color: #9ca3af;
     }
+
     .rm05-section-label {
       font-weight: 700;
       color: #374151;
       font-size: 13px;
       margin: 10px 0 4px;
     }
-    .rm05-section-label:first-child { margin-top: 0; }
+
+    .rm05-section-label:first-child {
+      margin-top: 0;
+    }
+
     .rm05-section-body {
       font-size: 13px;
       color: #1f2937;
@@ -345,6 +394,45 @@ function rm05_text($v)
       line-height: 1.45;
       margin-bottom: 6px;
     }
+
+    .rm05-lab-wrap {
+      background: #fff;
+    }
+
+    .rm05-labtable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      margin: 4px 0 14px;
+    }
+
+    .rm05-labtable th {
+      background: #169C89;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 8px 10px;
+      text-align: center;
+      border: none;
+    }
+
+    .rm05-labtable td {
+      padding: 7px 10px;
+      text-align: center;
+      color: #1f2937;
+      font-weight: 500;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: middle;
+    }
+
+    .rm05-labtable tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    .rm05-labtable td.rm05-abn {
+      font-weight: 700;
+    }
+
     .rm05-back {
       display: inline-flex;
       align-items: center;
@@ -355,21 +443,46 @@ function rm05_text($v)
       text-decoration: none;
       font-size: 14px;
     }
-    .rm05-back:hover { color: var(--rm05-tosca-dark); }
+
+    .rm05-back:hover {
+      color: var(--rm05-tosca-dark);
+    }
+
     .rm05-empty-visit {
       text-align: center;
       padding: 40px 16px;
       color: #94a3b8;
       font-weight: 500;
     }
+
     @media print {
-      #sidebar, .header, .footerdate, .footertime, .rm05-back, .rm05-no-print {
+
+      #sidebar,
+      .header,
+      .footerdate,
+      .footertime,
+      .rm05-back,
+      .rm05-no-print {
         display: none !important;
       }
-      #content-wrapper { margin: 0 !important; width: 100% !important; }
-      .rm05-split { grid-template-columns: 1fr; }
-      .rm05-visit-list { display: none; }
-      .card-modern { box-shadow: none; border: 1px solid #ccc; }
+
+      #content-wrapper {
+        margin: 0 !important;
+        width: 100% !important;
+      }
+
+      .rm05-split {
+        grid-template-columns: 1fr;
+      }
+
+      .rm05-visit-list {
+        display: none;
+      }
+
+      .card-modern {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
     }
   </style>
 </head>
@@ -402,9 +515,8 @@ function rm05_text($v)
           <div class="card-modern">
             <div class="rm05-profile">
               <img class="rm05-avatar"
-                   src="https://placehold.co/96x96/e5e7eb/64748b?text=<?php echo urlencode(mb_substr($mainname, 0, 1)); ?>"
-                   alt="Foto Pasien"
-                   onerror="this.src='assets/img/logo.png'">
+                src="https://placehold.co/96x96/e5e7eb/64748b?text=<?php echo urlencode(mb_substr($mainname, 0, 1)); ?>"
+                alt="Foto Pasien" onerror="this.src='assets/img/logo.png'">
               <div class="rm05-profile-main">
                 <h2 class="rm05-name">
                   <?php echo htmlspecialchars($mainname, ENT_QUOTES, 'UTF-8'); ?>
@@ -416,9 +528,12 @@ function rm05_text($v)
                   &nbsp;·&nbsp; <?php echo $genderLabel; ?>
                 </div>
                 <div class="rm05-info-row">
-                  <span><i class="bi bi-geo-alt-fill"></i><?php echo htmlspecialchars($mainaddr ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
-                  <span><i class="bi bi-phone-fill"></i><?php echo htmlspecialchars($mainphne ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
-                  <span class="rm05-blood"><i class="bi bi-droplet-fill"></i> Blood Type: <?php echo htmlspecialchars($bloodLabel, ENT_QUOTES, 'UTF-8'); ?></span>
+                  <span><i
+                      class="bi bi-geo-alt-fill"></i><?php echo htmlspecialchars($mainaddr ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
+                  <span><i
+                      class="bi bi-phone-fill"></i><?php echo htmlspecialchars($mainphne ?: '-', ENT_QUOTES, 'UTF-8'); ?></span>
+                  <span class="rm05-blood"><i class="bi bi-droplet-fill"></i> Blood Type:
+                    <?php echo htmlspecialchars($bloodLabel, ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
               </div>
             </div>
@@ -441,14 +556,16 @@ function rm05_text($v)
                     $poli = $v['POLI_NAME'] ?: ($v['TRXA_REGI_POLI'] ?: '-');
                     $doc = $v['DOCT_NAME'] ?: '-';
                     $href = 'MEDIRECO05-detail.php?id=' . urlencode($paticode) . '&visit_id=' . urlencode($vid);
-                ?>
-                  <a href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>"
-                     class="rm05-visit-card<?php echo $isActive ? ' active' : ''; ?>">
-                    <div class="v-date"><?php echo htmlspecialchars($tgl, ENT_QUOTES, 'UTF-8'); ?></div>
-                    <div class="v-poli"><i class="bi bi-hospital"></i> <?php echo htmlspecialchars($poli, ENT_QUOTES, 'UTF-8'); ?></div>
-                    <div class="v-doc"><i class="bi bi-person-badge"></i> <?php echo htmlspecialchars($doc, ENT_QUOTES, 'UTF-8'); ?></div>
-                  </a>
-                <?php }
+                    ?>
+                    <a href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>"
+                      class="rm05-visit-card<?php echo $isActive ? ' active' : ''; ?>">
+                      <div class="v-date"><?php echo htmlspecialchars($tgl, ENT_QUOTES, 'UTF-8'); ?></div>
+                      <div class="v-poli"><i class="bi bi-hospital"></i>
+                        <?php echo htmlspecialchars($poli, ENT_QUOTES, 'UTF-8'); ?></div>
+                      <div class="v-doc"><i class="bi bi-person-badge"></i>
+                        <?php echo htmlspecialchars($doc, ENT_QUOTES, 'UTF-8'); ?></div>
+                    </a>
+                  <?php }
                 } ?>
               </div>
             </div>
@@ -465,21 +582,55 @@ function rm05_text($v)
                 $doctBanner = $av['DOCT_NAME'] ?: '-';
 
                 $outtinggi = rm05_val($av['TINGGI'], ' cm');
-                $outberat  = rm05_val($av['BERAT'], ' kg');
-                $outlp     = rm05_val($av['LP'], ' cm');
-                $outimt    = rm05_val($av['IMT'], ' kg.m2');
-                $outdarah  = rm05_val($av['DARAH'], ' mmHg');
-                $outsuhu   = !empty($av['SUHU']) ? htmlspecialchars($av['SUHU'], ENT_QUOTES, 'UTF-8') . ' °C' : '-';
-                $outrr     = rm05_val($av['RR'], ' /minute');
-                $outhr     = rm05_val($av['HR'], ' bpm');
+                $outberat = rm05_val($av['BERAT'], ' kg');
+                $outlp = rm05_val($av['LP'], ' cm');
+                $outimt = rm05_val($av['IMT'], ' kg.m2');
+                $outdarah = rm05_val($av['DARAH'], ' mmHg');
+                $outsuhu = !empty($av['SUHU']) ? htmlspecialchars($av['SUHU'], ENT_QUOTES, 'UTF-8') . ' °C' : '-';
+                $outrr = rm05_val($av['RR'], ' /minute');
+                $outhr = rm05_val($av['HR'], ' bpm');
 
-                $outkeluhan  = rm05_text($av['KELUHAN']);
+                $outkeluhan = rm05_text($av['KELUHAN']);
                 $outanamnesa = rm05_text($av['ANAMNESA']);
-                $outbody     = rm05_text($av['BODY']);
+                $outbody = rm05_text($av['BODY']);
                 $outdiagnosa = !empty($av['DIAGNOSA']) ? $av['DIAGNOSA'] : '-';
-                $outcatatan  = rm05_text($av['CATATAN']);
-                $outresep    = rm05_text($av['RESEP']);
-              ?>
+                $outcatatan = rm05_text($av['CATATAN']);
+                $outresep = rm05_text($av['RESEP']);
+
+                // Kunjungan Laboratorium: tampilkan hasil lab, bukan TTV/pemeriksaan
+                $isLabVisit = (isset($av['TRXA_REGI_POLI']) && $av['TRXA_REGI_POLI'] === $code_lab_room);
+
+                // umur & gender pasien untuk filter rujukan lab
+                $pati_umur = null;
+                if (!empty($mainbirt) && $mainbirt !== '0000-00-00') {
+                    try {
+                        $lahir = new DateTime($mainbirt);
+                        $pati_umur = (int) $today->diff($lahir)->y;
+                    } catch (Exception $e) {
+                        $pati_umur = null;
+                    }
+                }
+                $pati_gend = strtoupper(trim((string) $maingend));
+
+                $labGroups = array();
+                if ($isLabVisit) {
+                    $stLab = $db->prepare("SELECT h.TRXA_MEDI_CODE AS MEDI_CODE,
+                            COALESCE(m.TBLF_MEDI_NAME, h.TRXA_MEDI_CODE, h.TEMP_CODE, 'HASIL LAB') AS MEDI_NAME,
+                            h.ITEM_NAME, h.ITEM_HASIL, h.ITEM_SATUAN, h.ITEM_RUJUKAN, h.ITEM_NOTE
+                        FROM trxalabo_detail_hasil h
+                        LEFT JOIN tblfmedi m ON m.TBLF_MEDI_CODE = h.TRXA_MEDI_CODE
+                        WHERE h.TRXA_LABO_REGI = :regi AND h.HASIL_VIEW_STAT = 'Y'
+                        ORDER BY h.TRXA_MEDI_CODE, h.ITEM_URUT, h.HASIL_ID");
+                    $stLab->execute(array(':regi' => $av['REGI_CODE']));
+                    foreach ($stLab->fetchAll(PDO::FETCH_ASSOC) as $hl) {
+                        $grpKey = $hl['MEDI_CODE'] ?: '_root';
+                        if (!isset($labGroups[$grpKey])) {
+                            $labGroups[$grpKey] = array('name' => $hl['MEDI_NAME'], 'items' => array());
+                        }
+                        $labGroups[$grpKey]['items'][] = $hl;
+                    }
+                }
+                ?>
                 <div class="rm05-detail-head">
                   <div class="card-title" style="margin-bottom:0;">Detail Kunjungan</div>
                   <button type="button" class="btn-modern btn-print rm05-no-print" onclick="window.print();">
@@ -497,48 +648,125 @@ function rm05_text($v)
                   Dokter Pemeriksa: <strong><?php echo htmlspecialchars($doctBanner, ENT_QUOTES, 'UTF-8'); ?></strong>
                 </div>
 
-                <div class="rm05-blocks">
-                  <!-- TTV -->
-                  <div class="rm05-block">
-                    <h4><i class="bi bi-heart-pulse"></i> Tanda-tanda Vital</h4>
-                    <table class="rm05-kv">
-                      <tr><td class="lbl">Tinggi</td><td class="sep">:</td><td><?php echo $outtinggi; ?></td></tr>
-                      <tr><td class="lbl">BB</td><td class="sep">:</td><td><?php echo $outberat; ?></td></tr>
-                      <tr><td class="lbl">LP</td><td class="sep">:</td><td><?php echo $outlp; ?></td></tr>
-                      <tr><td class="lbl">IMT</td><td class="sep">:</td><td><?php echo $outimt; ?></td></tr>
-                      <tr><td class="lbl">TD</td><td class="sep">:</td><td><?php echo $outdarah; ?></td></tr>
-                      <tr><td class="lbl">Suhu</td><td class="sep">:</td><td><?php echo $outsuhu; ?></td></tr>
-                      <tr><td class="lbl">RR</td><td class="sep">:</td><td><?php echo $outrr; ?></td></tr>
-                      <tr><td class="lbl">HR</td><td class="sep">:</td><td><?php echo $outhr; ?></td></tr>
-                    </table>
+                <?php if ($isLabVisit) { ?>
+                  <!-- Hasil Laboratorium -->
+                  <div class="rm05-lab-wrap">
+                    <div class="rm05-section-label" style="margin-top:0;">Hasil Pemeriksaan Laboratorium</div>
+                    <?php if (count($labGroups) === 0) { ?>
+                      <div class="rm05-empty-visit">Belum ada hasil laboratorium yang diinput.</div>
+                    <?php } else {
+                      foreach ($labGroups as $grp) {
+                        $no = 0; ?>
+                        <div class="rm05-section-label"><?php echo htmlspecialchars($grp['name'], ENT_QUOTES, 'UTF-8'); ?></div>
+                        <table class="rm05-labtable">
+                          <thead>
+                            <tr>
+                              <th>No</th>
+                              <th>Item</th>
+                              <th>Hasil</th>
+                              <th>Satuan</th>
+                              <th>Nilai Normal</th>
+                              <th>Keterangan</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <?php foreach ($grp['items'] as $it) {
+                              $no++;
+                              $rujukan = filter_lab_rujukan($it['ITEM_RUJUKAN'], $pati_umur, $pati_gend);
+                              $hasil = format_lab_hasil_flag($it['ITEM_HASIL'], $rujukan);
+                              $isAbn = is_lab_hasil_abnormal($it['ITEM_HASIL'], $rujukan);
+                              $rujukan = str_replace(array("\r\n", "\n", "\r"), ' / ', (string) $rujukan);
+                              ?>
+                              <tr>
+                                <td><?php echo $no; ?></td>
+                                <td style="text-align:left;"><?php echo htmlspecialchars($it['ITEM_NAME'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td class="<?php echo $isAbn ? 'rm05-abn' : ''; ?>"><?php echo htmlspecialchars($hasil, ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($it['ITEM_SATUAN'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($rujukan, ENT_QUOTES, 'UTF-8'); ?></td>
+                                <td><?php echo htmlspecialchars($it['ITEM_NOTE'], ENT_QUOTES, 'UTF-8'); ?></td>
+                              </tr>
+                            <?php } ?>
+                          </tbody>
+                        </table>
+                      <?php }
+                    } ?>
                   </div>
+                <?php } else { ?>
+                  <div class="rm05-blocks">
+                    <!-- TTV -->
+                    <div class="rm05-block">
+                      <h4><i class="bi bi-heart-pulse"></i> Tanda-tanda Vital</h4>
+                      <table class="rm05-kv">
+                        <tr>
+                          <td class="lbl">Tinggi</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outtinggi; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">BB</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outberat; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">LP</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outlp; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">IMT</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outimt; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">TD</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outdarah; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">Suhu</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outsuhu; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">RR</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outrr; ?></td>
+                        </tr>
+                        <tr>
+                          <td class="lbl">HR</td>
+                          <td class="sep">:</td>
+                          <td><?php echo $outhr; ?></td>
+                        </tr>
+                      </table>
+                    </div>
 
-                  <!-- Pemeriksaan & Diagnosa -->
-                  <div class="rm05-block">
-                    <h4><i class="bi bi-clipboard2-check"></i> Pemeriksaan &amp; Diagnosa</h4>
-                    <div class="rm05-section-label">Keluhan</div>
-                    <div class="rm05-section-body"><?php echo $outkeluhan; ?></div>
-                    <div class="rm05-section-label">Anamnesa</div>
-                    <div class="rm05-section-body"><?php echo $outanamnesa; ?></div>
-                    <div class="rm05-section-label">Pemeriksaan Fisik</div>
-                    <div class="rm05-section-body"><?php echo $outbody; ?></div>
-                    <div class="rm05-section-label">Diagnosa (ICD)</div>
-                    <div class="rm05-section-body"><?php echo $outdiagnosa; ?></div>
-                  </div>
+                    <!-- Pemeriksaan & Diagnosa -->
+                    <div class="rm05-block">
+                      <h4><i class="bi bi-clipboard2-check"></i> Pemeriksaan &amp; Diagnosa</h4>
+                      <div class="rm05-section-label">Keluhan</div>
+                      <div class="rm05-section-body"><?php echo $outkeluhan; ?></div>
+                      <div class="rm05-section-label">Anamnesa</div>
+                      <div class="rm05-section-body"><?php echo $outanamnesa; ?></div>
+                      <div class="rm05-section-label">Pemeriksaan Fisik</div>
+                      <div class="rm05-section-body"><?php echo $outbody; ?></div>
+                      <div class="rm05-section-label">Diagnosa (ICD)</div>
+                      <div class="rm05-section-body"><?php echo $outdiagnosa; ?></div>
+                    </div>
 
-                  <!-- Tindakan & Obat -->
-                  <div class="rm05-block">
-                    <h4><i class="bi bi-capsule"></i> Tindakan &amp; Obat</h4>
-                    <?php if ($av['CATATAN'] !== null && $av['CATATAN'] !== '') { ?>
-                      <div class="rm05-section-label">Catatan</div>
-                      <div class="rm05-section-body"><?php echo $outcatatan; ?></div>
-                    <?php } ?>
-                    <div class="rm05-section-label">Non-Farmakologis</div>
-                    <div class="rm05-section-body">-</div>
-                    <div class="rm05-section-label">Farmakoterapi</div>
-                    <div class="rm05-section-body"><?php echo $outresep; ?></div>
+                    <!-- Tindakan & Obat -->
+                    <div class="rm05-block">
+                      <h4><i class="bi bi-capsule"></i> Tindakan &amp; Obat</h4>
+                      <?php if ($av['CATATAN'] !== null && $av['CATATAN'] !== '') { ?>
+                        <div class="rm05-section-label">Catatan</div>
+                        <div class="rm05-section-body"><?php echo $outcatatan; ?></div>
+                      <?php } ?>
+                      <div class="rm05-section-label">Non-Farmakologis</div>
+                      <div class="rm05-section-body">-</div>
+                      <div class="rm05-section-label">Farmakoterapi</div>
+                      <div class="rm05-section-body"><?php echo $outresep; ?></div>
+                    </div>
                   </div>
-                </div>
+                <?php } ?>
               <?php } ?>
             </div>
           </div>

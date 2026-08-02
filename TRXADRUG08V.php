@@ -12,7 +12,8 @@ $dokter = $_POST['dokter'];
 //$kode = 'ACC';
 list($startdate, $enddate) = explode("|", $fulldate);
 ?>
-<table class="pure-table pure-table-horizontal">
+<div class="table-wrapper">
+  <table class="modern-table">
     <thead>
         <tr>
             <th style="width: 150px">Tanggal</th>
@@ -79,11 +80,11 @@ list($startdate, $enddate) = explode("|", $fulldate);
             patimast ON trxaregi.TRXA_PATI_CODE = patimast.PATI_MAST_CODE
         JOIN 
             passiden ON trxaprsc.TRXA_PRSC_DOCT = passiden.PASS_USER_IDEN
-        JOIN 
+        LEFT JOIN 
             invemast ON trxaprsc.TRXA_STOCK_CODE = invemast.INVE_MAST_CODE
-        JOIN 
+        LEFT JOIN 
             tblispec ON invemast.INVE_MAIN_SPEC = tblispec.TBLI_SPEC_CODE
-        JOIN 
+        LEFT JOIN 
             tbliunit ON invemast.INVE_SALE_UNIT = tbliunit.TBLI_UNIT_CODE
         WHERE 
             trxaprsc.TRXA_PRSC_STAT IN ('A', 'I', 'P') 
@@ -134,11 +135,11 @@ list($startdate, $enddate) = explode("|", $fulldate);
             patimast ON trxaregi.TRXA_PATI_CODE = patimast.PATI_MAST_CODE
         JOIN 
             passiden ON trxaprsc.TRXA_PRSC_DOCT = passiden.PASS_USER_IDEN
-        JOIN 
+        LEFT JOIN 
             invemast ON trxaprsc.TRXA_STOCK_CODE = invemast.INVE_MAST_CODE
-        JOIN 
+        LEFT JOIN 
             tblispec ON invemast.INVE_MAIN_SPEC = tblispec.TBLI_SPEC_CODE
-        JOIN 
+        LEFT JOIN 
             tbliunit ON invemast.INVE_SALE_UNIT = tbliunit.TBLI_UNIT_CODE
         WHERE 
             trxaprsc.TRXA_PRSC_STAT IN ('A', 'I', 'P') 
@@ -158,7 +159,7 @@ list($startdate, $enddate) = explode("|", $fulldate);
         $grandtotal = 0;
 
         while ($k = $q->fetch(PDO::FETCH_ASSOC)) {
-            echo '';
+            echo '<tr>';
 
             $jenispym = $k['PATI_PAYM'];
             $paym = '';
@@ -207,14 +208,17 @@ list($startdate, $enddate) = explode("|", $fulldate);
 
 
 
-        <td style="text-align:right;">
-            <b>Total - Rp. <?php echo number_format($grandtotal, 0, ',', '.'); ?></b>
-        </td>
+        <tr style="background:#e8e8e8;font-weight:bold;">
+            <td colspan="6" style="text-align:right;">
+                TOTAL
+            </td>
+            <td style="text-align:right;">
+                Rp. <?php echo number_format($grandtotal, 0, ',', '.'); ?>
+            </td>
+            <td></td>
+        </tr>
 
-        <td></td>
-
-        <?php
-        ?>
-    </tbody>
-</table>
+        </tbody>
+  </table>
+</div>
 

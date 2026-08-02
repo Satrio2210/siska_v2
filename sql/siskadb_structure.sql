@@ -2,7 +2,7 @@
 -- Host:                         127.0.0.1
 -- Server version:               8.0.30 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.17.0.7270
+-- HeidiSQL Version:             12.20.0.7320
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -13,6 +13,11 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+-- Dumping database structure for siskadb
+CREATE DATABASE IF NOT EXISTS `siskadb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `siskadb`;
 
 -- Dumping structure for table siskadb.attmast
 CREATE TABLE IF NOT EXISTS `attmast` (
@@ -395,6 +400,51 @@ CREATE TABLE IF NOT EXISTS `labomast` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table siskadb.mst_lab_template
+CREATE TABLE IF NOT EXISTS `mst_lab_template` (
+  `TEMP_CODE` char(8) NOT NULL COMMENT 'PK template, ex: TPL-0001',
+  `TEMP_TIPE` varchar(50) DEFAULT NULL COMMENT 'Kategori, ex: HEMATOLOGI',
+  `TEMP_NAME` varchar(100) NOT NULL COMMENT 'Nama layanan, ex: DARAH RUTIN',
+  `TEMP_MEDI_CODE` char(8) DEFAULT NULL COMMENT 'FK soft ke tblfmedi.TBLF_MEDI_CODE',
+  `TEMP_NOTE` varchar(200) DEFAULT NULL,
+  `TEMP_VIEW_STAT` char(1) DEFAULT 'Y',
+  `TEMP_ENTR_DATE` date DEFAULT NULL,
+  `TEMP_ENTR_TIME` time DEFAULT NULL,
+  `TEMP_ENTR_USER` varchar(5) DEFAULT NULL,
+  `TEMP_UPDT_DATE` date DEFAULT NULL,
+  `TEMP_UPDT_TIME` time DEFAULT NULL,
+  `TEMP_UPDT_USER` varchar(5) DEFAULT NULL,
+  PRIMARY KEY (`TEMP_CODE`),
+  KEY `idx_temp_medi` (`TEMP_MEDI_CODE`),
+  KEY `idx_temp_name` (`TEMP_NAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
+-- Dumping structure for table siskadb.mst_lab_template_detail
+CREATE TABLE IF NOT EXISTS `mst_lab_template_detail` (
+  `DTL_ID` int unsigned NOT NULL AUTO_INCREMENT,
+  `TEMP_CODE` char(8) NOT NULL COMMENT 'FK ke mst_lab_template.TEMP_CODE',
+  `ITEM_NAME` varchar(100) NOT NULL COMMENT 'ex: HEMOGLOBIN, HEMATOKRIT',
+  `ITEM_SATUAN` varchar(30) DEFAULT NULL COMMENT 'ex: gr/dL, %, per uL',
+  `ITEM_RUJUKAN` text COMMENT 'Nilai normal full text (multi baris OK)',
+  `ITEM_USIA` varchar(50) DEFAULT NULL COMMENT 'Catatan usia default dari excel',
+  `ITEM_URUT` smallint DEFAULT '0' COMMENT 'Urutan tampil di form',
+  `ITEM_IS_HEADER` char(1) DEFAULT 'N' COMMENT 'Y=label group, bukan input hasil',
+  `ITEM_VIEW_STAT` char(1) DEFAULT 'Y',
+  `ITEM_ENTR_DATE` date DEFAULT NULL,
+  `ITEM_ENTR_TIME` time DEFAULT NULL,
+  `ITEM_ENTR_USER` varchar(5) DEFAULT NULL,
+  `ITEM_UPDT_DATE` date DEFAULT NULL,
+  `ITEM_UPDT_TIME` time DEFAULT NULL,
+  `ITEM_UPDT_USER` varchar(5) DEFAULT NULL,
+  PRIMARY KEY (`DTL_ID`),
+  KEY `idx_dtl_temp` (`TEMP_CODE`,`ITEM_URUT`),
+  CONSTRAINT `fk_dtl_temp` FOREIGN KEY (`TEMP_CODE`) REFERENCES `mst_lab_template` (`TEMP_CODE`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
 -- Dumping structure for table siskadb.passiden
 CREATE TABLE IF NOT EXISTS `passiden` (
   `PASS_USER_IDEN` char(5) NOT NULL,
@@ -501,7 +551,7 @@ CREATE TABLE IF NOT EXISTS `queue_calls` (
   `poli_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` datetime NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=17334 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19115 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Data exporting was unselected.
 
@@ -999,6 +1049,33 @@ CREATE TABLE IF NOT EXISTS `trxalabo` (
 
 -- Data exporting was unselected.
 
+-- Dumping structure for table siskadb.trxalabo_detail_hasil
+CREATE TABLE IF NOT EXISTS `trxalabo_detail_hasil` (
+  `HASIL_ID` int unsigned NOT NULL AUTO_INCREMENT,
+  `TRXA_LABO_REGI` char(14) NOT NULL COMMENT 'Nomor daftar / registrasi lab',
+  `TRXA_MEDI_CODE` char(8) DEFAULT NULL COMMENT 'Kode pemeriksaan (trxatret.TRXA_MEDI_CODE)',
+  `TEMP_CODE` char(8) DEFAULT NULL COMMENT 'Template sumber (jika dari master)',
+  `DTL_ID` int unsigned DEFAULT NULL COMMENT 'Sumber item template (null jika manual)',
+  `ITEM_NAME` varchar(100) NOT NULL,
+  `ITEM_HASIL` varchar(50) DEFAULT NULL COMMENT 'Nilai hasil input user',
+  `ITEM_RUJUKAN` text COMMENT 'Snapshot rujukan saat input',
+  `ITEM_SATUAN` varchar(30) DEFAULT NULL COMMENT 'Snapshot satuan saat input',
+  `ITEM_URUT` smallint DEFAULT '0',
+  `ITEM_NOTE` varchar(200) DEFAULT NULL,
+  `HASIL_VIEW_STAT` char(1) DEFAULT 'Y',
+  `HASIL_ENTR_DATE` date DEFAULT NULL,
+  `HASIL_ENTR_TIME` time DEFAULT NULL,
+  `HASIL_ENTR_USER` varchar(5) DEFAULT NULL,
+  `HASIL_UPDT_DATE` date DEFAULT NULL,
+  `HASIL_UPDT_TIME` time DEFAULT NULL,
+  `HASIL_UPDT_USER` varchar(5) DEFAULT NULL,
+  PRIMARY KEY (`HASIL_ID`),
+  KEY `idx_hasil_regi` (`TRXA_LABO_REGI`,`TRXA_MEDI_CODE`),
+  KEY `idx_hasil_temp` (`TEMP_CODE`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+
+-- Data exporting was unselected.
+
 -- Dumping structure for table siskadb.trxaopna
 CREATE TABLE IF NOT EXISTS `trxaopna` (
   `TRXA_OPNA_CODE` char(7) NOT NULL,
@@ -1109,7 +1186,7 @@ CREATE TABLE IF NOT EXISTS `trxaracik_head` (
   `TRXAR_ENTR_TIME` time DEFAULT NULL,
   `TRXAR_ENTR_USER` varchar(5) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`TRXAR_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -1135,8 +1212,7 @@ CREATE TABLE IF NOT EXISTS `trxaregi` (
   `TRXA_REGI_RUJUK_TYPE` varchar(20) DEFAULT NULL,
   `TRXA_REGI_RUJUK_NOTE` text,
   PRIMARY KEY (`TRXA_REGI_CODE`),
-  KEY `TRXA_ENTR_DATE_TRXA_ENTR_TIME` (`TRXA_ENTR_DATE`,`TRXA_ENTR_TIME`),
-  KEY `idx_rm05_patient_visit` (`TRXA_PATI_CODE`,`TRXA_VIEW_STAT`,`TRXA_REGI_DATE`)
+  KEY `TRXA_ENTR_DATE_TRXA_ENTR_TIME` (`TRXA_ENTR_DATE`,`TRXA_ENTR_TIME`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Data exporting was unselected.

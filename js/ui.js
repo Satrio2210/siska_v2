@@ -90,6 +90,7 @@ window.addEventListener('resize', () => {
 // Collapsible Nav Group Logic
 const navGroups = document.querySelectorAll('.nav-group');
 
+// 1. Handle Klik Header Utama (Level 1 - Farmasi, dll)
 navGroups.forEach(group => {
     const header = group.querySelector('.nav-group-header');
     if (!header) return;
@@ -97,7 +98,7 @@ navGroups.forEach(group => {
     header.addEventListener('click', (e) => {
         e.preventDefault();
 
-        // Close other groups (accordion behavior)
+        // Accordion behavior untuk level 1
         navGroups.forEach(other => {
             if (other !== group) {
                 other.classList.remove('open');
@@ -108,21 +109,45 @@ navGroups.forEach(group => {
     });
 });
 
-// Auto-open parent group based on current URL
+// 2. Handle Klik Submenu Bertingkat (Level 2 - Report)
+document.querySelectorAll('.has-child > a').forEach(toggleBtn => {
+    toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Mencegah event bubbling ke parent
+
+        const parentLi = toggleBtn.closest('.has-child');
+        if (parentLi) {
+            parentLi.classList.toggle('open');
+        }
+    });
+});
+
+// 3. Auto-open berdasarkan URL aktif (Support Multi-level)
 function autoOpenActiveGroup() {
     const currentPath = window.location.pathname;
     const fileName = currentPath.split('/').pop() || 'index.php';
 
-    document.querySelectorAll('.nav-submenu .submenu-link').forEach(link => {
+    // Cari semua link (termasuk yang ada di dalam sub-submenu)
+    document.querySelectorAll('.nav-submenu a, .nav-sub-submenu a').forEach(link => {
         const href = link.getAttribute('href');
-        if (href && fileName === href) {
+
+        if (href && href !== 'javascript:void(0)' && fileName === href) {
             link.classList.add('active');
+
+            // Buka parent level 2 jika ada (.has-child)
+            const parentChild = link.closest('.has-child');
+            if (parentChild) {
+                parentChild.classList.add('open');
+            }
+
+            // Buka parent level 1 (.nav-group)
             const parentGroup = link.closest('.nav-group');
             if (parentGroup) {
                 parentGroup.classList.add('open');
             }
         }
     });
+
 
     // Also check top-level dashboard link
     const dashboardLink = document.querySelector('.nav-link-custom[data-nav="dashboard"]');

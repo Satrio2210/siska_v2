@@ -13,8 +13,8 @@ include "inc/sanie.php";
   <th style="width: 200px">Kategori</th>
   <th style="width: 200px">Nama Obat</th>
   <th style="width: 100px">Batch Code</th>
-  <th style="width: 150px">Harga Jual</th>
-  <th style="width: 150px">Harga Jual</th>
+  <th style="width: 150px">Harga Pack</th>
+  <th style="width: 150px">Harga Ritel</th>
   <th style="width: 150px">Tanggal Input</th>
 
   </tr>
@@ -37,7 +37,8 @@ $xxxquery = "SELECT INVE_STOCK_CODE AS STOCK_CODE, INVE_PROC_CODE AS PROC_CODE,
                 INVE_STOCK_TYPE, (SELECT TBLI_TYPE_NAME FROM tblitype WHERE TBLI_TYPE_CODE = INVE_STOCK_TYPE) AS CATE_NAME, 
                 INVE_STOCK_BTCH, INVE_STOCK_NAME, INVE_ENTR_DATE,
                 ((SELECT ITEM_PART_PRIC FROM itemproc 
-                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE) * '$profit') AS  PRICE_PACK,   
+                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE
+                ORDER BY ITEM_ENTR_DATE DESC, ITEM_ENTR_TIME DESC LIMIT 1) * '$profit') AS  PRICE_PACK,   
                 INVE_STOCK_PRIC, ( INVE_STOCK_PRIC * '$profit' ) AS PRICE_RITEL
                 FROM investock WHERE INVE_VIEW_STAT IN ('R','Y')
 
@@ -54,7 +55,8 @@ $xquery = "SELECT INVE_STOCK_CODE AS STOCK_CODE, INVE_PROC_CODE AS PROC_CODE,
                 INVE_STOCK_TYPE, (SELECT TBLI_TYPE_NAME FROM tblitype WHERE TBLI_TYPE_CODE = INVE_STOCK_TYPE) AS CATE_NAME, 
                 INVE_STOCK_BTCH, INVE_STOCK_NAME, INVE_ENTR_DATE,
                 ((SELECT ITEM_PART_PRIC FROM itemproc 
-                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE) * '$profit') AS  PRICE_PACK,   
+                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE
+                ORDER BY ITEM_ENTR_DATE DESC, ITEM_ENTR_TIME DESC LIMIT 1) * '$profit') AS  PRICE_PACK,   
                 INVE_STOCK_PRIC, ( INVE_STOCK_PRIC * '$profit' ) AS PRICE_RITEL
                 FROM investock WHERE INVE_VIEW_STAT IN ('R','Y')
 
@@ -79,7 +81,8 @@ $xquery = "SELECT INVE_STOCK_CODE AS STOCK_CODE, INVE_PROC_CODE AS PROC_CODE,
                 INVE_STOCK_TYPE, (SELECT TBLI_TYPE_NAME FROM tblitype WHERE TBLI_TYPE_CODE = INVE_STOCK_TYPE) AS CATE_NAME, 
                 INVE_STOCK_BTCH, INVE_STOCK_NAME,
                 ((SELECT ITEM_PART_PRIC FROM itemproc 
-                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE) * '$profit') AS  PRICE_PACK,
+                WHERE ITEM_PROC_CODE = PROC_CODE AND ITEM_PART_CODE = STOCK_CODE
+                ORDER BY ITEM_ENTR_DATE DESC, ITEM_ENTR_TIME DESC LIMIT 1) * '$profit') AS  PRICE_PACK,
 
                 INVE_STOCK_PRIC, INVE_ENTR_DATE,
                 (INVE_STOCK_PRIC * '$profit') AS PRICE_RITEL
@@ -134,7 +137,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC))
     //$view_price_sale = number_format($price_sale,0,',','.');
     //echo '<td style="width: 100px">Rp. '.$view_price_sale.'</td>'; 
 
-    $xharga1 = round($row['PRICE_PACK']);
+    $xharga1 = round((float) $row['PRICE_PACK']);
     $int1 = (int)$xharga1;
 
     $price_pack = pembulatan($int1);
@@ -142,7 +145,7 @@ while ($row = $q->fetch(PDO::FETCH_ASSOC))
     //$view_price_pack = number_format($row['PRICE_PACK'],0,',','.');    
     echo '<td style="width: 150px">'.$view_price_pack.' per '.$packunit.'</td>';
 
-    $xharga2 = round($row['PRICE_RITEL']);
+    $xharga2 = round((float) $row['PRICE_RITEL']);
     $int2 = (int)$xharga2;
 
     $price_ritel = pembulatan($int2);
