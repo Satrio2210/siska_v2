@@ -68,24 +68,33 @@ try {
         $already = $chk->fetchColumn();
         
         if ($already > 0) {
-            // Pasien sudah terdaftar hari ini, cukup update flagging
-            $stmt = $db->prepare("UPDATE trxaregi SET 
-                TRXA_REGI_RUJUK_TYPE = 'LB', 
-                TRXA_REGI_RUJUK_NOTE = :note,
-                TRXA_UPDT_DATE = :date,
-                TRXA_UPDT_TIME = :time,
-                TRXA_UPDT_USER = :user
-                WHERE TRXA_REGI_CODE = :regicode");
-            $stmt->execute([
-                ':note' => $rujuk_note,
-                ':date' => $dateinput,
-                ':time' => $timeinput,
-                ':user' => $userid,
-                ':regicode' => $regicode
-            ]);
-            $db->commit();
-            echo "SUCCESS|Pasien sudah terdaftar di Laboratorium hari ini. Flagging diupdate.";
-            exit();
+            // Pasien sudah terdaftar di Lab hari ini.
+            // Ambil pendaftaran Lab terbaru pasien tersebut, lalu update flagging rujukan di sana
+            $lbStmt = $db->prepare("SELECT TRXA_REGI_CODE FROM trxaregi 
+                WHERE TRXA_PATI_CODE = :paticode AND TRXA_REGI_DATE = :date AND TRXA_REGI_POLI = 'LB' AND TRXA_VIEW_STAT = 'Y'
+                ORDER BY TRXA_ENTR_TIME DESC LIMIT 1");
+            $lbStmt->execute([':paticode' => $paticode, ':date' => $dateinput]);
+            $lbcode = $lbStmt->fetchColumn();
+
+            if (!empty($lbcode)) {
+                $stmt = $db->prepare("UPDATE trxaregi SET 
+                    TRXA_REGI_RUJUK_TYPE = 'LB', 
+                    TRXA_REGI_RUJUK_NOTE = :note,
+                    TRXA_UPDT_DATE = :date,
+                    TRXA_UPDT_TIME = :time,
+                    TRXA_UPDT_USER = :user
+                    WHERE TRXA_REGI_CODE = :regicode");
+                $stmt->execute([
+                    ':note' => $rujuk_note,
+                    ':date' => $dateinput,
+                    ':time' => $timeinput,
+                    ':user' => $userid,
+                    ':regicode' => $lbcode
+                ]);
+                $db->commit();
+                echo "SUCCESS|Pasien sudah terdaftar di Laboratorium hari ini. Flagging diupdate.";
+                exit();
+            }
         }
 
         // Generate nomor antrian baru untuk Laboratorium (room = LB)
@@ -109,11 +118,13 @@ try {
         $new_regicode = date("dmY") . "-" . sprintf("%05d", $int_val);
 
         // Insert pendaftaran baru ke Laboratorium (dokter = HERAW, room = LB, status = W)
+        // Flagging rujukan (TYPE + NOTE) diisi di pendaftaran Lab yang baru ini
         $input = "INSERT INTO trxaregi (
             TRXA_REGI_CODE, TRXA_PATI_CODE, TRXA_REGI_DATE,
             TRXA_REGI_LIST, TRXA_REGI_FROM, TRXA_REGI_PAYM,
             TRXA_REGI_DOCT, TRXA_REGI_POLI, TRXA_REGI_FEE,
             TRXA_REGI_STAT, TRXA_VIEW_STAT,
+            TRXA_REGI_RUJUK_TYPE, TRXA_REGI_RUJUK_NOTE,
             TRXA_ENTR_DATE, TRXA_ENTR_TIME, TRXA_ENTR_USER,  
             TRXA_UPDT_DATE, TRXA_UPDT_TIME, TRXA_UPDT_USER) 
             VALUES (
@@ -121,6 +132,7 @@ try {
             :regilist, :regifrom, :regipaym,
             'HERAW', 'LB', '0',
             'W', 'Y',
+            'LB', :rujuk_note,
             :entr_date, :entr_time, :entr_user,  
             :updt_date, :updt_time, :updt_user)";
             
@@ -132,6 +144,7 @@ try {
             ':regilist' => $regilist,
             ':regifrom' => $regifrom,
             ':regipaym' => $regipaym,
+            ':rujuk_note' => $rujuk_note,
             ':entr_date' => $dateinput,
             ':entr_time' => $timeinput,
             ':entr_user' => $userid,
@@ -140,22 +153,6 @@ try {
             ':updt_user' => $userid
         ]);
 
-        // Update flagging rujukan internal di pendaftaran asal
-        $stmt_upd = $db->prepare("UPDATE trxaregi SET 
-            TRXA_REGI_RUJUK_TYPE = 'LB', 
-            TRXA_REGI_RUJUK_NOTE = :note,
-            TRXA_UPDT_DATE = :date,
-            TRXA_UPDT_TIME = :time,
-            TRXA_UPDT_USER = :user
-            WHERE TRXA_REGI_CODE = :regicode");
-        $stmt_upd->execute([
-            ':note' => $rujuk_note,
-            ':date' => $dateinput,
-            ':time' => $timeinput,
-            ':user' => $userid,
-            ':regicode' => $regicode
-        ]);
-        
         $db->commit();
         echo "SUCCESS|Rujukan LB berhasil didaftarkan!";
         exit();
