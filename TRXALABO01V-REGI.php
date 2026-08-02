@@ -3,211 +3,6 @@ include "conf/config.php";
 include "inc/sanie.php";
 ?>
 
-<!-- <style>
-  #screen {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    background: #fff;
-  }
-
-  .table-wrapper {
-    width: 100%;
-    border-radius: 18px;
-    overflow: hidden;
-    border: 1px solid #e5e7eb;
-    background: white;
-  }
-
-  #screen thead {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-  }
-
-  #screen thead tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-  }
-
-  #screen th {
-    padding: 16px;
-    font-size: 14px;
-    font-weight: 700;
-    text-align: center;
-    border: none;
-    background: #10b981;
-    color: white;
-  }
-
-  #screen tbody {
-    display: block;
-    max-height: 520px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 100%;
-    scrollbar-gutter: stable;
-  }
-
-  #screen tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    transition: .2s ease;
-    background: white;
-  }
-
-  #screen tbody tr:nth-child(even) {
-    background: #f9fafb;
-  }
-
-  #screen tbody tr:hover {
-    background: #f3f4f6;
-  }
-
-  #screen td {
-    padding: 14px 12px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #000;
-    border-bottom: 1px solid #edf2f7;
-    text-align: center;
-    vertical-align: middle;
-    word-wrap: break-word;
-  }
-
-  #screen th:nth-child(1),
-  #screen td:nth-child(1) {
-    width: 150px;
-  }
-
-  #screen th:nth-child(2),
-  #screen td:nth-child(2) {
-    width: 90px;
-  }
-
-  #screen th:nth-child(3),
-  #screen td:nth-child(3) {
-    width: 200px;
-  }
-
-  #screen th:nth-child(4),
-  #screen td:nth-child(4) {
-    width: 150px;
-  }
-
-  #screen th:nth-child(5),
-  #screen td:nth-child(5) {
-    width: 180px;
-    text-align: left;
-  }
-
-  #screen th:nth-child(6),
-  #screen td:nth-child(6) {
-    width: 120px;
-  }
-
-  #screen th:nth-child(7),
-  #screen td:nth-child(7) {
-    width: 150px;
-  }
-
-  #screen th:nth-child(8),
-  #screen td:nth-child(8) {
-    width: 160px;
-  }
-
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  .status-sudah {
-    background: #dcfce7;
-    color: #15803d;
-  }
-
-  .status-belum {
-    background: #fef3c7;
-    color: #b45309;
-  }
-
-  .action-group {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .button-periksa {
-    border: none;
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s ease;
-    text-decoration: none;
-    background: #10b981;
-    color: white;
-  }
-
-  .button-periksa:hover {
-    background: #059669;
-  }
-
-  .button-hasil {
-    border: none;
-    border-radius: 10px;
-    padding: 8px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s ease;
-    text-decoration: none;
-    background: #3b82f6;
-    color: white;
-  }
-
-  .button-hasil:hover {
-    background: #2563eb;
-  }
-
-  #screen tbody::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  #screen tbody::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 999px;
-  }
-
-  .lab00-empty {
-    padding: 28px 12px;
-    text-align: center;
-    color: #64748b;
-    font-weight: 600;
-  }
-
-  @media(max-width:768px) {
-
-    .table-wrapper {
-      overflow-x: auto;
-    }
-
-    #screen {
-      min-width: 1020px;
-    }
-
-  }
-</style> -->
-
 <link rel="stylesheet" href="assets/css/modern-table.css">
 <div class="table-wrapper">
   <table class="modern-table">
@@ -262,6 +57,8 @@ include "inc/sanie.php";
                 r.TRXA_REGI_DOCT,
                 r.TRXA_ENTR_DATE,
                 r.TRXA_ENTR_TIME,
+                r.TRXA_REGI_RUJUK_TYPE,
+                r.TRXA_REGI_RUJUK_NOTE,
                 CONCAT(p.PATI_MAIN_TITL, ' ', p.PATI_MAIN_NAME) AS MAIN_NAME,
                 DATE_FORMAT(p.PATI_MAIN_BIRT, '%d/%m/%Y') AS BIRT_DATE,
                 p.PATI_MAIN_BIRT AS MAIN_BIRT_RAW,
@@ -323,19 +120,21 @@ include "inc/sanie.php";
         $prefix = isset($prefixMap[$kodePoli]) ? $prefixMap[$kodePoli] : '';
         $noantri_full = $prefix . $k['TRXA_REGI_LIST'];
 
+        $rujukType = $k['TRXA_REGI_RUJUK_TYPE'];
+        $rujukNote = $k['TRXA_REGI_RUJUK_NOTE'];
+
         echo '<tr>';
         echo '<td>' . htmlspecialchars($k['TRXA_ENTR_DATE'], ENT_QUOTES, 'UTF-8') . '<br>' . htmlspecialchars($k['TRXA_ENTR_TIME'], ENT_QUOTES, 'UTF-8') . '</td>';
         echo '<td>' . htmlspecialchars($noantri_full, ENT_QUOTES, 'UTF-8') . '</td>';
-        $rujukType = '';
-        $rujukNote = '';
+
         if ($rujukType === 'LB' && $rujukNote !== '') {
-          $keterangan = 'Rujuk Internal - ' . $rujukNote;
-        } elseif ($rujukType === 'LB') {
+          $keterangan = 'Rujuk Internal<br>' . htmlspecialchars($rujukNote, ENT_QUOTES, 'UTF-8');
+        } else if ($rujukType === 'LB') {
           $keterangan = 'Rujuk Internal';
         } else {
           $keterangan = 'Datang Sendiri';
         }
-        echo '<td>' . htmlspecialchars($keterangan, ENT_QUOTES, 'UTF-8') . '</td>';
+        echo '<td>' . $keterangan . '</td>';
         echo '<td>' . htmlspecialchars($outmainname, ENT_QUOTES, 'UTF-8') . '</td>';
         // echo '<td>' . htmlspecialchars($regipoli, ENT_QUOTES, 'UTF-8') . '</td>';
         if ($outregipaym === 'BPJS') {
