@@ -81,38 +81,57 @@ if (isset($_SESSION['username'])) {
                   </div>
                   <div class="form-group full">
                     <label class="form-label">Nama Pasien</label>
-                    <div class="checkbox-group">
-                      <input type="checkbox" name="opttn" id="opttn" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optny').checked = false; document.getElementById('optnn').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Tn.'; document.getElementById('txtmainname').focus(); }">
-                      <label for="opttn">Tn.</label>
-                      <input type="checkbox" name="optny" id="optny" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optnn').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Ny.'; document.getElementById('txtmainname').focus(); }">
-                      <label for="optny">Ny.</label>
-                      <input type="checkbox" name="optnn" id="optnn" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optny').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Nn.'; document.getElementById('txtmainname').focus(); }">
-                      <label for="optnn">Nn.</label>
-                      <input type="checkbox" name="optan" id="optan" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optny').checked = false; document.getElementById('optnn').checked = false; document.getElementById('hidmaintitl').value = 'An.'; document.getElementById('txtmainname').focus(); }">
-                      <label for="optan">An.</label>
+                    <div class="checkbox-row">
+                      <label class="checkbox-modern" for="opttn">
+                        <input type="radio" name="opttn" id="opttn" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optny').checked = false; document.getElementById('optnn').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Tn.'; document.getElementById('txtmainname').focus(); }">
+                        Tn.
+                      </label>
+
+                      <label class="checkbox-modern" for="optny">
+                        <input type="radio" name="optny" id="optny" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optnn').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Ny.'; document.getElementById('txtmainname').focus(); }">
+                        Ny.
+                      </label>
+
+                      <label class="checkbox-modern" for="optnn">
+                        <input type="radio" name="optnn" id="optnn" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optny').checked = false; document.getElementById('optan').checked = false; document.getElementById('hidmaintitl').value = 'Nn.'; document.getElementById('txtmainname').focus(); }">
+                        Nn.
+                      </label>
+
+                      <label class="checkbox-modern" for="optan">
+                        <input type="radio" name="optan" id="optan" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('opttn').checked = false; document.getElementById('optny').checked = false; document.getElementById('optnn').checked = false; document.getElementById('hidmaintitl').value = 'An.'; document.getElementById('txtmainname').focus(); }">
+                        An.
+                      </label>
+
                       <input name="hidmaintitl" id="hidmaintitl" type="hidden">
                     </div>
+
                     <input type="text" name="txtmainname" id="txtmainname" class="form-control" maxlength="50"
                       style="margin-top:6px;" disabled oninput="this.value = this.value.toUpperCase()" autocomplete="off"
                       onkeyup="if (event.keyCode == 222) { alert('Single Quote Error'); this.value = ''; this.focus(); }"
                       onkeydown="if (event.keyCode == 13 && value.length > 0) document.getElementById('optmale').focus()">
                   </div>
+
                   <div class="form-group">
                     <label class="form-label">Jenis Kelamin</label>
-                    <div class="checkbox-group">
-                      <input type="checkbox" name="optmale" id="optmale" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optfemale').checked = false; document.getElementById('hidmaingend').value = 'M'; }">
-                      <label for="optmale">Laki-Laki</label>
-                      <input type="checkbox" name="optfemale" id="optfemale" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optmale').checked = false; document.getElementById('hidmaingend').value = 'F'; }">
-                      <label for="optfemale">Perempuan</label>
+                    <div class="checkbox-row">
+                      <label class="checkbox-modern" for="optmale">
+                        <input type="radio" name="optmale" id="optmale" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optfemale').checked = false; document.getElementById('hidmaingend').value = 'M'; }">
+                        Laki-Laki
+                      </label>
+                      <label class="checkbox-modern" for="optfemale">
+                        <input type="radio" name="optfemale" id="optfemale" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optmale').checked = false; document.getElementById('hidmaingend').value = 'F'; }">
+                        Perempuan
+                      </label>
                       <input name="hidmaingend" id="hidmaingend" type="hidden">
                     </div>
                   </div>
+
                   <div class="form-group">
                     <label class="form-label">Tanggal Lahir <span
                         style="font-size:11px;color:#94a3b8;font-weight:normal;">(Bulan/Tanggal/Tahun)</span></label>
@@ -121,26 +140,42 @@ if (isset($_SESSION['username'])) {
                   <div class="form-group">
                     <label class="form-label">Golongan Darah</label>
                     <div class="checkbox-group">
-                      <input type="checkbox" name="optblooda" id="optblooda" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'A'; }">
-                      <label for="optblooda">[A]</label>
-                      <input type="checkbox" name="optbloodb" id="optbloodb" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'B'; }">
-                      <label for="optbloodb">[B]</label>
-                      <input type="checkbox" name="optbloodab" id="optbloodab" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'AB'; }">
-                      <label for="optbloodab">[AB]</label>
-                      <input type="checkbox" name="optbloodo" id="optbloodo" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'O'; }">
-                      <label for="optbloodo">[O]</label>
-                      <input type="checkbox" name="optbloodx" id="optbloodx" value="true" disabled
-                        onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('hidmainblod').value = 'X'; }">
-                      <label for="optbloodx">[Tidak Tahu]</label>
+
+                      <label class="checkbox-modern" for="optblooda">
+                        <input type="radio" name="optblooda" id="optblooda" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'A'; }">
+                        [A]
+                      </label>
+
+                      <label class="checkbox-modern" for="optbloodb">
+                        <input type="radio" name="optbloodb" id="optbloodb" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'B'; }">
+                        [B]
+                      </label>
+
+                      <label class="checkbox-modern" for="optbloodab">
+                        <input type="radio" name="optbloodab" id="optbloodab" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'AB'; }">
+                        [AB]
+                      </label>
+
+                      <label class="checkbox-modern" for="optbloodo">
+                        <input type="radio" name="optbloodo" id="optbloodo" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodx').checked = false; document.getElementById('hidmainblod').value = 'O'; }">
+                        [O]
+                      </label>
+
+                      <label class="checkbox-modern" for="optbloodx">
+                        <input type="radio" name="optbloodx" id="optbloodx" value="true" disabled
+                          onclick="if (checked == true) { document.getElementById('optblooda').checked = false; document.getElementById('optbloodb').checked = false; document.getElementById('optbloodab').checked = false; document.getElementById('optbloodo').checked = false; document.getElementById('hidmainblod').value = 'X'; }">
+                        [Tidak Tahu]
+                      </label>
                       <input name="hidmainblod" id="hidmainblod" type="hidden">
                     </div>
                   </div>
                 </div>
               </div>
+
               <div class="card-modern">
                 <div class="card-title">&#x1F4CD; Alamat &amp; Data Diri</div>
                 <div class="form-grid">

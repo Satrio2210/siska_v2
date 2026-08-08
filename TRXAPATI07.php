@@ -72,103 +72,105 @@ if (isset($_SESSION['username'])) {
                 <div id="tblscreen" style="margin-top: 10px; "></div>
               </div>
 
-              <div class="card-modern" id="dataKunjungan">
-                <div class="card-title" id="dataKunjunganTitle" tabindex="-1">&#x1F3E5; Data Kunjungan & Pasien</div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label" for="hidexamcode">Kode Pendaftaran</label>
-                    <input type="hidden" name="hidexamcode" id="hidexamcode">
-                    <input type="text" name="tglregidate" id="tglregidate" class="form-control" readonly
-                      placeholder="Tanggal Berobat">
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtmainname">Nama Pasien</label>
-                    <input type="text" name="txtmainname" id="txtmainname" class="form-control" maxlength="50" readonly>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtmastcode">Rekam Medis</label>
-                    <input type="text" name="txtmastcode" id="txtmastcode" class="form-control" maxlength="10" readonly>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtmainbirt">Tanggal Lahir</label>
-                    <input type="text" name="txtmainbirt" id="txtmainbirt" class="form-control" maxlength="50" readonly>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtmaingend">L/P</label>
-                    <input type="text" name="txtmaingend" id="txtmaingend" class="form-control" maxlength="50" readonly>
+              <div class="form-grid-2">
+                <div class="card-modern" id="dataKunjungan">
+                  <div class="card-title" id="dataKunjunganTitle" tabindex="-1">&#x1F3E5; Data Kunjungan & Pasien</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label" for="hidexamcode">Tanggal Mendaftar</label>
+                      <input type="text" name="tglregidate" id="tglregidate" class="form-control" readonly>
+                      <input type="hidden" name="hidexamcode" id="hidexamcode">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="txtmainname">Nama Pasien</label>
+                      <input type="text" name="txtmainname" id="txtmainname" class="form-control" maxlength="50" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="txtmastcode">Rekam Medis</label>
+                      <input type="text" name="txtmastcode" id="txtmastcode" class="form-control" maxlength="10" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="txtmainbirt">Tanggal Lahir</label>
+                      <input type="text" name="txtmainbirt" id="txtmainbirt" class="form-control" maxlength="50" readonly>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="txtmaingend">L/P</label>
+                      <input type="text" name="txtmaingend" id="txtmaingend" class="form-control" maxlength="50" readonly>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="card-modern">
-                <div class="card-title">&#x1F4C8; Pengukuran Antropometri &amp; TTV</div>
-                <div class="form-grid">
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamhght">Tinggi Badan</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamhght" id="txtexamhght" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamwght').focus(); }">
-                      <span class="input-group-text">cm</span>
+
+                <div class="card-modern">
+                  <div class="card-title">&#x1F4C8; Pengukuran Antropometri &amp; TTV</div>
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamhght">Tinggi Badan</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamhght" id="txtexamhght" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamwght').focus(); }">
+                        <span class="input-group-text">cm</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamwght">Berat Badan</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamwght" id="txtexamwght" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamwaist').focus(); }">
-                      <span class="input-group-text">kg</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamwght">Berat Badan</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamwght" id="txtexamwght" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamwaist').focus(); }">
+                        <span class="input-group-text">kg</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamwaist">Lingkar Perut</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamwaist" id="txtexamwaist" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamblod').focus(); }">
-                      <span class="input-group-text">cm</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamwaist">Lingkar Perut</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamwaist" id="txtexamwaist" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamblod').focus(); }">
+                        <span class="input-group-text">cm</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexambmi">IMT (Indeks Massa Tubuh)</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexambmi" id="txtexambmi" class="form-control" maxlength="10" readonly>
-                      <span class="input-group-text">kg/m2</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexambmi">IMT (Indeks Massa Tubuh)</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexambmi" id="txtexambmi" class="form-control" maxlength="10" readonly>
+                        <span class="input-group-text">kg/m2</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamblod">Tekanan Darah</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamblod" id="txtexamblod" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamtemp').focus(); }">
-                      <span class="input-group-text">mmHg</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamblod">Tekanan Darah</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamblod" id="txtexamblod" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamtemp').focus(); }">
+                        <span class="input-group-text">mmHg</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamtemp">Suhu Tubuh</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamtemp" id="txtexamtemp" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamrr').focus(); }">
-                      <span class="input-group-text">C</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamtemp">Suhu Tubuh</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamtemp" id="txtexamtemp" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamrr').focus(); }">
+                        <span class="input-group-text">C</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamrr">Respiratory Rate</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamrr" id="txtexamrr" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamhr').focus(); }">
-                      <span class="input-group-text">/ min</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamrr">Respiratory Rate</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamrr" id="txtexamrr" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamhr').focus(); }">
+                        <span class="input-group-text">/ min</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label" for="txtexamhr">Heart Rate</label>
-                    <div class="input-group">
-                      <input type="text" name="txtexamhr" id="txtexamhr" class="form-control" maxlength="10"
-                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamcomp').focus(); }">
-                      <span class="input-group-text">bpm</span>
+                    <div class="form-group">
+                      <label class="form-label" for="txtexamhr">Heart Rate</label>
+                      <div class="input-group">
+                        <input type="text" name="txtexamhr" id="txtexamhr" class="form-control" maxlength="10"
+                          onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('txtexamcomp').focus(); }">
+                        <span class="input-group-text">bpm</span>
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group full">
-                    <label class="form-label" for="txtexamcomp">Keluhan / Riwayat Penyakit</label>
-                    <input type="text" name="txtexamcomp" id="txtexamcomp" class="form-control" maxlength="50"
-                      onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('btnSubmit').focus(); }">
+                    <div class="form-group full">
+                      <label class="form-label" for="txtexamcomp">Keluhan / Riwayat Penyakit</label>
+                      <input type="text" name="txtexamcomp" id="txtexamcomp" class="form-control" maxlength="50"
+                        onkeydown="if (event.keyCode == 13 && value.length > 0) { document.getElementById('btnSubmit').focus(); }">
+                    </div>
                   </div>
                 </div>
               </div>
